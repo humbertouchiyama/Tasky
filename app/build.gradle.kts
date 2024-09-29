@@ -1,8 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -22,13 +25,21 @@ android {
         }
     }
 
+    android.buildFeatures.buildConfig = true
+
     buildTypes {
+        debug {
+            buildConfigField("String", "API_KEY", "\"${getApiKey()}\"")
+            buildConfigField("String", "BASE_URL", "\"https://tasky.pl-coding.com/\"")
+        }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "API_KEY", "\"${getApiKey()}\"")
+            buildConfigField("String", "BASE_URL", "\"https://tasky.pl-coding.com/\"")
         }
     }
     compileOptions {
@@ -42,13 +53,22 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+fun getApiKey(): String {
+    val properties = Properties()
+    val localPropertiesFile = project.rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { properties.load(it) }
+    }
+    return properties.getProperty("API_KEY") ?: ""
 }
 
 dependencies {
@@ -65,6 +85,20 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.serialization)
+
+    // okhttp
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // serialization
+    implementation(libs.kotlinx.serialization.json)
+
+    // timber logging
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
