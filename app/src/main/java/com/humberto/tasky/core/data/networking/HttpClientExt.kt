@@ -7,7 +7,7 @@ import retrofit2.Response
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 
-inline fun <reified T> safeCall(execute: () -> Response<T>): Result<T, DataError.Network> {
+suspend inline fun <reified T> safeCall(execute: () -> Response<T>): Result<T, DataError.Network> {
     val response = try {
         execute()
     } catch (e: IOException) {
