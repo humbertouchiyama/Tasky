@@ -72,7 +72,7 @@ class CoreDataModule {
             authInfo?.let {
                 request.addHeader("Authorization", "Bearer ${authInfo.accessToken}")
             }
-            request.addHeader("api_key", BuildConfig.API_KEY)
+            request.addHeader("x-api-key", BuildConfig.API_KEY)
             request.addHeader("Content-Type", "application/json")
             chain.proceed(request.build())
         }
