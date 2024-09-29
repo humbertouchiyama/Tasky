@@ -6,6 +6,8 @@ import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.domain.model.AuthInfo
 import com.humberto.tasky.core.domain.repository.AccessTokenManager
 import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.util.onError
+import com.humberto.tasky.core.domain.util.onSuccess
 import dagger.Lazy
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -37,26 +39,22 @@ class AccessTokenAuthenticator @Inject constructor(
     private suspend fun refreshAccessToken(
         authInfo: AuthInfo?
     ): AuthInfo? {
-        return try {
-            val response = safeCall {
-                accessTokenService.get().refreshAccessToken(
-                    AccessTokenRequest(
-                        refreshToken = authInfo?.refreshToken ?: "",
-                        userId = authInfo?.userId ?: ""
-                ))
-            }
-            if (response is Result.Success) {
-                AuthInfo(
-                    accessToken = response.data.accessToken,
+        var result: AuthInfo? = null
+        safeCall {
+            accessTokenService.get().refreshAccessToken(
+                AccessTokenRequest(
                     refreshToken = authInfo?.refreshToken ?: "",
                     userId = authInfo?.userId ?: ""
-                )
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+            ))
+        }.onSuccess { accessTokenResponse ->
+            result = AuthInfo(
+                accessToken = accessTokenResponse.accessToken,
+                refreshToken = authInfo?.refreshToken ?: "",
+                userId = authInfo?.userId ?: ""
+            )
+        }.onError {
+            result = null
         }
+        return result
     }
 }
