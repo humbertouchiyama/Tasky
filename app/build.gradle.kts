@@ -80,10 +80,13 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.core.splashscreen)
 
     // hilt
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
     // retrofit
@@ -99,6 +102,10 @@ dependencies {
 
     // timber logging
     implementation(libs.timber)
+
+    // accompanist
+    implementation(libs.accompanist.systemuicontroller)
+    implementation(libs.accompanist.insets)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
