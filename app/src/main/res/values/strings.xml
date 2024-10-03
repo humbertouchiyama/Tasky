@@ -5,4 +5,15 @@
     <string name="error_payload_too_large">The file is too large!</string>
     <string name="error_server_error">Oops, something went wrong, please try again!</string>
     <string name="error_unknown">An unknown error occured.</string>
+    <string name="error_email_password_incorrect">The email or password is incorrect!</string>
+    <string name="login_successful">You logged in!</string>
+    <string name="create_your_account">Create your account</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="show_password">Show password.</string>
+    <string name="hide_password">Hide password.</string>
+    <string name="email_address">Email address</string>
+    <string name="password">Password</string>
+    <string name="get_started">GET STARTED</string>
+    <string name="dont_have_account">DON\'T HAVE AN ACCOUNT?</string>
+    <string name="sign_up">SIGN UP</string>
 </resources>
