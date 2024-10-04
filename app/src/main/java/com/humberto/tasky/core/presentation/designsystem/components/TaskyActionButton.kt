@@ -26,8 +26,8 @@ fun TaskyActionButton(
     text: String,
     isLoading: Boolean,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,

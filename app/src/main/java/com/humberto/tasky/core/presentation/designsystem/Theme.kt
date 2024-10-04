@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorScheme = lightColorScheme(
     primary = TaskyBlack,
@@ -37,7 +36,6 @@ private val LightColorScheme = lightColorScheme(
 fun TaskyTheme(
     content: @Composable () -> Unit
 ) {
-    val systemUiController = rememberSystemUiController()
     val colorScheme = LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -46,10 +44,6 @@ fun TaskyTheme(
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
-    systemUiController.setStatusBarColor(
-        color = TaskyBlack,
-    )
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
