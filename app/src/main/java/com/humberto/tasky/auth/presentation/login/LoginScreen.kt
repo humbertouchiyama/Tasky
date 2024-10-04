@@ -15,8 +15,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -35,9 +38,9 @@ import com.humberto.tasky.R
 import com.humberto.tasky.core.presentation.designsystem.Inter
 import com.humberto.tasky.core.presentation.designsystem.TaskyLinkBlue
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
-import com.humberto.tasky.core.presentation.designsystem.components.RoundedBordersBackground
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyActionButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyPasswordTextField
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyTextField
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import timber.log.Timber
@@ -89,17 +92,23 @@ private fun LoginScreen(
     state: LoginState,
     onAction: (LoginAction) -> Unit
 ) {
-    RoundedBordersBackground(
+    val (
+        emailFocusRequester,
+        passwordFocusRequester,
+    ) = FocusRequester.createRefs()
+
+    val isEmailFocused = remember { mutableStateOf(false) }
+    val isPasswordFocused = remember { mutableStateOf(false) }
+
+    TaskyScaffold(
         title = stringResource(id = R.string.welcome_back),
-        modifier = Modifier.fillMaxSize()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(vertical = 32.dp)
-                .padding(top = 16.dp)
+                .padding(vertical = 40.dp)
         ) {
             TaskyTextField(
                 state = state.email,
@@ -108,7 +117,9 @@ private fun LoginScreen(
                 } else null,
                 keyboardType = KeyboardType.Email,
                 hint = stringResource(id = R.string.email_address),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isFocused = isEmailFocused,
+                focusRequester = emailFocusRequester
             )
             Spacer(modifier = Modifier.height(16.dp))
             TaskyPasswordTextField(
@@ -118,16 +129,18 @@ private fun LoginScreen(
                     onAction(LoginAction.OnTogglePasswordVisibilityClick)
                 },
                 hint = stringResource(id = R.string.password),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isFocused = isPasswordFocused,
+                focusRequester = passwordFocusRequester
             )
             Spacer(modifier = Modifier.height(32.dp))
             TaskyActionButton(
                 text = stringResource(id = R.string.get_started),
                 isLoading = state.isLoggingIn,
-                enabled = state.canLogin && !state.isLoggingIn,
                 onClick = {
                     onAction(LoginAction.OnLoginClick)
                 },
+                enabled = state.canLogin && !state.isLoggingIn
             )
             Box(modifier = Modifier
                 .fillMaxWidth()
