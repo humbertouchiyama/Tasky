@@ -10,8 +10,8 @@ import com.humberto.tasky.auth.domain.AuthRepository
 import com.humberto.tasky.auth.domain.UserDataValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,7 +46,7 @@ class LoginViewModel @Inject constructor(
                         !state.isLoggingIn &&
                         password.isNotEmpty()
             )
-        }.collectLatest { }
+        }.launchIn(viewModelScope)
     }
 
     fun onAction(action: LoginAction) {
