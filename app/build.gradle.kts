@@ -103,10 +103,6 @@ dependencies {
     // timber logging
     implementation(libs.timber)
 
-    // accompanist
-    implementation(libs.accompanist.systemuicontroller)
-    implementation(libs.accompanist.insets)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
