@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
+import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 
 @Composable
 fun NavigationRoot(
@@ -52,6 +53,26 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 }
             )
         }
+        composable("register") {
+            RegisterScreenRoot(
+                onRegisterSuccess = {
+                    fromRegisterToLogin(navController)
+                },
+                onBackClick = {
+                    fromRegisterToLogin(navController)
+                }
+            )
+        }
+    }
+}
+
+fun fromRegisterToLogin(navController: NavHostController) {
+    navController.navigate("login") {
+        popUpTo("register") {
+            inclusive = true
+            saveState = true
+        }
+        restoreState = true
     }
 }
 
