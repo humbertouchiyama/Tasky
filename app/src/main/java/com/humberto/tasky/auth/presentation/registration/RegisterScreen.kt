@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,7 +73,7 @@ fun RegisterScreenRoot(
                 keyboardController?.hide()
                 Toast.makeText(
                     context,
-                    R.string.login_successful,
+                    R.string.register_success,
                     Toast.LENGTH_LONG
                 ).show()
 
@@ -105,6 +107,14 @@ private fun RegisterScreen(
     var isNameFocused by remember { mutableStateOf(false) }
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val keyboardActionHandler = KeyboardActionHandler {
+        if (state.canRegister) {
+            keyboardController?.hide()
+            onAction(RegisterAction.OnRegisterClick)
+        }
+    }
 
     TaskyScaffold(
         title = stringResource(id = R.string.create_your_account),
@@ -142,7 +152,8 @@ private fun RegisterScreen(
                 onFocusChange = {
                     isNameFocused = it.isFocused
                 },
-                focusRequester = nameFocusRequester
+                focusRequester = nameFocusRequester,
+                imeAction = ImeAction.Next
             )
             Spacer(modifier = Modifier.height(16.dp))
             TaskyTextField(
@@ -160,7 +171,8 @@ private fun RegisterScreen(
                 onFocusChange = {
                     isEmailFocused = it.isFocused
                 },
-                focusRequester = emailFocusRequester
+                focusRequester = emailFocusRequester,
+                imeAction = ImeAction.Next
             )
             Spacer(modifier = Modifier.height(16.dp))
             TaskyPasswordTextField(
@@ -175,7 +187,9 @@ private fun RegisterScreen(
                 onFocusChange = {
                     isPasswordFocused = it.isFocused
                 },
-                focusRequester = passwordFocusRequester
+                focusRequester = passwordFocusRequester,
+                imeAction = ImeAction.Go,
+                keyboardActionHandler = keyboardActionHandler
             )
             Spacer(modifier = Modifier.height(16.dp))
             PasswordRequirement(
