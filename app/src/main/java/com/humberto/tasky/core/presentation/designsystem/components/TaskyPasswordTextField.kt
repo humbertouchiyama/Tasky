@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.TextObfuscationMode
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -24,8 +26,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +37,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
@@ -54,7 +55,9 @@ fun TaskyPasswordTextField(
     modifier: Modifier = Modifier,
     isFocused: Boolean,
     onFocusChange: (FocusState) -> Unit,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    imeAction: ImeAction = ImeAction.Done,
+    keyboardActionHandler: KeyboardActionHandler = KeyboardActionHandler {}
 ) {
     Column(
         modifier = modifier
@@ -68,6 +71,10 @@ fun TaskyPasswordTextField(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.onTertiary),
+            keyboardOptions = KeyboardOptions(
+                imeAction = imeAction
+            ),
+            onKeyboardAction = keyboardActionHandler,
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.tertiary)

@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.input.KeyboardActionHandler
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +30,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
@@ -103,6 +104,14 @@ private fun LoginScreen(
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
 
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val keyboardActionHandler = KeyboardActionHandler {
+        if (state.canLogin) {
+            keyboardController?.hide()
+            onAction(LoginAction.OnLoginClick)
+        }
+    }
+
     TaskyScaffold(
         title = stringResource(id = R.string.welcome_back),
     ) {
@@ -112,6 +121,7 @@ private fun LoginScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 40.dp)
+                .imePadding()
         ) {
             TaskyTextField(
                 state = state.email,
@@ -125,7 +135,8 @@ private fun LoginScreen(
                 onFocusChange = {
                     isEmailFocused = it.isFocused
                 },
-                focusRequester = emailFocusRequester
+                focusRequester = emailFocusRequester,
+                imeAction = ImeAction.Next
             )
             Spacer(modifier = Modifier.height(16.dp))
             TaskyPasswordTextField(
@@ -140,7 +151,9 @@ private fun LoginScreen(
                 onFocusChange = {
                     isPasswordFocused = it.isFocused
                 },
-                focusRequester = passwordFocusRequester
+                focusRequester = passwordFocusRequester,
+                imeAction = ImeAction.Go,
+                keyboardActionHandler = keyboardActionHandler
             )
             Spacer(modifier = Modifier.height(32.dp))
             TaskyActionButton(

@@ -32,6 +32,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,8 @@ fun TaskyTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     isFocused: Boolean,
     onFocusChange: (FocusState) -> Unit,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    imeAction: ImeAction = ImeAction.Done
 ) {
     Column(
         modifier = modifier
@@ -62,7 +64,9 @@ fun TaskyTextField(
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
+                imeAction = imeAction
             ),
+//            onKeyboardAction = ,
             lineLimits = TextFieldLineLimits.SingleLine,
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
