@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -50,7 +51,8 @@ fun TaskyTextField(
     modifier: Modifier = Modifier,
     hasError: Boolean? = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    isFocused: MutableState<Boolean>,
+    isFocused: Boolean,
+    onFocusChange: (FocusState) -> Unit,
     focusRequester: FocusRequester
 ) {
     Column(
@@ -69,8 +71,8 @@ fun TaskyTextField(
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.tertiary)
                 .border(
-                    width = if(isFocused.value || hasError == true) 1.dp else 0.dp,
-                    color = if(isFocused.value) {
+                    width = if(isFocused || hasError == true) 1.dp else 0.dp,
+                    color = if(isFocused) {
                         TaskyLightBlue
                     } else if (hasError == true) {
                         MaterialTheme.colorScheme.error
@@ -81,9 +83,7 @@ fun TaskyTextField(
                 )
                 .padding(horizontal = 20.dp)
                 .focusRequester(focusRequester)
-                .onFocusChanged {
-                    isFocused.value = it.isFocused
-                }
+                .onFocusChanged(onFocusChanged = onFocusChange)
                 .defaultMinSize(minHeight = 64.dp),
             decorator = { innerBox ->
                 Row(
@@ -94,7 +94,7 @@ fun TaskyTextField(
                         modifier = Modifier
                             .weight(1f)
                     ) {
-                        if (state.text.isEmpty() && !isFocused.value) {
+                        if (state.text.isEmpty() && !isFocused) {
                             Text(
                                 text = hint,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
@@ -127,9 +127,7 @@ fun TaskyTextField(
 @Preview
 @Composable
 private fun TaskyTextFieldPreview() {
-    val isFocusedState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-
     TaskyTheme {
         TaskyTextField(
             state = rememberTextFieldState(),
@@ -137,7 +135,8 @@ private fun TaskyTextFieldPreview() {
             hint = "Email address",
             modifier = Modifier
                 .fillMaxWidth(),
-            isFocused = isFocusedState,
+            isFocused = true,
+            onFocusChange = { },
             focusRequester = focusRequester
         )
     }

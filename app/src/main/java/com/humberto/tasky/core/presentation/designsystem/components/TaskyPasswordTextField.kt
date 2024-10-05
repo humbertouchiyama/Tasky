@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -51,7 +52,8 @@ fun TaskyPasswordTextField(
     onTogglePasswordVisibility: () -> Unit,
     hint: String,
     modifier: Modifier = Modifier,
-    isFocused: MutableState<Boolean>,
+    isFocused: Boolean,
+    onFocusChange: (FocusState) -> Unit,
     focusRequester: FocusRequester
 ) {
     Column(
@@ -71,7 +73,7 @@ fun TaskyPasswordTextField(
                 .background(MaterialTheme.colorScheme.tertiary)
                 .border(
                     width = 1.dp,
-                    color = if (isFocused.value) {
+                    color = if (isFocused) {
                         TaskyLightBlue
                     } else {
                         Color.Transparent
@@ -80,9 +82,7 @@ fun TaskyPasswordTextField(
                 )
                 .padding(horizontal = 20.dp)
                 .focusRequester(focusRequester)
-                .onFocusChanged {
-                    isFocused.value = it.isFocused
-                }
+                .onFocusChanged(onFocusChanged = onFocusChange)
                 .defaultMinSize(minHeight = 64.dp),
             decorator = { innerBox ->
                 Row(
@@ -93,7 +93,7 @@ fun TaskyPasswordTextField(
                         modifier = Modifier
                             .weight(1f)
                     ) {
-                        if (state.text.isEmpty() && !isFocused.value) {
+                        if (state.text.isEmpty() && !isFocused) {
                             Text(
                                 text = hint,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
@@ -128,9 +128,7 @@ fun TaskyPasswordTextField(
 @Preview
 @Composable
 private fun TaskyPasswordTextFieldPreview() {
-    val isFocusedState = remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
-
     TaskyTheme {
         TaskyPasswordTextField(
             state = rememberTextFieldState(),
@@ -139,7 +137,8 @@ private fun TaskyPasswordTextFieldPreview() {
                 .fillMaxWidth(),
             isPasswordVisible = false,
             onTogglePasswordVisibility = {},
-            isFocused = isFocusedState,
+            isFocused = true,
+            onFocusChange = {},
             focusRequester = focusRequester
         )
     }
