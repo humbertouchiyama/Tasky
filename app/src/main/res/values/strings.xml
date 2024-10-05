@@ -16,4 +16,10 @@
     <string name="get_started">GET STARTED</string>
     <string name="dont_have_account">DON\'T HAVE AN ACCOUNT?</string>
     <string name="sign_up">SIGN UP</string>
+    <string name="name">Name</string>
+    <string name="back_to_login">Go back to login screen.</string>
+    <string name="at_least_x_characters">At least %d characters</string>
+    <string name="at_least_one_number">At least one number</string>
+    <string name="contains_lowercase_char">Contains lowercase character</string>
+    <string name="contains_uppercase_char">Contains uppercase character</string>
 </resources>
