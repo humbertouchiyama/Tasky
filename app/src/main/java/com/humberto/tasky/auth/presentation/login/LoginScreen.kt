@@ -15,8 +15,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -97,8 +99,8 @@ private fun LoginScreen(
         passwordFocusRequester,
     ) = FocusRequester.createRefs()
 
-    val isEmailFocused = remember { mutableStateOf(false) }
-    val isPasswordFocused = remember { mutableStateOf(false) }
+    var isEmailFocused by remember { mutableStateOf(false) }
+    var isPasswordFocused by remember { mutableStateOf(false) }
 
     TaskyScaffold(
         title = stringResource(id = R.string.welcome_back),
@@ -119,6 +121,9 @@ private fun LoginScreen(
                 hint = stringResource(id = R.string.email_address),
                 modifier = Modifier.fillMaxWidth(),
                 isFocused = isEmailFocused,
+                onFocusChange = {
+                    isEmailFocused = it.isFocused
+                },
                 focusRequester = emailFocusRequester
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -131,6 +136,9 @@ private fun LoginScreen(
                 hint = stringResource(id = R.string.password),
                 modifier = Modifier.fillMaxWidth(),
                 isFocused = isPasswordFocused,
+                onFocusChange = {
+                    isPasswordFocused = it.isFocused
+                },
                 focusRequester = passwordFocusRequester
             )
             Spacer(modifier = Modifier.height(32.dp))
