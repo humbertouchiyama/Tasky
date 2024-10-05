@@ -39,4 +39,20 @@ class AuthRepositoryImpl @Inject constructor(
 
         return result.asEmptyDataResult()
     }
+
+    override suspend fun register(
+        fullName: String,
+        email: String,
+        password: String
+    ): EmptyResult<DataError.Network> {
+        return safeCall {
+            authApiService.register(
+                RegisterRequest(
+                    fullName = fullName,
+                    email = email,
+                    password = password
+                )
+            )
+        }
+    }
 }
