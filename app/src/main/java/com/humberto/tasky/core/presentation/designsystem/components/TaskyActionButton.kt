@@ -17,9 +17,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
+import com.humberto.tasky.core.presentation.designsystem.TaskyLight3
+import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 
 @Composable
 fun TaskyActionButton(
@@ -35,8 +37,8 @@ fun TaskyActionButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = TaskyGray,
-            disabledContentColor = TaskyBlack
+            disabledContainerColor = TaskyLight3,
+            disabledContentColor = TaskyGray
         ),
         shape = RoundedCornerShape(100f),
         modifier = modifier
@@ -51,7 +53,7 @@ fun TaskyActionButton(
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(15.dp)
-                    .alpha(if(isLoading) 1f else 0f),
+                    .alpha(if (isLoading) 1f else 0f),
                 strokeWidth = 1.5.dp,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -62,5 +64,20 @@ fun TaskyActionButton(
                 fontWeight = FontWeight.Medium
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TaskyActionButtonPreview() {
+    TaskyTheme {
+        TaskyActionButton(
+            text = "GET STARTED",
+            isLoading = false,
+            modifier = Modifier
+                .fillMaxWidth(),
+            onClick = { },
+            enabled = false
+        )
     }
 }

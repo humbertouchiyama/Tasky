@@ -11,13 +11,14 @@ fun TaskyScaffold(
     modifier: Modifier = Modifier,
     topAppBar: @Composable () -> Unit = {},
     floatingActionButton: @Composable () -> Unit = {},
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     title: String? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         topBar = topAppBar,
         floatingActionButton = floatingActionButton,
-        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButtonPosition = floatingActionButtonPosition,
         modifier = modifier
     ) { padding ->
         RoundedBordersBackground(

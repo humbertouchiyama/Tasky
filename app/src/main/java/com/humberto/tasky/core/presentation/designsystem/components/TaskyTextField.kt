@@ -17,15 +17,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.humberto.tasky.core.presentation.designsystem.CheckIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
 import com.humberto.tasky.core.presentation.designsystem.TaskyLightBlue
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
@@ -131,7 +128,7 @@ private fun TaskyTextFieldPreview() {
     TaskyTheme {
         TaskyTextField(
             state = rememberTextFieldState(),
-            endIcon = Icons.Default.Check,
+            endIcon = CheckIcon,
             hint = "Email address",
             modifier = Modifier
                 .fillMaxWidth(),
