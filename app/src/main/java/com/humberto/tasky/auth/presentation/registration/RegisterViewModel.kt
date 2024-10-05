@@ -6,7 +6,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.humberto.tasky.R
+import com.humberto.tasky.auth.domain.AuthRepository
 import com.humberto.tasky.auth.domain.UserDataValidator
+import com.humberto.tasky.core.domain.util.DataError
+import com.humberto.tasky.core.domain.util.onError
+import com.humberto.tasky.core.domain.util.onSuccess
+import com.humberto.tasky.core.presentation.ui.UiText
+import com.humberto.tasky.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
@@ -17,6 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
     private val userDataValidator: UserDataValidator
 ): ViewModel() {
 
@@ -28,11 +36,11 @@ class RegisterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            collectCombinedEmailAndPassword()
+            collectFullNameEmailAndPassword()
         }
     }
 
-    private fun collectCombinedEmailAndPassword() {
+    private fun collectFullNameEmailAndPassword() {
         combine(
             snapshotFlow { state.fullName.text },
             snapshotFlow { state.email.text },
@@ -55,13 +63,37 @@ class RegisterViewModel @Inject constructor(
 
     fun onAction(action: RegisterAction) {
         when(action) {
-            RegisterAction.OnRegisterClick -> {}
+            RegisterAction.OnRegisterClick -> register()
             RegisterAction.OnTogglePasswordVisibilityClick -> {
                 state = state.copy(
                     isPasswordVisible = !state.isPasswordVisible
                 )
             }
             else -> Unit
+        }
+    }
+
+    private fun register() {
+        viewModelScope.launch {
+            state = state.copy(isRegisteringIn = true)
+            authRepository.register(
+                fullName = state.fullName.text.toString(),
+                email = state.email.text.toString().trim(),
+                password =  state.password.text.toString()
+            )
+                .onSuccess {
+                    eventChannel.send(RegisterEvent.RegisterSuccess)
+                }
+                .onError { error ->
+                    if (error == DataError.Network.CONFLICT) {
+                        eventChannel.send(RegisterEvent.Error(
+                            UiText.StringResource(R.string.error_email_exists)
+                        ))
+                    } else {
+                        eventChannel.send(RegisterEvent.Error(error.asUiText()))
+                    }
+                }
+            state = state.copy(isRegisteringIn = false)
         }
     }
 }

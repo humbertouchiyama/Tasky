@@ -22,4 +22,6 @@
     <string name="at_least_one_number">At least one number</string>
     <string name="contains_lowercase_char">Contains lowercase character</string>
     <string name="contains_uppercase_char">Contains uppercase character</string>
+    <string name="error_email_exists">An user with this e-mail already exists!</string>
+    <string name="register_success">Registration successful! Please log in now.</string>
 </resources>
