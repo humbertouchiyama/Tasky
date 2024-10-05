@@ -8,3 +8,11 @@ import com.humberto.tasky.R
 val EyeClosedIcon: ImageVector
     @Composable
     get() = ImageVector.vectorResource(id = R.drawable.eye_closed)
+
+val CrossIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.cross)
+
+val CheckIcon: ImageVector
+    @Composable
+    get() = ImageVector.vectorResource(id = R.drawable.check)

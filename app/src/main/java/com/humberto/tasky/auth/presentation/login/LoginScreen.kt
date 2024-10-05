@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
+import com.humberto.tasky.core.presentation.designsystem.CheckIcon
 import com.humberto.tasky.core.presentation.designsystem.Inter
 import com.humberto.tasky.core.presentation.designsystem.TaskyLinkBlue
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
@@ -115,7 +116,7 @@ private fun LoginScreen(
             TaskyTextField(
                 state = state.email,
                 endIcon = if(state.isEmailValid) {
-                    Icons.Default.Check
+                    CheckIcon
                 } else null,
                 keyboardType = KeyboardType.Email,
                 hint = stringResource(id = R.string.email_address),
