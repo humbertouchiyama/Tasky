@@ -70,14 +70,14 @@ fun TaskyPasswordTextField(
             textStyle = LocalTextStyle.current.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onTertiary),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
             keyboardOptions = KeyboardOptions(
                 imeAction = imeAction
             ),
             onKeyboardAction = keyboardActionHandler,
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.tertiary)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
                     width = 1.dp,
                     color = if (isFocused) {
