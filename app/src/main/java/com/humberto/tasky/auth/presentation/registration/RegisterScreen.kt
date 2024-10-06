@@ -102,7 +102,7 @@ private fun RegisterScreen(
         nameFocusRequester,
         emailFocusRequester,
         passwordFocusRequester,
-    ) = FocusRequester.createRefs()
+    ) = remember { FocusRequester.createRefs() }
 
     var isNameFocused by remember { mutableStateOf(false) }
     var isEmailFocused by remember { mutableStateOf(false) }
@@ -139,14 +139,14 @@ private fun RegisterScreen(
         ) {
             TaskyTextField(
                 state = state.fullName,
-                endIcon = if(state.isFullNameValid) {
+                endIcon = if(state.isValidFullName) {
                     CheckIcon
                 } else null,
                 keyboardType = KeyboardType.Text,
                 hint = stringResource(id = R.string.name),
                 modifier = Modifier.fillMaxWidth(),
                 hasError = !isNameFocused &&
-                        !state.isFullNameValid &&
+                        !state.isValidFullName &&
                         state.fullName.text.isNotEmpty(),
                 isFocused = isNameFocused,
                 onFocusChange = {
@@ -158,14 +158,14 @@ private fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
             TaskyTextField(
                 state = state.email,
-                endIcon = if(state.isEmailValid) {
+                endIcon = if(state.isValidEmail) {
                     CheckIcon
                 } else null,
                 keyboardType = KeyboardType.Email,
                 hint = stringResource(id = R.string.email_address),
                 modifier = Modifier.fillMaxWidth(),
                 hasError = !isEmailFocused &&
-                        !state.isEmailValid &&
+                        !state.isValidEmail &&
                         state.email.text.isNotEmpty(),
                 isFocused = isEmailFocused,
                 onFocusChange = {
@@ -217,11 +217,11 @@ private fun RegisterScreen(
             Spacer(modifier = Modifier.height(32.dp))
             TaskyActionButton(
                 text = stringResource(id = R.string.get_started),
-                isLoading = state.isRegisteringIn,
+                isLoading = state.isRegistering,
                 onClick = {
                     onAction(RegisterAction.OnRegisterClick)
                 },
-                enabled = state.canRegister && !state.isRegisteringIn
+                enabled = state.canRegister && !state.isRegistering
             )
         }
     }

@@ -99,7 +99,7 @@ private fun LoginScreen(
     val (
         emailFocusRequester,
         passwordFocusRequester,
-    ) = FocusRequester.createRefs()
+    ) = remember { FocusRequester.createRefs() }
 
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }

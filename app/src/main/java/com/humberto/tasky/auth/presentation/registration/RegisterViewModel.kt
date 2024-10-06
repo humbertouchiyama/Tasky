@@ -16,8 +16,7 @@ import com.humberto.tasky.core.presentation.ui.UiText
 import com.humberto.tasky.core.presentation.ui.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,29 +35,57 @@ class RegisterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            collectFullNameEmailAndPassword()
+            collectFullName()
+        }
+        viewModelScope.launch {
+            collectEmail()
+        }
+        viewModelScope.launch {
+            collectPassword()
         }
     }
 
-    private fun collectFullNameEmailAndPassword() {
-        combine(
-            snapshotFlow { state.fullName.text },
-            snapshotFlow { state.email.text },
-            snapshotFlow { state.password.text }
-        ) { fullName, email, password ->
-            val isValidFullName = userDataValidator.isValidFullName(fullName.toString())
-            val isValidEmail = userDataValidator.isValidEmail(email.toString())
-            val passwordValidationState =
-                userDataValidator.validatePassword(password.toString())
-            state = state.copy(
-                isFullNameValid = isValidFullName,
-                isEmailValid = isValidEmail,
-                passwordValidationState = passwordValidationState,
-                canRegister = isValidEmail &&
-                        !state.isRegisteringIn &&
-                        passwordValidationState.isValidPassword
-            )
-        }.launchIn(viewModelScope)
+    private suspend fun collectFullName() {
+        snapshotFlow { state.fullName.text }
+            .collectLatest { fullName ->
+                val isValidFullName = userDataValidator.isValidFullName(fullName.toString())
+                state = state.copy(
+                    isValidFullName = isValidFullName,
+                    canRegister = isValidFullName &&
+                            state.isValidEmail &&
+                            !state.isRegistering &&
+                            state.passwordValidationState.isValidPassword
+                )
+            }
+    }
+
+    private suspend fun collectEmail() {
+        snapshotFlow { state.email.text }
+            .collectLatest { email ->
+                val isValidEmail = userDataValidator.isValidEmail(email.toString())
+                state = state.copy(
+                    isValidEmail = isValidEmail,
+                    canRegister = state.isValidFullName &&
+                            isValidEmail &&
+                            !state.isRegistering &&
+                            state.passwordValidationState.isValidPassword
+                )
+            }
+    }
+
+    private suspend fun collectPassword() {
+        snapshotFlow { state.password.text }
+            .collectLatest { password ->
+                val passwordValidationState =
+                    userDataValidator.validatePassword(password.toString())
+                state = state.copy(
+                    passwordValidationState = passwordValidationState,
+                    canRegister = state.isValidFullName &&
+                            state.isValidEmail &&
+                            !state.isRegistering &&
+                            passwordValidationState.isValidPassword
+                )
+            }
     }
 
     fun onAction(action: RegisterAction) {
@@ -75,7 +102,7 @@ class RegisterViewModel @Inject constructor(
 
     private fun register() {
         viewModelScope.launch {
-            state = state.copy(isRegisteringIn = true)
+            state = state.copy(isRegistering = true)
             authRepository.register(
                 fullName = state.fullName.text.toString(),
                 email = state.email.text.toString().trim(),
@@ -93,7 +120,7 @@ class RegisterViewModel @Inject constructor(
                         eventChannel.send(RegisterEvent.Error(error.asUiText()))
                     }
                 }
-            state = state.copy(isRegisteringIn = false)
+            state = state.copy(isRegistering = false)
         }
     }
 }
