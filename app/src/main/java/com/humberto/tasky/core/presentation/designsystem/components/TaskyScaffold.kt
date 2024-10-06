@@ -1,6 +1,6 @@
 package com.humberto.tasky.core.presentation.designsystem.components
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -13,18 +13,19 @@ fun TaskyScaffold(
     floatingActionButton: @Composable () -> Unit = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     title: String? = null,
-    content: @Composable (PaddingValues) -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Scaffold(
         topBar = topAppBar,
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
         modifier = modifier
-    ) { padding ->
+    ) { innerPadding ->
         RoundedBordersBackground(
-            title = title
+            title = title,
+            modifier = Modifier.padding(innerPadding)
         ) {
-            content(padding)
+            content()
         }
     }
 }

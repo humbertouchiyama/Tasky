@@ -70,7 +70,7 @@ fun TaskyTextField(
             lineLimits = TextFieldLineLimits.SingleLine,
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.tertiary)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
                     width = if(isFocused || hasError == true) 1.dp else 0.dp,
                     color = if(isFocused) {
