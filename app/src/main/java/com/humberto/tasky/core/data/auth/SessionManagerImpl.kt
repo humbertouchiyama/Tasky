@@ -2,14 +2,14 @@ package com.humberto.tasky.core.data.auth
 
 import android.content.SharedPreferences
 import com.humberto.tasky.core.domain.model.AuthInfo
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
+import com.humberto.tasky.core.domain.repository.SessionManager
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class AccessTokenManagerImpl @Inject constructor(
+class SessionManagerImpl @Inject constructor(
     private val sharedPreferences: SharedPreferences
-): AccessTokenManager {
+): SessionManager {
     companion object {
         private const val KEY_AUTH_INFO = "KEY_AUTH_INFO"
     }

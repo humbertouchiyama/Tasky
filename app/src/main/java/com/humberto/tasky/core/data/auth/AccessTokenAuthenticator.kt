@@ -4,8 +4,7 @@ import com.humberto.tasky.core.data.model.AccessTokenRequest
 import com.humberto.tasky.core.data.networking.AccessTokenService
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.domain.model.AuthInfo
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
-import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
 import dagger.Lazy
@@ -17,7 +16,7 @@ import okhttp3.Route
 import javax.inject.Inject
 
 class AccessTokenAuthenticator @Inject constructor(
-    private val tokenManager: AccessTokenManager,
+    private val tokenManager: SessionManager,
     private val accessTokenService: Lazy<AccessTokenService>
 ) : Authenticator {
 
@@ -50,7 +49,8 @@ class AccessTokenAuthenticator @Inject constructor(
             result = AuthInfo(
                 accessToken = accessTokenResponse.accessToken,
                 refreshToken = authInfo?.refreshToken ?: "",
-                userId = authInfo?.userId ?: ""
+                userId = authInfo?.userId ?: "",
+                fullName = authInfo?.fullName ?: ""
             )
         }.onError {
             result = null

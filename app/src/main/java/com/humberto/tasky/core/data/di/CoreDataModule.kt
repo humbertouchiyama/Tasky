@@ -3,9 +3,9 @@ package com.humberto.tasky.core.data.di
 import android.content.Context
 import com.humberto.tasky.BuildConfig
 import com.humberto.tasky.core.data.auth.AccessTokenAuthenticator
-import com.humberto.tasky.core.data.auth.AccessTokenManagerImpl
+import com.humberto.tasky.core.data.auth.SessionManagerImpl
 import com.humberto.tasky.core.data.networking.AccessTokenService
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
+import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -38,14 +38,14 @@ class CoreDataModule {
     @Singleton
     fun provideAccessTokenManager(
         @ApplicationContext context: Context
-    ): AccessTokenManager {
-        return AccessTokenManagerImpl(context.getSharedPreferences("access_token_prefs", Context.MODE_PRIVATE))
+    ): SessionManager {
+        return SessionManagerImpl(context.getSharedPreferences("access_token_prefs", Context.MODE_PRIVATE))
     }
 
     @Provides
     @Singleton
     fun provideTokenAuthenticator(
-        tokenManager: AccessTokenManager,
+        tokenManager: SessionManager,
         accessTokenService: Lazy<AccessTokenService>
     ): AccessTokenAuthenticator {
         return AccessTokenAuthenticator(tokenManager, accessTokenService)
@@ -64,11 +64,11 @@ class CoreDataModule {
     @Provides
     @Singleton
     fun providesHeadersInterceptor(
-        accessTokenManager: AccessTokenManager,
+        sessionManager: SessionManager,
     ): Interceptor {
         return Interceptor { chain ->
             val request = chain.request().newBuilder()
-            val authInfo = accessTokenManager.get()
+            val authInfo = sessionManager.get()
             authInfo?.let {
                 request.addHeader("Authorization", "Bearer ${authInfo.accessToken}")
             }

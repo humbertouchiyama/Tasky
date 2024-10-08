@@ -3,18 +3,16 @@ package com.humberto.tasky.auth.data
 import com.humberto.tasky.auth.domain.AuthRepository
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.domain.model.AuthInfo
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
+import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.asEmptyDataResult
-import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
-import timber.log.Timber
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
-    private val tokenManager: AccessTokenManager,
+    private val tokenManager: SessionManager,
 ): AuthRepository {
     override suspend fun login(email: String, password: String): EmptyResult<DataError.Network> {
         val result = safeCall {
@@ -29,12 +27,10 @@ class AuthRepositoryImpl @Inject constructor(
                 AuthInfo(
                     accessToken = loginResponse.accessToken,
                     refreshToken = loginResponse.refreshToken,
-                    userId = loginResponse.userId
+                    userId = loginResponse.userId,
+                    fullName = loginResponse.fullName
                 )
             )
-            Timber.d("login success")
-        }.onError {
-            Timber.d("login failed")
         }
 
         return result.asEmptyDataResult()

@@ -6,7 +6,7 @@ import com.humberto.tasky.auth.data.EmailPatternValidator
 import com.humberto.tasky.auth.domain.AuthRepository
 import com.humberto.tasky.auth.domain.PatternValidator
 import com.humberto.tasky.auth.domain.UserDataValidator
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
+import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,11 +28,11 @@ class AuthDataModule {
     @Singleton
     fun providesAuthRepository(
         authApiService: AuthApiService,
-        accessTokenManager: AccessTokenManager
+        sessionManager: SessionManager
     ): AuthRepository {
         return AuthRepositoryImpl(
             authApiService,
-            accessTokenManager
+            sessionManager
         )
     }
 

@@ -5,14 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.humberto.tasky.core.domain.repository.AccessTokenManager
+import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val accessTokenManager: AccessTokenManager
+    private val sessionManager: SessionManager
 ): ViewModel() {
 
     var state by mutableStateOf(MainState())
@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isCheckingAuth = true)
             state = state.copy(
-                isLoggedIn = accessTokenManager.get() != null
+                isLoggedIn = sessionManager.get() != null
             )
             state = state.copy(isCheckingAuth = false)
         }
