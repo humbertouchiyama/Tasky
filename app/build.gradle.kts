@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.humberto.tasky"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -102,6 +102,9 @@ dependencies {
 
     // timber logging
     implementation(libs.timber)
+
+    // datetime picker
+    implementation(libs.datetime.picker)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
