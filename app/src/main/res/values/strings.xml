@@ -4,7 +4,7 @@
     <string name="error_no_internet">Check your connection.</string>
     <string name="error_payload_too_large">The file is too large!</string>
     <string name="error_server_error">Oops, something went wrong, please try again!</string>
-    <string name="error_unknown">An unknown error occured.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
     <string name="error_email_password_incorrect">The email or password is incorrect!</string>
     <string name="login_successful">You logged in!</string>
     <string name="create_your_account">Create your account</string>
@@ -24,4 +24,7 @@
     <string name="contains_uppercase_char">Contains uppercase character</string>
     <string name="error_email_exists">An user with this e-mail already exists!</string>
     <string name="register_success">Registration successful! Please log in now.</string>
+    <string name="logout">Logout</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>
