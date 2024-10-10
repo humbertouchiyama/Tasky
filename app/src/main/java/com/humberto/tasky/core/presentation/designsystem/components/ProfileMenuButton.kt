@@ -3,10 +3,6 @@ package com.humberto.tasky.core.presentation.designsystem.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.DropdownMenu
@@ -24,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
+import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownListItem
 
 @Composable
 fun ProfileMenuButton(
@@ -38,20 +35,17 @@ fun ProfileMenuButton(
             expanded = isDropDownOpen,
             onDismissRequest = {
                 isDropDownOpen = false
-            }
+            },
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             if (menuItems.isNotEmpty()) {
                 menuItems.forEach{ item ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clickable { item.onClick }
-                            .fillMaxWidth()
-                            .defaultMinSize(minWidth = 56.dp)
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(text = item.title)
-                    }
+                    DropDownListItem(
+                        modifier = Modifier,
+                        title = item.title,
+                        onClick = item.onClick
+                    )
                 }
             }
         }

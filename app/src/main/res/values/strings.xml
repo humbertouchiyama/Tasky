@@ -27,4 +27,8 @@
     <string name="logout">Logout</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="add_new_event">Add new event</string>
+    <string name="event">Event</string>
+    <string name="task">Task</string>
+    <string name="reminder">Reminder</string>
 </resources>
