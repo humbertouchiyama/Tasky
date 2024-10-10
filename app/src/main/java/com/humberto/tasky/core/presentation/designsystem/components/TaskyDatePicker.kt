@@ -40,7 +40,7 @@ fun TaskyDatePicker(
             colors = DatePickerDefaults.colors(
                 headerBackgroundColor = TaskyGreen,
                 dateActiveBackgroundColor = TaskyGreen,
-                dateActiveTextColor = TaskyWhite,
+                dateActiveTextColor = TaskyWhite
             ),
             initialDate = initialDate
         ) { date ->
