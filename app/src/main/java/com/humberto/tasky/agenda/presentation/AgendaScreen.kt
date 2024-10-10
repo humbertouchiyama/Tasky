@@ -57,16 +57,12 @@ private fun AgendaScreen(
     userState: UserState,
     onAction: (AgendaAction) -> Unit
 ) {
-    var selectedDate: LocalDate by rememberSaveable {
-        mutableStateOf(LocalDate.now())
-    }
-
     val dialogState = rememberMaterialDialogState()
     TaskyDatePicker(
         dialogState = dialogState,
-        initialDate = selectedDate,
+        initialDate = state.selectedDate,
         onDateChange = { date ->
-            selectedDate = date
+            onAction(AgendaAction.OnSelectedDate(date))
         }
     )
 
@@ -82,7 +78,7 @@ private fun AgendaScreen(
                             }
                     ) {
                         Text(
-                            text = selectedDate.displayUpperCaseMonth(),
+                            text = state.upperCaseMonth,
                             style = MaterialTheme.typography.titleSmall,
                         )
                         Icon(
@@ -128,13 +124,15 @@ private fun AgendaScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = selectedDate.toString(),
-                modifier = Modifier
-                    .padding(top = 8.dp),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.headlineMedium
-            )
+            if (state.selectedDateIsToday) {
+                Text(
+                    text = stringResource(id = R.string.today),
+                    modifier = Modifier
+                        .padding(top = 8.dp),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
     }
 }
@@ -145,7 +143,7 @@ private fun AgendaScreenPreview() {
     TaskyTheme {
         AgendaScreen(
             state = AgendaState(
-                isLoading = false
+                selectedDateIsToday = true
             ),
             userState = UserState(
                 initials = "HC"
