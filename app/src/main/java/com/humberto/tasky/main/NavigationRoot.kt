@@ -1,16 +1,12 @@
 package com.humberto.tasky.main
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.humberto.tasky.agenda.presentation.AgendaScreenRoot
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 
@@ -82,13 +78,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         route = "agenda"
     ) {
         composable("agenda_list") {
-            Text(
-                text = "Agenda list",
-                modifier = Modifier
-                    .padding(top = 24.dp),
-                color = MaterialTheme.colorScheme.onPrimary,
-                style = MaterialTheme.typography.headlineMedium
-            )
+            AgendaScreenRoot()
         }
     }
 }
