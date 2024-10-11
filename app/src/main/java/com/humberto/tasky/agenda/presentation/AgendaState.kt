@@ -4,7 +4,9 @@ import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
 import java.time.LocalDate
 
 data class AgendaState(
+    val initials: String = "",
     val selectedDateIsToday: Boolean = true,
     val selectedDate: LocalDate = LocalDate.now(),
     val upperCaseMonth: String = LocalDate.now().displayUpperCaseMonth(),
+    val isLoggingOut: Boolean = false
 )
