@@ -78,7 +78,15 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
         route = "agenda"
     ) {
         composable("agenda_list") {
-            AgendaScreenRoot()
+            AgendaScreenRoot(
+                onLogoutSuccess = {
+                    navController.navigate("auth") {
+                        popUpTo("agenda") {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

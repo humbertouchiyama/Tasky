@@ -2,6 +2,7 @@
 
 package com.humberto.tasky.agenda.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -15,38 +16,52 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.components.FloatingActionButtonWithDropDownMenu
-import com.humberto.tasky.agenda.presentation.user.UserState
-import com.humberto.tasky.agenda.presentation.user.UserViewModel
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
-import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
+import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDate
 
 @Composable
 fun AgendaScreenRoot(
-    viewModel: AgendaViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    onLogoutSuccess: () -> Unit,
+    viewModel: AgendaViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    ObserveAsEvents(viewModel.events) { event ->
+        when(event) {
+            is AgendaEvent.Error -> {
+                Toast.makeText(
+                    context,
+                    event.error.asString(context),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            AgendaEvent.LogoutSuccess -> {
+                Toast.makeText(
+                    context,
+                    R.string.logout_successful,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                onLogoutSuccess()
+            }
+        }
+    }
     AgendaScreen(
         state = viewModel.state,
-        userState = userViewModel.state,
         onAction = viewModel::onAction
     )
 }
@@ -54,7 +69,6 @@ fun AgendaScreenRoot(
 @Composable
 private fun AgendaScreen(
     state: AgendaState,
-    userState: UserState,
     onAction: (AgendaAction) -> Unit
 ) {
     val dialogState = rememberMaterialDialogState()
@@ -90,7 +104,7 @@ private fun AgendaScreen(
                 },
                 endContent = {
                     ProfileMenuButton(
-                        initials = userState.initials,
+                        initials = state.initials,
                         menuItems = listOf(DropDownItem(
                             title = stringResource(R.string.logout),
                             onClick = { onAction(AgendaAction.OnLogoutClick) }
@@ -143,9 +157,7 @@ private fun AgendaScreenPreview() {
     TaskyTheme {
         AgendaScreen(
             state = AgendaState(
-                selectedDateIsToday = true
-            ),
-            userState = UserState(
+                selectedDateIsToday = true,
                 initials = "HC"
             ),
             onAction = {}
