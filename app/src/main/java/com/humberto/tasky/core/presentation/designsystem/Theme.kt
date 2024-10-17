@@ -11,8 +11,8 @@ import androidx.core.view.WindowCompat
 private val LightColorScheme = lightColorScheme(
     primary = TaskyBlack,
     onPrimary = TaskyWhite,
-    secondary = TaskyLightGreen,
-    onSecondary = TaskyBlack,
+    secondary = TaskyGreen,
+    onSecondary = TaskyWhite,
     tertiary = TaskyLight,
     onTertiary = TaskyLightBlue,
     background = TaskyBlack,
