@@ -33,4 +33,8 @@
     <string name="reminder">Reminder</string>
     <string name="today">Today</string>
     <string name="logout_successful">You logged out!</string>
+    <string name="open_event_options">Open event options</string>
+    <string name="open">Open</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
