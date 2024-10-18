@@ -44,7 +44,6 @@ fun MoreButtonWithDropDownMenu(
         ) {
             menuItems.forEachIndexed { index, item ->
                 DropDownListItem(
-                    modifier = Modifier,
                     title = item.title,
                     onClick = item.onClick
                 )
