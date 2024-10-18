@@ -24,9 +24,9 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 fun TaskyRadioButton(
     selected: Boolean,
     enabled: Boolean = true,
-    onClick: () -> Unit,
-    radioButtonColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = { },
+    radioButtonColor: Color
 ) {
     Box(
         modifier = modifier
@@ -38,8 +38,10 @@ fun TaskyRadioButton(
                 shape = CircleShape
             )
             .padding(4.dp)
-            .then(if (enabled) Modifier.clickable { onClick() } else Modifier),
-        contentAlignment = Alignment.Center
+            .clickable(enabled = enabled) {
+                onClick()
+            },
+        contentAlignment = Alignment.Center,
     ) {
         if (selected) {
             Icon(

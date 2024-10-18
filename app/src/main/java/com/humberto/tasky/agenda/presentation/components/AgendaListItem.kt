@@ -35,7 +35,7 @@ import com.humberto.tasky.core.presentation.designsystem.components.util.DropDow
 @Composable
 fun AgendaListItem(
     modifier: Modifier = Modifier,
-    onCheckItem: () -> Unit? = { },
+    onCheckItem: () -> Unit = { },
     onOpenItem: () -> Unit,
     onEditItem: () -> Unit,
     onDeleteItem: () -> Unit,

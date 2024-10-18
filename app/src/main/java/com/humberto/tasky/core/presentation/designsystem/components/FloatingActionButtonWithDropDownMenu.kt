@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.presentation.components
+package com.humberto.tasky.core.presentation.designsystem.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.humberto.tasky.R
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
-import com.humberto.tasky.core.presentation.designsystem.components.TaskyFloatingActionButton
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownListItem
 
