@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val TaskyBlack = Color(0xFF16161C)
 val TaskyDarkGray = Color(0xFF5C5D5A)
-val TaskyGray = Color(0xFFABB4BD)
+val TaskyGray = Color(0xFFA9B4BE)
 val TaskyDarkGreen = Color(0xFF25562F)
 val TaskyGreen = Color(0xFF279F70)
 val TaskyLightGreen = Color(0xFFCAEF45)

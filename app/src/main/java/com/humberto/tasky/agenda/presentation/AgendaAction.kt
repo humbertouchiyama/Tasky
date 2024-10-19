@@ -7,7 +7,7 @@ sealed interface AgendaAction {
     data object OnNewTaskClick: AgendaAction
     data object OnNewReminderClick: AgendaAction
     data object OnLogoutClick: AgendaAction
-    data class OnSelectedDate(
+    data class OnSelectDate(
         val selectedDate: LocalDate
     ): AgendaAction
 }

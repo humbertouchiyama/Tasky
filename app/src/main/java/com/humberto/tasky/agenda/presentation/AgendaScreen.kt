@@ -24,9 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
-import com.humberto.tasky.agenda.presentation.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
+import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyCalendarHeader
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
@@ -76,7 +77,7 @@ private fun AgendaScreen(
         dialogState = dialogState,
         initialDate = state.selectedDate,
         onDateChange = { date ->
-            onAction(AgendaAction.OnSelectedDate(date))
+            onAction(AgendaAction.OnSelectDate(date))
         }
     )
 
@@ -138,6 +139,13 @@ private fun AgendaScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 16.dp)
         ) {
+            TaskyCalendarHeader(
+                modifier = Modifier.padding(bottom = 8.dp),
+                onSelectDate = { date ->
+                    onAction(AgendaAction.OnSelectDate(date))
+                },
+                selectedDate = state.selectedDate
+            )
             if (state.selectedDateIsToday) {
                 Text(
                     text = stringResource(id = R.string.today),
