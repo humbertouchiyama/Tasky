@@ -44,7 +44,7 @@ class AgendaViewModel @Inject constructor(
 
     fun onAction(action: AgendaAction) {
         when(action) {
-            is AgendaAction.OnSelectedDate -> {
+            is AgendaAction.OnSelectDate -> {
                 val selectedDate = action.selectedDate
                 state = state.copy(
                     selectedDate = selectedDate,
