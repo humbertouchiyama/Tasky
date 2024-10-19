@@ -22,11 +22,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
-import com.humberto.tasky.agenda.presentation.CardStyle
-import com.humberto.tasky.agenda.presentation.EventType
+import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
-import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
+import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
+import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
 import com.humberto.tasky.core.presentation.designsystem.TaskyLightGreen
+import com.humberto.tasky.core.presentation.designsystem.TaskyLight2
+import com.humberto.tasky.core.presentation.designsystem.TaskyWhite
+import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
+import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.MoreButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
@@ -39,15 +43,34 @@ fun AgendaListItem(
     onOpenItem: () -> Unit,
     onEditItem: () -> Unit,
     onDeleteItem: () -> Unit,
-    agendaItemUi: AgendaItemUi
+    agendaItem: AgendaItemUi
 ) {
-    val cardStyle = getCardStyle(agendaItemUi.eventType)
+    val backgroundColor = when (agendaItem.agendaItemType) {
+        AgendaItemType.Event -> TaskyLightGreen
+        AgendaItemType.Task -> TaskyGreen
+        AgendaItemType.Reminder -> TaskyLight2
+    }
+
+    val foregroundColor = when (agendaItem.agendaItemType) {
+        AgendaItemType.Task -> TaskyWhite
+        else -> TaskyBlack
+    }
+
+    val textColor = when (agendaItem.agendaItemType) {
+        AgendaItemType.Task -> TaskyWhite
+        else -> TaskyDarkGray
+    }
+
+    val moreButtonColor = when (agendaItem.agendaItemType) {
+        AgendaItemType.Task -> TaskyWhite
+        else -> TaskyBrown
+    }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(cardStyle.backgroundColor)
+            .background(backgroundColor)
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -60,23 +83,23 @@ fun AgendaListItem(
                 modifier = Modifier.weight(1f)
             ) {
                 TaskyRadioButton(
-                    selected = agendaItemUi.isItemChecked == true,
-                    enabled = agendaItemUi.isItemCheckable,
+                    selected = agendaItem.isItemChecked == true,
+                    enabled = agendaItem.isItemCheckable,
                     onClick = { onCheckItem() },
-                    radioButtonColor = cardStyle.titleColor,
+                    radioButtonColor = foregroundColor,
                     modifier = Modifier.padding(2.dp)
                 )
                 Column(
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(
-                        text = agendaItemUi.title,
+                        text = agendaItem.title,
                         modifier = Modifier,
-                        color = cardStyle.titleColor,
+                        color = foregroundColor,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.W600,
                             textDecoration =
-                                if (agendaItemUi.isItemChecked == true) TextDecoration.LineThrough
+                                if (agendaItem.isItemChecked == true) TextDecoration.LineThrough
                                 else TextDecoration.None
                         ),
                         maxLines = 1,
@@ -84,8 +107,8 @@ fun AgendaListItem(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = agendaItemUi.description,
-                        color = cardStyle.descriptionColor,
+                        text = agendaItem.description,
+                        color = textColor,
                         style = MaterialTheme.typography.bodyLarge,
                         minLines = 2,
                         maxLines = 2,
@@ -108,39 +131,15 @@ fun AgendaListItem(
                         onClick = onDeleteItem,
                     ),
                 ),
-                iconColor = cardStyle.moreButtonColor,
+                iconColor = moreButtonColor,
             )
         }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            color = cardStyle.descriptionColor,
+            color = textColor,
             textAlign = TextAlign.End,
-            text = agendaItemUi.dateTime,
+            text = agendaItem.dateTime,
             style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
-private fun getCardStyle(eventType: EventType): CardStyle {
-    return when (eventType) {
-        is EventType.Task -> CardStyle(
-            backgroundColor = MaterialTheme.colorScheme.secondary,
-            titleColor = MaterialTheme.colorScheme.onPrimary,
-            descriptionColor = MaterialTheme.colorScheme.onSecondary,
-            moreButtonColor = MaterialTheme.colorScheme.onSecondary
-        )
-        is EventType.Event -> CardStyle(
-            backgroundColor = TaskyLightGreen,
-            titleColor = MaterialTheme.colorScheme.onSurface,
-            descriptionColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            moreButtonColor = TaskyBrown
-        )
-        is EventType.Reminder -> CardStyle(
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            titleColor = MaterialTheme.colorScheme.onSurface,
-            descriptionColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            moreButtonColor = TaskyBrown
         )
     }
 }
@@ -150,12 +149,12 @@ private fun getCardStyle(eventType: EventType): CardStyle {
 private fun AgendaListItemPreview() {
     TaskyTheme {
         AgendaListItem(
-            agendaItemUi = AgendaItemUi(
+            agendaItem = AgendaItemUi(
                 title = "Meeting",
                 description = "Description",
                 dateTime = "Mar 5, 10:30",
                 isItemChecked = true,
-                eventType = EventType.Task
+                agendaItemType = AgendaItemType.Task
             ),
             onOpenItem = { },
             onEditItem = { },
