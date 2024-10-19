@@ -118,7 +118,7 @@ private fun DayItem(
     }
 }
 
-fun getDaysOfMonth(date: LocalDate): List<LocalDate> {
+private fun getDaysOfMonth(date: LocalDate): List<LocalDate> {
     val firstDayOfMonth = date.withDayOfMonth(1)
     val daysInMonth = date.lengthOfMonth()
     return (0 until daysInMonth).map { firstDayOfMonth.plusDays(it.toLong()) }
