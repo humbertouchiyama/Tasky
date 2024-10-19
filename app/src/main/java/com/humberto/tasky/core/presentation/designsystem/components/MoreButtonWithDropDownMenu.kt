@@ -3,6 +3,7 @@ package com.humberto.tasky.core.presentation.designsystem.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.DropdownMenu
@@ -15,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.humberto.tasky.R
@@ -53,7 +55,9 @@ fun MoreButtonWithDropDownMenu(
             }
         }
         Box(
-            modifier = Modifier.clickable { isDropDownOpen = true }
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable { isDropDownOpen = true }
         ) {
             Icon(
                 imageVector = Icons.Default.MoreHoriz,
