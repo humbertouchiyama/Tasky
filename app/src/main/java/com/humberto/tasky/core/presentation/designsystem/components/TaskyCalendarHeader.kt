@@ -41,7 +41,9 @@ fun TaskyCalendarHeader(
     onSelectDate: (LocalDate) -> Unit,
     selectedDate: LocalDate,
 ) {
-    val daysList = remember { getDaysOfMonth(selectedDate) }
+    val daysList = remember(selectedDate.month, selectedDate.year) {
+        getDaysOfMonth(selectedDate)
+    }
     val listState = rememberLazyListState()
 
     var isDayClicked by remember { mutableStateOf(false) }
