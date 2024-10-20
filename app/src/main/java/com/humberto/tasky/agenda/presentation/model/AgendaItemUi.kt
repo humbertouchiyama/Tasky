@@ -10,5 +10,5 @@ data class AgendaItemUi(
     val isItemChecked: Boolean? = false,
 ) {
     val isItemCheckable
-        get() = agendaItemType == AgendaItemType.Task
+        get() = agendaItemType == AgendaItemType.TASK
 }
