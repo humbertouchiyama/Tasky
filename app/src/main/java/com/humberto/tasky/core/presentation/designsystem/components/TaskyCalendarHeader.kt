@@ -46,13 +46,13 @@ fun TaskyCalendarHeader(
     }
     val listState = rememberLazyListState()
 
-    var isDayClicked by remember { mutableStateOf(false) }
+    var isDateSelectedFromLazyRow by remember { mutableStateOf(false) }
     LaunchedEffect(selectedDate) {
         val selectedDateIndex = daysList.indexOfFirst { it == selectedDate }
-        if (selectedDateIndex != -1 && !isDayClicked) {
+        if (selectedDateIndex != -1 && !isDateSelectedFromLazyRow) {
             listState.scrollToItem(selectedDateIndex)
         }
-        isDayClicked = false
+        isDateSelectedFromLazyRow = false
     }
     Box(
         modifier = modifier
@@ -65,14 +65,17 @@ fun TaskyCalendarHeader(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(daysList) { day ->
+            items(daysList, key = {
+                day -> day
+            }) { day ->
                 DayItem(
                     day = day,
                     onSelectDate = {
-                        isDayClicked = true
+                        isDateSelectedFromLazyRow = true
                         onSelectDate(day)
                     },
-                    isSelected = day == selectedDate)
+                    isSelected = day == selectedDate
+                )
             }
         }
     }
