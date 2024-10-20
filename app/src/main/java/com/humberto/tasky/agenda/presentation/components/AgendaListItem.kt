@@ -46,23 +46,23 @@ fun AgendaListItem(
     agendaItem: AgendaItemUi
 ) {
     val backgroundColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.Event -> TaskyLightGreen
-        AgendaItemType.Task -> TaskyGreen
-        AgendaItemType.Reminder -> TaskyLight2
+        AgendaItemType.EVENT -> TaskyLightGreen
+        AgendaItemType.TASK -> TaskyGreen
+        AgendaItemType.REMINDER -> TaskyLight2
     }
 
     val foregroundColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.Task -> TaskyWhite
+        AgendaItemType.TASK -> TaskyWhite
         else -> TaskyBlack
     }
 
     val textColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.Task -> TaskyWhite
+        AgendaItemType.TASK -> TaskyWhite
         else -> TaskyDarkGray
     }
 
     val moreButtonColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.Task -> TaskyWhite
+        AgendaItemType.TASK -> TaskyWhite
         else -> TaskyBrown
     }
 
@@ -154,7 +154,7 @@ private fun AgendaListItemPreview() {
                 description = "Description",
                 dateTime = "Mar 5, 10:30",
                 isItemChecked = true,
-                agendaItemType = AgendaItemType.Task
+                agendaItemType = AgendaItemType.TASK
             ),
             onOpenItem = { },
             onEditItem = { },
