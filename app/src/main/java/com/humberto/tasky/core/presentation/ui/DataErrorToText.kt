@@ -17,6 +17,9 @@ fun DataError.asUiText(): UiText {
         DataError.Network.SERVER_ERROR -> UiText.StringResource(
             R.string.error_server_error
         )
+        DataError.Local.DISK_FULL -> UiText.StringResource(
+            R.string.error_disk_full
+        )
         else -> UiText.StringResource(
             R.string.error_unknown
         )

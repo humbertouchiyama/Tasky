@@ -65,9 +65,7 @@ fun TaskyCalendarHeader(
             modifier = Modifier,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(daysList, key = {
-                day -> day
-            }) { day ->
+            items(daysList, key = { it }) { day ->
                 DayItem(
                     day = day,
                     onSelectDate = {
