@@ -6,8 +6,8 @@ junit = "4.14-SNAPSHOT"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.6"
-activityCompose = "1.9.2"
-composeBom = "2024.09.03"
+activityCompose = "1.9.3"
+composeBom = "2024.10.00"
 hilt = "2.51.1"
 ksp = "1.9.22-1.0.17"
 retrofit = "2.11.0"
@@ -19,6 +19,7 @@ okhttp-logging-interceptor = "4.9.3"
 hilt-navigation-compose = "1.2.0"
 core-splash-screen = "1.0.1"
 datetime-picker = "0.9.0"
+room = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,9 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp-logging-interceptor" }
 datetime-picker = { group = "io.github.vanpra.compose-material-dialogs", name = "datetime", version.ref = "datetime-picker" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
