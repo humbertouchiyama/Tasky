@@ -6,6 +6,7 @@ import androidx.room.Upsert
 import com.humberto.tasky.core.database.entity.AttendeeEntity
 import com.humberto.tasky.core.database.entity.EventEntity
 import com.humberto.tasky.core.database.entity.PhotoEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventDao {
@@ -15,6 +16,13 @@ interface EventDao {
 
     @Upsert
     suspend fun upsertEvents(reminderEntities: List<EventEntity>)
+
+    @Query("""
+        SELECT * FROM evententity 
+        WHERE (`from` BETWEEN :startOfDay AND :endOfDay)
+        OR (`to` BETWEEN :startOfDay AND :endOfDay)
+    """)
+    fun getEventsForDay(startOfDay: Long, endOfDay: Long): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM evententity WHERE id=:id")
     fun getEvent(id: String): EventEntity

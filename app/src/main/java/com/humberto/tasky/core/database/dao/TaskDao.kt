@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.humberto.tasky.core.database.entity.TaskEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
@@ -12,6 +13,9 @@ interface TaskDao {
 
     @Upsert
     suspend fun upsertTasks(taskEntities: List<TaskEntity>)
+
+    @Query("SELECT * FROM taskentity WHERE time BETWEEN :startOfDay AND :endOfDay")
+    fun getTasksForDay(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM taskentity WHERE id=:id")
     fun getTask(id: String): TaskEntity
