@@ -128,4 +128,10 @@ class RoomLocalAgendaDataSource(
             else -> Result.Success(Unit)
         }
     }
+
+    override suspend fun deleteAllAgenda() {
+        taskDao.deleteAllTasks()
+        eventDao.deleteAllEvents()
+        reminderDao.deleteAllReminders()
+    }
 }

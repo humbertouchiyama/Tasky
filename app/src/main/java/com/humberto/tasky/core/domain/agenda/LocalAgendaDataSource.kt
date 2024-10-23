@@ -15,4 +15,5 @@ interface LocalAgendaDataSource {
         events: List<Event>,
         reminders: List<Reminder>
     ): Result<Unit, DataError.Local>
+    suspend fun deleteAllAgenda()
 }
