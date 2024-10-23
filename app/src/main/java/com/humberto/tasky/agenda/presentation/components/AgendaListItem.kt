@@ -23,7 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
+import com.humberto.tasky.core.domain.task.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
 import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
 import com.humberto.tasky.core.presentation.designsystem.TaskyLightGreen
@@ -35,6 +37,8 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.MoreButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
+import java.time.ZonedDateTime
+import java.util.UUID
 
 @Composable
 fun AgendaListItem(
@@ -149,13 +153,14 @@ fun AgendaListItem(
 private fun AgendaListItemPreview() {
     TaskyTheme {
         AgendaListItem(
-            agendaItem = AgendaItemUi(
+            agendaItem = Task(
+                id = "1",
                 title = "Meeting",
                 description = "Description",
-                dateTime = "Mar 5, 10:30",
-                isItemChecked = true,
-                agendaItemType = AgendaItemType.TASK
-            ),
+                time = ZonedDateTime.now(),
+                remindAt = ZonedDateTime.now(),
+                isDone = true
+            ).toAgendaItemUi(),
             onOpenItem = { },
             onEditItem = { },
             onDeleteItem = { }
