@@ -109,6 +109,7 @@ class AgendaViewModel @Inject constructor(
             }
             agendaRepository.logout()
             sessionManager.set(null)
+            localAgendaDataSource.deleteAllAgenda()
             eventChannel.send(AgendaEvent.LogoutSuccess)
             _agendaState.update { state ->
                 state.copy(isLoggingOut = false)
