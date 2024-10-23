@@ -5,8 +5,10 @@ import com.humberto.tasky.core.database.dao.AgendaDao
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
+import com.humberto.tasky.core.database.mapper.toAttendee
 import com.humberto.tasky.core.database.mapper.toEvent
 import com.humberto.tasky.core.database.mapper.toEventEntity
+import com.humberto.tasky.core.database.mapper.toPhoto
 import com.humberto.tasky.core.database.mapper.toReminder
 import com.humberto.tasky.core.database.mapper.toReminderEntity
 import com.humberto.tasky.core.database.mapper.toTask
@@ -81,10 +83,16 @@ class RoomLocalAgendaDataSource(
             startOfDay = startOfDay,
             endOfDay = endOfDay
         ).map { eventEntities ->
-            eventEntities.map {
-                it.toEvent(
-                    getAttendeesEntitiesByIds = { ids -> eventDao.getAttendeesByIds(ids) },
-                    getPhotosEntitiesByUrls = { ids -> eventDao.getPhotosByKeys(ids) }
+            eventEntities.map { eventEntity ->
+                val attendees = eventDao
+                    .getAttendeesByIds(eventEntity.attendeeIds)
+                    .map { it.toAttendee() }
+                val photos = eventDao
+                    .getPhotosByKeys(eventEntity.photoKeys)
+                    .map { it.toPhoto() }
+                eventEntity.toEvent(
+                    attendees = attendees,
+                    photos = photos
                 )
             }
         }
