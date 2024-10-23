@@ -9,8 +9,8 @@ import com.humberto.tasky.core.domain.event.Photo
 import java.util.UUID
 
 fun EventEntity.toEvent(
-    getAttendeesEntitiesByIds: (List<String>) -> List<AttendeeEntity>,
-    getPhotosEntitiesByUrls: (List<String>) -> List<PhotoEntity>
+    attendees: List<Attendee>,
+    photos: List<Photo>
 ): Event {
     return Event(
         id = id,
@@ -19,8 +19,8 @@ fun EventEntity.toEvent(
         from = from.toZonedDateTime("UTC"),
         to = to.toZonedDateTime("UTC"),
         remindAt = remindAt.toZonedDateTime("UTC"),
-        attendees = getAttendeesEntitiesByIds(attendeeIds).map { it.toAttendee() },
-        photos = getPhotosEntitiesByUrls(photoKeys).map { it.toPhoto() },
+        attendees = attendees,
+        photos = photos,
         isGoing = isGoing
     )
 }
