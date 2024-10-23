@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.humberto.tasky.core.database.entity.ReminderEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReminderDao {
@@ -13,6 +14,9 @@ interface ReminderDao {
 
     @Upsert
     suspend fun upsertReminders(reminderEntities: List<ReminderEntity>)
+
+    @Query("SELECT * FROM reminderentity WHERE time BETWEEN :startOfDay AND :endOfDay")
+    fun getRemindersForDay(startOfDay: Long, endOfDay: Long): Flow<List<ReminderEntity>>
 
     @Query("SELECT * FROM reminderentity WHERE id=:id")
     fun getReminder(id: String): ReminderEntity

@@ -3,7 +3,6 @@ package com.humberto.tasky.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.humberto.tasky.core.database.AgendaDatabase
-import com.humberto.tasky.core.database.dao.AgendaDao
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
@@ -34,14 +33,6 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun providesAgendaDao(
-        agendaDatabase: AgendaDatabase
-    ): AgendaDao {
-        return agendaDatabase.agendaDao
-    }
-
-    @Provides
-    @Singleton
     fun providesTaskDao(
         agendaDatabase: AgendaDatabase
     ): TaskDao {
@@ -67,16 +58,16 @@ class DatabaseModule {
     @Provides
     @Singleton
     fun providesRoomLocalAgendaDataSource(
-        agendaDao: AgendaDao,
         taskDao: TaskDao,
         eventDao: EventDao,
         reminderDao: ReminderDao,
+        agendaDatabase: AgendaDatabase
     ): LocalAgendaDataSource {
         return RoomLocalAgendaDataSource(
-            agendaDao = agendaDao,
             taskDao = taskDao,
             eventDao = eventDao,
-            reminderDao = reminderDao
+            reminderDao = reminderDao,
+            agendaDatabase = agendaDatabase
         )
     }
 }

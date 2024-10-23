@@ -3,7 +3,6 @@ package com.humberto.tasky.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.humberto.tasky.core.database.dao.AgendaDao
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
@@ -25,7 +24,6 @@ import com.humberto.tasky.core.database.entity.TaskEntity
 @TypeConverters(Converters::class)
 abstract class AgendaDatabase: RoomDatabase() {
 
-    abstract val agendaDao: AgendaDao
     abstract val taskDao: TaskDao
     abstract val eventDao: EventDao
     abstract val reminderDao: ReminderDao
