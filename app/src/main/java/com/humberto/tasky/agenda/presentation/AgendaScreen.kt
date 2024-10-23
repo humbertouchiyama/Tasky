@@ -5,10 +5,16 @@ package com.humberto.tasky.agenda.presentation
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
+import com.humberto.tasky.agenda.presentation.components.AgendaListItem
+import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
+import com.humberto.tasky.core.domain.event.Event
+import com.humberto.tasky.core.domain.reminder.Reminder
+import com.humberto.tasky.core.domain.task.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
@@ -34,6 +47,7 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.ZonedDateTime
 
 @Composable
 fun AgendaScreenRoot(
@@ -61,8 +75,9 @@ fun AgendaScreenRoot(
             }
         }
     }
+    val state by viewModel.agendaState.collectAsState()
     AgendaScreen(
-        state = viewModel.state,
+        state = state,
         onAction = viewModel::onAction
     )
 }
@@ -155,6 +170,21 @@ private fun AgendaScreen(
                     style = MaterialTheme.typography.headlineMedium
                 )
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(state.agendaItems, key = { it.id } ) { agendaItem ->
+                    AgendaListItem(
+                        agendaItem = agendaItem,
+                        onOpenItem = { },
+                        onEditItem = { },
+                        onDeleteItem = { },
+                    )
+
+                }
+            }
         }
     }
 }
@@ -166,9 +196,37 @@ private fun AgendaScreenPreview() {
         AgendaScreen(
             state = AgendaState(
                 selectedDateIsToday = true,
-                initials = "HC"
+                initials = "HC",
+                agendaItems = listOf(
+                    Task(
+                        id = "1",
+                        title = "Task",
+                        description = "Description",
+                        time = ZonedDateTime.now(),
+                        remindAt = ZonedDateTime.now(),
+                        isDone = true
+                    ).toAgendaItemUi(),
+                    Event(
+                        id = "2",
+                        title = "Event",
+                        description = "Description",
+                        from = ZonedDateTime.now(),
+                        to = ZonedDateTime.now().plusMinutes(30),
+                        remindAt = ZonedDateTime.now(),
+                        attendees = listOf(),
+                        photos = listOf(),
+                        isGoing = true
+                    ).toAgendaItemUi(),
+                    Reminder(
+                        id = "3",
+                        title = "Reminder",
+                        description = "Description",
+                        time = ZonedDateTime.now(),
+                        remindAt = ZonedDateTime.now()
+                    ).toAgendaItemUi(),
+                )
             ),
-            onAction = {}
+            onAction = {},
         )
     }
 }
