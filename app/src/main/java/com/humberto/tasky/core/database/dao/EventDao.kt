@@ -25,17 +25,17 @@ interface EventDao {
     fun getEventsForDay(startOfDay: Long, endOfDay: Long): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM evententity WHERE id=:id")
-    fun getEvent(id: String): EventEntity
+    suspend fun getEvent(id: String): EventEntity
 
     @Query("DELETE FROM evententity WHERE id=:id")
-    fun deleteEvent(id: String)
+    suspend fun deleteEvent(id: String)
 
     @Query("DELETE FROM evententity")
-    fun deleteAllEvents()
+    suspend fun deleteAllEvents()
 
     @Query("SELECT * FROM photoentity WHERE `key` IN (:keys)")
-    fun getPhotosByKeys(keys: List<String>): List<PhotoEntity>
+    suspend fun getPhotosByKeys(keys: List<String>): List<PhotoEntity>
 
     @Query("SELECT * FROM attendeeentity WHERE `userId` IN (:ids)")
-    fun getAttendeesByIds(ids: List<String>): List<AttendeeEntity>
+    suspend fun getAttendeesByIds(ids: List<String>): List<AttendeeEntity>
 }

@@ -45,11 +45,10 @@ class AccessTokenAuthenticator @Inject constructor(
                     userId = authInfo.userId
             ))
         }.onSuccess { accessTokenResponse ->
-            result = AuthInfo(
+            result = result.copy(
                 accessToken = accessTokenResponse.accessToken,
                 refreshToken = authInfo.refreshToken,
                 userId = authInfo.userId,
-                fullName = authInfo.fullName
             )
         }
         return result

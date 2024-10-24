@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 interface LocalAgendaDataSource {
-    fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>>
+    suspend fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>>
     suspend fun upsertFullAgenda(
         tasks: List<Task>,
         events: List<Event>,
