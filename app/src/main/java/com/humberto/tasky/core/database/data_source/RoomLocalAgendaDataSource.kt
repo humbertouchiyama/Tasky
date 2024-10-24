@@ -14,7 +14,7 @@ import com.humberto.tasky.core.database.mapper.toReminder
 import com.humberto.tasky.core.database.mapper.toReminderEntity
 import com.humberto.tasky.core.database.mapper.toTask
 import com.humberto.tasky.core.database.mapper.toTaskEntity
-import com.humberto.tasky.core.domain.agenda.Agenda
+import com.humberto.tasky.core.domain.agenda.AgendaItem
 import com.humberto.tasky.core.domain.agenda.LocalAgendaDataSource
 import com.humberto.tasky.core.domain.event.Event
 import com.humberto.tasky.core.domain.reminder.Reminder
@@ -75,7 +75,7 @@ class RoomLocalAgendaDataSource(
         }
     }
 
-    override fun getAgendaForDate(localDate: LocalDate): Flow<Agenda> {
+    override fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>> {
         val startOfDay = localDate.toStartOfDayUtc().toInstant().toEpochMilli()
         val endOfDay = localDate.toEndOfDayUtc().toInstant().toEpochMilli()
         
@@ -118,11 +118,12 @@ class RoomLocalAgendaDataSource(
           tasks,
           events,
           reminders ->
-            Agenda(
-                tasks = tasks,
-                events = events,
-                reminders = reminders
-            )
+            val combinedList =
+                tasks.map { AgendaItem.TaskItem(it) } +
+                events.map { AgendaItem.EventItem(it) } +
+                reminders.map { AgendaItem.ReminderItem(it) }
+
+            combinedList.sortedBy { it.dateTime }
         }
     }
 

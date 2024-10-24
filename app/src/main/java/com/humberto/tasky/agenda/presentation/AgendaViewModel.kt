@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
-import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
-import com.humberto.tasky.core.domain.agenda.Agenda
 import com.humberto.tasky.core.domain.agenda.LocalAgendaDataSource
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
@@ -44,11 +42,10 @@ class AgendaViewModel @Inject constructor(
 
     private fun buildUserInitials() {
         viewModelScope.launch {
-            val fullName = sessionManager.get()?.fullName
-            fullName?.let {
+            sessionManager.get()?.let { authInfo ->
                 _agendaState.update { state ->
                     state.copy(
-                        initials = fullName.toInitials()
+                        initials = authInfo.fullName.toInitials()
                     )
                 }
             }
@@ -82,10 +79,10 @@ class AgendaViewModel @Inject constructor(
                 state.copy(isLoadingAgendaItems = true)
             }
             localAgendaDataSource.getAgendaForDate(selectedDate)
-                .collect { agenda ->
+                .collect { agendaItems ->
                     _agendaState.update { state ->
                         state.copy(
-                            agendaItems = orderAgendaItems(agenda),
+                            agendaItems = agendaItems.map { it.toAgendaItemUi() },
                             isLoadingAgendaItems = false
                         )
                     }
@@ -94,22 +91,14 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-    private fun orderAgendaItems(agenda: Agenda): List<AgendaItemUi> {
-        val allItems = mutableListOf<AgendaItemUi>()
-        allItems.addAll(agenda.events.map { event -> event.toAgendaItemUi() })
-        allItems.addAll(agenda.tasks.map { task -> task.toAgendaItemUi() })
-        allItems.addAll(agenda.reminders.map { reminder -> reminder.toAgendaItemUi() })
-        return allItems.sortedBy { it.dateTime }
-    }
-
     private fun logout() {
         applicationScope.launch {
             _agendaState.update { state ->
                 state.copy(isLoggingOut = true)
             }
+            localAgendaDataSource.deleteAllAgenda()
             agendaRepository.logout()
             sessionManager.set(null)
-            localAgendaDataSource.deleteAllAgenda()
             eventChannel.send(AgendaEvent.LogoutSuccess)
             _agendaState.update { state ->
                 state.copy(isLoggingOut = false)

@@ -2,41 +2,37 @@ package com.humberto.tasky.agenda.presentation.mapper
 
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
-import com.humberto.tasky.core.domain.event.Event
-import com.humberto.tasky.core.domain.reminder.Reminder
-import com.humberto.tasky.core.domain.task.Task
+import com.humberto.tasky.core.domain.agenda.AgendaItem
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-fun Task.toAgendaItemUi(): AgendaItemUi =
-    AgendaItemUi(
-        id = id ?: UUID.randomUUID().toString(),
-        title = title,
-        description = description ?: "",
-        dateTime = time.toFormattedDateTime(),
-        agendaItemType = AgendaItemType.TASK,
-        isItemChecked = isDone
-    )
-
-fun Event.toAgendaItemUi(): AgendaItemUi =
-    AgendaItemUi(
-        id = id ?: UUID.randomUUID().toString(),
-        title = title,
-        description = description ?: "",
-        dateTime = "${from.toFormattedDateTime()} - ${to.toFormattedDateTime()}",
-        agendaItemType = AgendaItemType.EVENT
-    )
-
-fun Reminder.toAgendaItemUi(): AgendaItemUi =
-    AgendaItemUi(
-        id = id ?: UUID.randomUUID().toString(),
-        title = title,
-        description = description ?: "",
-        dateTime = time.toFormattedDateTime(),
-        agendaItemType = AgendaItemType.REMINDER
-    )
+fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
+    return when (this) {
+        is AgendaItem.TaskItem -> AgendaItemUi(
+            id = task.id ?: UUID.randomUUID().toString(),
+            title = task.title,
+            description = task.description ?: "",
+            dateTime = task.time.toFormattedDateTime(),
+            agendaItemType = AgendaItemType.TASK
+        )
+        is AgendaItem.EventItem -> AgendaItemUi(
+            id = event.id ?: UUID.randomUUID().toString(),
+            title = event.title,
+            description = event.description ?: "",
+            dateTime = "${event.from.toFormattedDateTime()} - ${event.to.toFormattedDateTime()}",
+            agendaItemType = AgendaItemType.EVENT
+        )
+        is AgendaItem.ReminderItem -> AgendaItemUi(
+            id = reminder.id ?: UUID.randomUUID().toString(),
+            title = reminder.title,
+            description = reminder.description ?: "",
+            dateTime = reminder.time.toFormattedDateTime(),
+            agendaItemType = AgendaItemType.REMINDER
+        )
+    }
+}
 
 private fun ZonedDateTime.toFormattedDateTime(): String {
     val timeInLocalTime = this
