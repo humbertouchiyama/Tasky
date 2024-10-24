@@ -18,11 +18,11 @@ interface TaskDao {
     fun getTasksForDay(startOfDay: Long, endOfDay: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM taskentity WHERE id=:id")
-    fun getTask(id: String): TaskEntity
+    suspend fun getTask(id: String): TaskEntity
 
     @Query("DELETE FROM taskentity WHERE id=:id")
-    fun deleteTask(id: String)
+    suspend fun deleteTask(id: String)
 
     @Query("DELETE FROM taskentity")
-    fun deleteAllTasks()
+    suspend fun deleteAllTasks()
 }

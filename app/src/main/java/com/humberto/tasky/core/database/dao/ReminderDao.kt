@@ -19,11 +19,11 @@ interface ReminderDao {
     fun getRemindersForDay(startOfDay: Long, endOfDay: Long): Flow<List<ReminderEntity>>
 
     @Query("SELECT * FROM reminderentity WHERE id=:id")
-    fun getReminder(id: String): ReminderEntity
+    suspend fun getReminder(id: String): ReminderEntity
 
     @Query("DELETE FROM reminderentity WHERE id=:id")
-    fun deleteReminder(id: String)
+    suspend fun deleteReminder(id: String)
 
     @Query("DELETE FROM reminderentity")
-    fun deleteAllReminders()
+    suspend fun deleteAllReminders()
 }

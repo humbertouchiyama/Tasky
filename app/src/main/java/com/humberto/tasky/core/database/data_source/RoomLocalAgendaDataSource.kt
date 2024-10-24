@@ -75,7 +75,7 @@ class RoomLocalAgendaDataSource(
         }
     }
 
-    override fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>> {
+    override suspend fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>> {
         val startOfDay = localDate.toStartOfDayUtc().toInstant().toEpochMilli()
         val endOfDay = localDate.toEndOfDayUtc().toInstant().toEpochMilli()
         
@@ -145,13 +145,13 @@ class RoomLocalAgendaDataSource(
     }
 
     override suspend fun deleteAllAgenda() {
-        withContext(Dispatchers.IO) {
-            agendaDatabase.withTransaction {
+        agendaDatabase.withTransaction {
+            withContext(Dispatchers.IO) {
                 listOf(
                     async { eventDao.deleteAllEvents() },
                     async { reminderDao.deleteAllReminders() },
                     async { taskDao.deleteAllTasks() }
-                )
+                ).awaitAll()
             }
         }
     }
