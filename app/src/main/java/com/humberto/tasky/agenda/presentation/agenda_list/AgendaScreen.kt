@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.humberto.tasky.agenda.presentation
+package com.humberto.tasky.agenda.presentation.agenda_list
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -32,11 +32,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
-import com.humberto.tasky.agenda.presentation.components.AgendaListItem
+import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
-import com.humberto.tasky.core.domain.event.Event
-import com.humberto.tasky.core.domain.reminder.Reminder
-import com.humberto.tasky.core.domain.task.Task
+import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.event.domain.Event
+import com.humberto.tasky.reminder.domain.Reminder
+import com.humberto.tasky.task.domain.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
@@ -64,6 +66,7 @@ fun AgendaScreenRoot(
                     Toast.LENGTH_LONG
                 ).show()
             }
+
             AgendaEvent.LogoutSuccess -> {
                 Toast.makeText(
                     context,
@@ -134,15 +137,27 @@ private fun AgendaScreen(
                 menuItems = listOf(
                     DropDownItem(
                         title = stringResource(id = R.string.event),
-                        onClick = { onAction(AgendaAction.OnNewEventClick) },
+                        onClick = {
+                            onAction(
+                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.EVENT)
+                            )
+                        },
                     ),
                     DropDownItem(
                         title = stringResource(id = R.string.task),
-                        onClick = { onAction(AgendaAction.OnNewTaskClick) },
+                        onClick = {
+                            onAction(
+                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.TASK)
+                            )
+                        }
                     ),
                     DropDownItem(
                         title = stringResource(id = R.string.reminder),
-                        onClick = { onAction(AgendaAction.OnNewReminderClick) },
+                        onClick = {
+                            onAction(
+                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.REMINDER)
+                            )
+                        }
                     )
                 ),
             )
@@ -175,14 +190,13 @@ private fun AgendaScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(state.agendaItems, key = { it.id } ) { agendaItem ->
+                items(state.agendaItems, key = { it.id }) { agendaItem ->
                     AgendaListItem(
                         agendaItem = agendaItem,
-                        onOpenItem = { },
-                        onEditItem = { },
-                        onDeleteItem = { },
+                        onOpenItem = { onAction(AgendaAction.OnOpenAgendaItemClick(agendaItem)) },
+                        onEditItem = { onAction(AgendaAction.OnEditAgendaItemClick(agendaItem)) },
+                        onDeleteItem = { onAction(AgendaAction.OnDeleteAgendaItemClick(agendaItem)) },
                     )
-
                 }
             }
         }
@@ -198,31 +212,37 @@ private fun AgendaScreenPreview() {
                 selectedDateIsToday = true,
                 initials = "HC",
                 agendaItems = listOf(
-                    Task(
-                        id = "1",
-                        title = "Task",
-                        description = "Description",
-                        time = ZonedDateTime.now(),
-                        remindAt = ZonedDateTime.now(),
-                        isDone = true
+                    AgendaItem.TaskItem(
+                        Task(
+                            id = "1",
+                            title = "Task",
+                            description = "Description",
+                            time = ZonedDateTime.now(),
+                            remindAt = ZonedDateTime.now(),
+                            isDone = true
+                        )
                     ).toAgendaItemUi(),
-                    Event(
-                        id = "2",
-                        title = "Event",
-                        description = "Description",
-                        from = ZonedDateTime.now(),
-                        to = ZonedDateTime.now().plusMinutes(30),
-                        remindAt = ZonedDateTime.now(),
-                        attendees = listOf(),
-                        photos = listOf(),
-                        isGoing = true
+                    AgendaItem.EventItem(
+                        Event(
+                            id = "2",
+                            title = "Event",
+                            description = "Description",
+                            from = ZonedDateTime.now(),
+                            to = ZonedDateTime.now().plusMinutes(30),
+                            remindAt = ZonedDateTime.now(),
+                            attendees = listOf(),
+                            photos = listOf(),
+                            isGoing = true
+                        )
                     ).toAgendaItemUi(),
-                    Reminder(
-                        id = "3",
-                        title = "Reminder",
-                        description = "Description",
-                        time = ZonedDateTime.now(),
-                        remindAt = ZonedDateTime.now()
+                    AgendaItem.ReminderItem(
+                        Reminder(
+                            id = "3",
+                            title = "Reminder",
+                            description = "Description",
+                            time = ZonedDateTime.now(),
+                            remindAt = ZonedDateTime.now()
+                        )
                     ).toAgendaItemUi(),
                 )
             ),

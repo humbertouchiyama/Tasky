@@ -1,4 +1,4 @@
-package com.humberto.tasky.core.domain.event
+package com.humberto.tasky.event.domain
 
 import java.time.ZonedDateTime
 

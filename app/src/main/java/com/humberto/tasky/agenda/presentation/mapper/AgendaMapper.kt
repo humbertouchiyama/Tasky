@@ -1,8 +1,8 @@
 package com.humberto.tasky.agenda.presentation.mapper
 
 import com.humberto.tasky.agenda.presentation.AgendaItemType
-import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
-import com.humberto.tasky.core.domain.agenda.AgendaItem
+import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
+import com.humberto.tasky.agenda.domain.AgendaItem
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

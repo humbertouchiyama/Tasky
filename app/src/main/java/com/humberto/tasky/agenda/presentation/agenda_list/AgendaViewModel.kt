@@ -1,16 +1,15 @@
-package com.humberto.tasky.agenda.presentation
+package com.humberto.tasky.agenda.presentation.agenda_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
-import com.humberto.tasky.core.domain.agenda.LocalAgendaDataSource
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
+import com.humberto.tasky.event.domain.EventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +23,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AgendaViewModel @Inject constructor(
     private val sessionManager: SessionManager,
-    private val agendaRepository: AgendaRepository,
     private val applicationScope: CoroutineScope,
-    private val localAgendaDataSource: LocalAgendaDataSource
+    private val agendaRepository: AgendaRepository,
+    private val eventRepository: EventRepository
 ): ViewModel() {
 
     private val _agendaState = MutableStateFlow(AgendaState())
@@ -65,20 +64,22 @@ class AgendaViewModel @Inject constructor(
                 }
                 getAgendaForDate(selectedDate)
             }
-            AgendaAction.OnLogoutClick -> logout()
-            AgendaAction.OnNewEventClick -> { }
-            AgendaAction.OnNewReminderClick -> { }
-            AgendaAction.OnNewTaskClick -> { }
-            else -> Unit
+            AgendaAction.OnLogoutClick -> {
+                logout()
+            }
+            is AgendaAction.OnDeleteAgendaItemClick -> {}
+            is AgendaAction.OnEditAgendaItemClick -> TODO()
+            is AgendaAction.OnNewAgendaItemClick -> TODO()
+            is AgendaAction.OnOpenAgendaItemClick -> TODO()
         }
     }
 
     private fun getAgendaForDate(selectedDate: LocalDate) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _agendaState.update { state ->
                 state.copy(isLoadingAgendaItems = true)
             }
-            localAgendaDataSource.getAgendaForDate(selectedDate)
+            agendaRepository.getAgendaForDate(selectedDate)
                 .collect { agendaItems ->
                     _agendaState.update { state ->
                         state.copy(
@@ -96,7 +97,7 @@ class AgendaViewModel @Inject constructor(
             _agendaState.update { state ->
                 state.copy(isLoggingOut = true)
             }
-            localAgendaDataSource.deleteAllAgenda()
+            agendaRepository.deleteAllAgenda()
             agendaRepository.logout()
             sessionManager.set(null)
             eventChannel.send(AgendaEvent.LogoutSuccess)

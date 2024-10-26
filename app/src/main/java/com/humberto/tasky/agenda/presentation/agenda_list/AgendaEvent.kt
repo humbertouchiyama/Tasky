@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.presentation
+package com.humberto.tasky.agenda.presentation.agenda_list
 
 import com.humberto.tasky.core.presentation.ui.UiText
 

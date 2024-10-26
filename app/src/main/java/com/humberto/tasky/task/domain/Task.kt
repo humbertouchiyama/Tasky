@@ -1,11 +1,12 @@
-package com.humberto.tasky.core.domain.reminder
+package com.humberto.tasky.task.domain
 
 import java.time.ZonedDateTime
 
-data class Reminder(
+data class Task(
     val id: String?,
     val title: String,
     val description: String?,
     val time: ZonedDateTime,
-    val remindAt: ZonedDateTime
+    val remindAt: ZonedDateTime,
+    val isDone: Boolean
 )

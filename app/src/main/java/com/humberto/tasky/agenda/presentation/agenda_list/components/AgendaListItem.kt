@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.presentation.components
+package com.humberto.tasky.agenda.presentation.agenda_list.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,21 +24,21 @@ import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
-import com.humberto.tasky.agenda.presentation.model.AgendaItemUi
-import com.humberto.tasky.core.domain.task.Task
-import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
-import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
-import com.humberto.tasky.core.presentation.designsystem.TaskyLightGreen
-import com.humberto.tasky.core.presentation.designsystem.TaskyLight2
-import com.humberto.tasky.core.presentation.designsystem.TaskyWhite
+import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
+import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.task.domain.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
+import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
+import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
+import com.humberto.tasky.core.presentation.designsystem.TaskyLight2
+import com.humberto.tasky.core.presentation.designsystem.TaskyLightGreen
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
+import com.humberto.tasky.core.presentation.designsystem.TaskyWhite
 import com.humberto.tasky.core.presentation.designsystem.components.MoreButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import java.time.ZonedDateTime
-import java.util.UUID
 
 @Composable
 fun AgendaListItem(
@@ -153,13 +153,16 @@ fun AgendaListItem(
 private fun AgendaListItemPreview() {
     TaskyTheme {
         AgendaListItem(
-            agendaItem = Task(
-                id = "1",
-                title = "Meeting",
-                description = "Description",
-                time = ZonedDateTime.now(),
-                remindAt = ZonedDateTime.now(),
-                isDone = true
+            agendaItem =
+            AgendaItem.TaskItem(
+                Task(
+                    id = "1",
+                    title = "Meeting",
+                    description = "Description",
+                    time = ZonedDateTime.now(),
+                    remindAt = ZonedDateTime.now(),
+                    isDone = true
+                )
             ).toAgendaItemUi(),
             onOpenItem = { },
             onEditItem = { },
