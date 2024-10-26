@@ -6,8 +6,6 @@ import com.humberto.tasky.core.database.AgendaDatabase
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
-import com.humberto.tasky.core.database.data_source.RoomLocalAgendaDataSource
-import com.humberto.tasky.core.domain.agenda.LocalAgendaDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,21 +51,5 @@ class DatabaseModule {
         reminderDatabase: AgendaDatabase
     ): ReminderDao {
         return reminderDatabase.reminderDao
-    }
-
-    @Provides
-    @Singleton
-    fun providesRoomLocalAgendaDataSource(
-        taskDao: TaskDao,
-        eventDao: EventDao,
-        reminderDao: ReminderDao,
-        agendaDatabase: AgendaDatabase
-    ): LocalAgendaDataSource {
-        return RoomLocalAgendaDataSource(
-            taskDao = taskDao,
-            eventDao = eventDao,
-            reminderDao = reminderDao,
-            agendaDatabase = agendaDatabase
-        )
     }
 }

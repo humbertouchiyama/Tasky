@@ -1,11 +1,12 @@
-package com.humberto.tasky.core.database.mapper
+package com.humberto.tasky.event.data
 
 import com.humberto.tasky.core.database.entity.AttendeeEntity
 import com.humberto.tasky.core.database.entity.EventEntity
 import com.humberto.tasky.core.database.entity.PhotoEntity
-import com.humberto.tasky.core.domain.event.Attendee
-import com.humberto.tasky.core.domain.event.Event
-import com.humberto.tasky.core.domain.event.Photo
+import com.humberto.tasky.core.domain.util.toZonedDateTime
+import com.humberto.tasky.event.domain.Attendee
+import com.humberto.tasky.event.domain.Event
+import com.humberto.tasky.event.domain.Photo
 import java.util.UUID
 
 fun EventEntity.toEvent(
