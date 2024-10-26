@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.humberto.tasky.agenda.presentation.AgendaScreenRoot
+import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 
