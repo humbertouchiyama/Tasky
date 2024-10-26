@@ -32,13 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.humberto.tasky.R
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
-import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.event.domain.Event
-import com.humberto.tasky.reminder.domain.Reminder
-import com.humberto.tasky.task.domain.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
@@ -48,12 +45,17 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffol
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
+import com.humberto.tasky.event.domain.Event
+import com.humberto.tasky.main.navigation.AgendaDetails
+import com.humberto.tasky.reminder.domain.Reminder
+import com.humberto.tasky.task.domain.Task
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.ZonedDateTime
 
 @Composable
 fun AgendaScreenRoot(
     onLogoutSuccess: () -> Unit,
+    onNewAgendaItemClick: (AgendaDetails) -> Unit,
     viewModel: AgendaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -81,7 +83,15 @@ fun AgendaScreenRoot(
     val state by viewModel.agendaState.collectAsState()
     AgendaScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = { action ->
+            when(action) {
+                is AgendaAction.OnNewAgendaItemClick -> onNewAgendaItemClick(
+                    action.agendaDetails
+                )
+                else -> Unit
+            }
+            viewModel.onAction(action)
+        }
     )
 }
 
@@ -139,7 +149,11 @@ private fun AgendaScreen(
                         title = stringResource(id = R.string.event),
                         onClick = {
                             onAction(
-                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.EVENT)
+                                AgendaAction.OnNewAgendaItemClick(
+                                    AgendaDetails(
+                                        agendaItemType = AgendaItemType.EVENT
+                                    )
+                                )
                             )
                         },
                     ),
@@ -147,7 +161,11 @@ private fun AgendaScreen(
                         title = stringResource(id = R.string.task),
                         onClick = {
                             onAction(
-                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.TASK)
+                                AgendaAction.OnNewAgendaItemClick(
+                                    AgendaDetails(
+                                        agendaItemType = AgendaItemType.TASK
+                                    )
+                                )
                             )
                         }
                     ),
@@ -155,7 +173,11 @@ private fun AgendaScreen(
                         title = stringResource(id = R.string.reminder),
                         onClick = {
                             onAction(
-                                AgendaAction.OnNewAgendaItemClick(AgendaItemType.REMINDER)
+                                AgendaAction.OnNewAgendaItemClick(
+                                    AgendaDetails(
+                                        agendaItemType = AgendaItemType.REMINDER
+                                    )
+                                )
                             )
                         }
                     )
@@ -193,8 +215,18 @@ private fun AgendaScreen(
                 items(state.agendaItems, key = { it.id }) { agendaItem ->
                     AgendaListItem(
                         agendaItem = agendaItem,
-                        onOpenItem = { onAction(AgendaAction.OnOpenAgendaItemClick(agendaItem)) },
-                        onEditItem = { onAction(AgendaAction.OnEditAgendaItemClick(agendaItem)) },
+                        onOpenItem = { onAction(AgendaAction.OnOpenAgendaItemClick(
+                            AgendaDetails(
+                                agendaItemId = agendaItem.id,
+                                agendaItemType = agendaItem.agendaItemType
+                            )
+                        )) },
+                        onEditItem = { onAction(AgendaAction.OnEditAgendaItemClick(
+                            AgendaDetails(
+                                agendaItemId = agendaItem.id,
+                                agendaItemType = agendaItem.agendaItemType
+                            )
+                        )) },
                         onDeleteItem = { onAction(AgendaAction.OnDeleteAgendaItemClick(agendaItem)) },
                     )
                 }

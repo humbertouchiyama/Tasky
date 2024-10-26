@@ -5,10 +5,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
+import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsScreenRoot
 import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
+import com.humberto.tasky.main.navigation.AgendaDetails
+import com.humberto.tasky.main.navigation.AgendaList
+import com.humberto.tasky.main.navigation.Login
+import com.humberto.tasky.main.navigation.Register
 
 @Composable
 fun NavigationRoot(
@@ -17,7 +22,7 @@ fun NavigationRoot(
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) "agenda" else "auth"
+        startDestination = if (isLoggedIn) AgendaList else Login
     ) {
         authGraph(navController)
         agendaGraph(navController)
@@ -25,46 +30,38 @@ fun NavigationRoot(
 }
 
 private fun NavGraphBuilder.authGraph(navController: NavHostController) {
-    navigation(
-        startDestination = "login",
-        route = "auth"
-    ) {
-        composable("login") {
-            LoginScreenRoot(
-                onLoginSuccess = {
-                    navController.navigate("agenda") {
-                        popUpTo("auth") {
-                            inclusive = true
-                        }
-                    }
-                },
-                onSignUpClick = {
-                    navController.navigate("register") {
-                        popUpTo("login") {
-                            inclusive = true
-                            saveState = true
-                        }
-                        restoreState = true
-                    }
+    composable<Login> {
+        LoginScreenRoot(
+            onLoginSuccess = {
+                navController.navigate(AgendaList) {
+                    popUpTo(Login)
                 }
-            )
-        }
-        composable("register") {
-            RegisterScreenRoot(
-                onRegisterSuccess = {
-                    fromRegisterToLogin(navController)
-                },
-                onBackClick = {
-                    fromRegisterToLogin(navController)
+            },
+            onSignUpClick = {
+                navController.navigate(Register) {
+                    popUpTo(Login) {
+                        saveState = true
+                    }
+                    restoreState = true
                 }
-            )
-        }
+            }
+        )
+    }
+    composable<Register> {
+        RegisterScreenRoot(
+            onRegisterSuccess = {
+                fromRegisterToLogin(navController)
+            },
+            onBackClick = {
+                fromRegisterToLogin(navController)
+            }
+        )
     }
 }
 
 fun fromRegisterToLogin(navController: NavHostController) {
-    navController.navigate("login") {
-        popUpTo("register") {
+    navController.navigate(Login) {
+        popUpTo(Register) {
             inclusive = true
             saveState = true
         }
@@ -73,20 +70,26 @@ fun fromRegisterToLogin(navController: NavHostController) {
 }
 
 private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
-    navigation(
-        startDestination = "agenda_list",
-        route = "agenda"
-    ) {
-        composable("agenda_list") {
-            AgendaScreenRoot(
-                onLogoutSuccess = {
-                    navController.navigate("auth") {
-                        popUpTo("agenda") {
-                            inclusive = true
-                        }
+    composable<AgendaList> {
+        AgendaScreenRoot(
+            onLogoutSuccess = {
+                navController.navigate(Login) {
+                    popUpTo(AgendaList) {
+                        inclusive = true
                     }
                 }
-            )
-        }
+            },
+            onNewAgendaItemClick = { agendaDetails ->
+                navController.navigate(
+                    route = agendaDetails,
+                ) {
+                    popUpTo(AgendaList)
+                }
+            }
+        )
+    }
+    composable<AgendaDetails> { backStackEntry ->
+        val agendaDetails: AgendaDetails = backStackEntry.toRoute<AgendaDetails>()
+        AgendaDetailsScreenRoot(agendaDetails)
     }
 }
