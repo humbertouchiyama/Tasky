@@ -69,8 +69,8 @@ class AgendaViewModel @Inject constructor(
             }
             is AgendaAction.OnDeleteAgendaItemClick -> {}
             is AgendaAction.OnEditAgendaItemClick -> TODO()
-            is AgendaAction.OnNewAgendaItemClick -> TODO()
             is AgendaAction.OnOpenAgendaItemClick -> TODO()
+            else -> Unit
         }
     }
 

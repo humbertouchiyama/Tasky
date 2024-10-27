@@ -12,8 +12,13 @@ import javax.inject.Inject
 class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao
 ): TaskRepository {
-    override suspend fun getTask(taskId: String): Task {
-        return taskDao.getTask(taskId).toTask()
+    override suspend fun getTask(taskId: String): Result<Task, DataError> {
+        val task = taskDao.getTask(taskId)?.toTask()
+        return if(task != null) {
+            Result.Success(task)
+        } else {
+            Result.Error(DataError.Local.NOT_FOUND)
+        }
     }
 
     override suspend fun createTask(task: Task): EmptyResult<DataError> {

@@ -12,18 +12,22 @@ import javax.inject.Inject
 class EventRepositoryImpl @Inject constructor(
     private val eventDao: EventDao
 ) : EventRepository {
-    override suspend fun getEvent(eventId: String): Event {
+    override suspend fun getEvent(eventId: String): Result<Event, DataError> {
         val eventEntity = eventDao.getEvent(eventId)
-        val attendees = eventDao
-            .getAttendeesByIds(eventEntity.attendeeIds)
-            .map { it.toAttendee() }
-        val photos = eventDao
-            .getPhotosByKeys(eventEntity.photoKeys)
-            .map { it.toPhoto() }
-        return eventEntity.toEvent(
-            attendees = attendees,
-            photos = photos
-        )
+        return eventEntity?.let {
+            val attendees = eventDao
+                .getAttendeesByIds(eventEntity.attendeeIds)
+                .map { it.toAttendee() }
+            val photos = eventDao
+                .getPhotosByKeys(eventEntity.photoKeys)
+                .map { it.toPhoto() }
+            Result.Success(
+                eventEntity.toEvent(
+                attendees = attendees,
+                photos = photos
+                )
+            )
+        } ?: Result.Error(DataError.Local.NOT_FOUND)
     }
 
     override suspend fun createEvent(event: Event): EmptyResult<DataError> {
