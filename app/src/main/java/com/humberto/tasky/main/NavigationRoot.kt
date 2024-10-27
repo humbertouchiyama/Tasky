@@ -90,6 +90,17 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     }
     composable<AgendaDetails> { backStackEntry ->
         val agendaDetails: AgendaDetails = backStackEntry.toRoute<AgendaDetails>()
-        AgendaDetailsScreenRoot(agendaDetails)
+        AgendaDetailsScreenRoot(
+            agendaDetails,
+            onBackClick = {
+                navController.navigate(
+                    route = AgendaList
+                ) {
+                    popUpTo(agendaDetails) {
+                        inclusive = true
+                    }
+                }
+            }
+        )
     }
 }
