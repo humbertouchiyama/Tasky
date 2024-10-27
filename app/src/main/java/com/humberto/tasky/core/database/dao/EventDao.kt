@@ -25,7 +25,7 @@ interface EventDao {
     fun getEventsForDay(startOfDay: Long, endOfDay: Long): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM evententity WHERE id=:id")
-    suspend fun getEvent(id: String): EventEntity
+    suspend fun getEvent(id: String): EventEntity?
 
     @Query("DELETE FROM evententity WHERE id=:id")
     suspend fun deleteEvent(id: String)

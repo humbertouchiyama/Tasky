@@ -12,8 +12,13 @@ import javax.inject.Inject
 class ReminderRepositoryImpl @Inject constructor(
     private val reminderDao: ReminderDao
 ): ReminderRepository {
-    override suspend fun getReminder(reminderId: String): Reminder {
-        return reminderDao.getReminder(reminderId).toReminder()
+    override suspend fun getReminder(reminderId: String): Result<Reminder, DataError> {
+        val reminder = reminderDao.getReminder(reminderId)?.toReminder()
+        return if(reminder != null) {
+            Result.Success(reminder)
+        } else {
+            Result.Error(DataError.Local.NOT_FOUND)
+        }
     }
 
     override suspend fun createReminder(reminder: Reminder): EmptyResult<DataError> {

@@ -39,4 +39,5 @@
     <string name="delete">Delete</string>
     <string name="error_disk_full">The disk is full!</string>
     <string name="save">Save</string>
+    <string name="error_not_found">Item not found!</string>
 </resources>
