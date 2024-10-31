@@ -18,15 +18,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 
 @Composable
 fun TaskyRadioButton(
-    selected: Boolean,
+    selected: Boolean = false,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = { },
-    radioButtonColor: Color
+    radioButtonColor: Color = TaskyBlack
 ) {
     Box(
         modifier = modifier
