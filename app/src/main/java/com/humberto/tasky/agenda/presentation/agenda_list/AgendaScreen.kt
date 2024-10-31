@@ -151,7 +151,8 @@ private fun AgendaScreen(
                             onAction(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
-                                        agendaItemType = AgendaItemType.EVENT
+                                        agendaItemType = AgendaItemType.EVENT,
+                                        isEditing = true
                                     )
                                 )
                             )
@@ -163,7 +164,8 @@ private fun AgendaScreen(
                             onAction(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
-                                        agendaItemType = AgendaItemType.TASK
+                                        agendaItemType = AgendaItemType.TASK,
+                                        isEditing = true
                                     )
                                 )
                             )
@@ -175,7 +177,8 @@ private fun AgendaScreen(
                             onAction(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
-                                        agendaItemType = AgendaItemType.REMINDER
+                                        agendaItemType = AgendaItemType.REMINDER,
+                                        isEditing = true
                                     )
                                 )
                             )
