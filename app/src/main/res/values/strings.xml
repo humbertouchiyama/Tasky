@@ -40,4 +40,10 @@
     <string name="error_disk_full">The disk is full!</string>
     <string name="save">Save</string>
     <string name="error_not_found">Item not found!</string>
+    <string name="add_photos">Add photos</string>
+    <string name="visitors">Visitors</string>
+    <string name="filter_all">All</string>
+    <string name="filter_going">Going</string>
+    <string name="filter_not_going">Not going</string>
+    <string name="from">From</string>
 </resources>

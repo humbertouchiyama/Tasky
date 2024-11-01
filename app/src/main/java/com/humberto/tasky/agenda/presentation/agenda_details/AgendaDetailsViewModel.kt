@@ -16,21 +16,24 @@ class AgendaDetailsViewModel @Inject constructor(
 
     private val agendaDetailsArgs = savedStateHandle.toRoute<AgendaDetails>()
 
-    private val _agendaDetailsState = MutableStateFlow(
+    private val _state = MutableStateFlow(
         AgendaDetailsState(
             agendaItemType = agendaDetailsArgs.agendaItemType,
             agendaItemId = agendaDetailsArgs.agendaItemId,
             isEditing = agendaDetailsArgs.isEditing
         )
     )
-    val agendaDetailsState: StateFlow<AgendaDetailsState> = _agendaDetailsState.asStateFlow()
+    val state: StateFlow<AgendaDetailsState> = _state.asStateFlow()
 
     private fun toggleEditingState() {
-        _agendaDetailsState.update { it.copy(isEditing = !it.isEditing) }
+        _state.update { it.copy(isEditing = !it.isEditing) }
     }
 
     fun onAction(agendaDetailsAction: AgendaDetailsAction) {
         when(agendaDetailsAction) {
+            is AgendaDetailsAction.OnSelectFilter -> {
+                _state.update { it.copy(selectedFilter = agendaDetailsAction.filterType) }
+            }
             is AgendaDetailsAction.OnSaveClick -> {
                 toggleEditingState()
             }
