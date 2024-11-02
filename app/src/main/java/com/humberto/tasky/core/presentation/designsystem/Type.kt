@@ -65,6 +65,12 @@ val Typography = Typography(
     headlineMedium = TextStyle(
         fontFamily = Inter,
         fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        color = TaskyWhite
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = Inter,
+        fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
         color = TaskyWhite
     ),
