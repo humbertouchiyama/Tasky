@@ -46,4 +46,10 @@
     <string name="filter_going">Going</string>
     <string name="filter_not_going">Not going</string>
     <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="at">At</string>
+    <string name="add_title">Add title</string>
+    <string name="saved_successful">Saved changes successfully!</string>
+    <string name="delete_successful">Event delete successfully!</string>
+    <string name="add_description">Add description, e.g., project timeline</string>
 </resources>
