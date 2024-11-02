@@ -35,7 +35,7 @@ import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
-import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
@@ -55,7 +55,7 @@ import java.time.ZonedDateTime
 @Composable
 fun AgendaScreenRoot(
     onLogoutSuccess: () -> Unit,
-    onNewAgendaItemClick: (AgendaDetails) -> Unit,
+    onGoToAgendaDetailsClick: (AgendaDetails) -> Unit,
     viewModel: AgendaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -84,11 +84,14 @@ fun AgendaScreenRoot(
     AgendaScreen(
         state = state,
         onAction = { action ->
-            when(action) {
-                is AgendaAction.OnNewAgendaItemClick -> onNewAgendaItemClick(
-                    action.agendaDetails
-                )
-                else -> Unit
+            val agendaDetails = when (action) {
+                is AgendaAction.OnNewAgendaItemClick -> action.agendaDetails
+                is AgendaAction.OnOpenAgendaItemClick -> action.agendaDetails
+                is AgendaAction.OnEditAgendaItemClick -> action.agendaDetails
+                else -> null
+            }
+            if (agendaDetails != null) {
+                onGoToAgendaDetailsClick(agendaDetails)
             }
             viewModel.onAction(action)
         }
@@ -207,7 +210,7 @@ private fun AgendaScreen(
                     modifier = Modifier
                         .padding(top = 8.dp),
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineSmall
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -227,7 +230,8 @@ private fun AgendaScreen(
                         onEditItem = { onAction(AgendaAction.OnEditAgendaItemClick(
                             AgendaDetails(
                                 agendaItemId = agendaItem.id,
-                                agendaItemType = agendaItem.agendaItemType
+                                agendaItemType = agendaItem.agendaItemType,
+                                isEditing = true
                             )
                         )) },
                         onDeleteItem = { onAction(AgendaAction.OnDeleteAgendaItemClick(agendaItem)) },

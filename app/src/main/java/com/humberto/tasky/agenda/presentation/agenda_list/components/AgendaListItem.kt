@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.AgendaItemType
-import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.task.domain.Task
@@ -100,7 +100,7 @@ fun AgendaListItem(
                         text = agendaItem.title,
                         modifier = Modifier,
                         color = foregroundColor,
-                        style = MaterialTheme.typography.headlineMedium.copy(
+                        style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.W600,
                             textDecoration =
                                 if (agendaItem.isItemChecked == true) TextDecoration.LineThrough

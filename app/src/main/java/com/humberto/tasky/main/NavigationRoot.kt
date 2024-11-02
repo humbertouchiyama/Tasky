@@ -79,7 +79,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     }
                 }
             },
-            onNewAgendaItemClick = { agendaDetails ->
+            onGoToAgendaDetailsClick = { agendaDetails ->
                 navController.navigate(
                     route = agendaDetails,
                 ) {

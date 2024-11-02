@@ -3,7 +3,7 @@ package com.humberto.tasky.agenda.presentation.agenda_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.humberto.tasky.agenda.domain.AgendaRepository
-import com.humberto.tasky.agenda.presentation.mapper.toAgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
@@ -68,8 +68,6 @@ class AgendaViewModel @Inject constructor(
                 logout()
             }
             is AgendaAction.OnDeleteAgendaItemClick -> {}
-            is AgendaAction.OnEditAgendaItemClick -> TODO()
-            is AgendaAction.OnOpenAgendaItemClick -> TODO()
             else -> Unit
         }
     }
@@ -88,7 +86,6 @@ class AgendaViewModel @Inject constructor(
                         )
                     }
                 }
-
         }
     }
 

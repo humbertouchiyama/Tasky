@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.presentation.mapper
+package com.humberto.tasky.agenda.presentation.agenda_list.mapper
 
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
