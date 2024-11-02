@@ -1,9 +1,9 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
 
 data class AgendaDetailsState(
-    val agendaItemId: String? = null,
-    val agendaItemType: AgendaItemType,
+    val agendaItem: AgendaDetailsUi,
     val isEditing: Boolean = false,
+    val selectedFilter: FilterType = FilterType.ALL,
 )
