@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -36,9 +37,11 @@ fun TaskyEditableField(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (alignContentToCenter) Text(text = "")
         Box(
-            modifier = if (alignContentToCenter) Modifier else Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            contentAlignment = if (alignContentToCenter)
+                Alignment.Center
+                else Alignment.CenterStart,
         ) {
             content()
         }
@@ -46,7 +49,8 @@ fun TaskyEditableField(
             Spacer(modifier = Modifier.width(24.dp))
             Icon(
                 imageVector = Icons.Default.ChevronRight,
-                contentDescription = null
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
             )
         }
     }
