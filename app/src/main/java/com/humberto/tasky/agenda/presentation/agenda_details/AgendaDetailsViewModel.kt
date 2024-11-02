@@ -95,7 +95,37 @@ class AgendaDetailsViewModel @Inject constructor(
             AgendaDetailsAction.OnEditClick -> {
                 toggleEditingState()
             }
+            is AgendaDetailsAction.OnSelectAtDate -> {
+                updateAgendaItem { it.copy(atDate = agendaDetailsAction.atDate) }
+            }
+            is AgendaDetailsAction.OnSelectAtTime -> {
+                updateAgendaItem { it.copy(atTime = agendaDetailsAction.atTime) }
+            }
+            is AgendaDetailsAction.OnSelectFromDate -> {
+                updateAgendaItem { it.copy(
+                        fromDate = agendaDetailsAction.fromDate,
+                        toDate = agendaDetailsAction.fromDate
+                    )
+                }
+            }
+            is AgendaDetailsAction.OnSelectFromTime -> {
+                val newFromTime = agendaDetailsAction.fromTime
+                val newToTime = newFromTime.plusMinutes(30)
+                updateAgendaItem { it.copy(fromTime = newFromTime, toTime = newToTime) }
+            }
+            is AgendaDetailsAction.OnSelectToDate -> {
+                updateAgendaItem { it.copy(toDate = agendaDetailsAction.toDate) }
+            }
+            is AgendaDetailsAction.OnSelectToTime -> {
+                updateAgendaItem { it.copy(toTime = agendaDetailsAction.toTime) }
+            }
             else -> Unit
+        }
+    }
+
+    private fun updateAgendaItem(transform: (AgendaDetailsUi) -> AgendaDetailsUi) {
+        _state.update { currentState ->
+            currentState.copy(agendaItem = transform(currentState.agendaItem))
         }
     }
 }
