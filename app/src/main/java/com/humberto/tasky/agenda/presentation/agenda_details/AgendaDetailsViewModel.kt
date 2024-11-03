@@ -11,10 +11,10 @@ import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetails
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.map
 import com.humberto.tasky.core.presentation.ui.asUiText
-import com.humberto.tasky.event.domain.EventRepository
+import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.main.navigation.AgendaDetails
-import com.humberto.tasky.reminder.domain.ReminderRepository
-import com.humberto.tasky.task.domain.TaskRepository
+import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -7,7 +7,7 @@ import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
-import com.humberto.tasky.event.domain.EventRepository
+import com.humberto.tasky.agenda.domain.event.EventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel

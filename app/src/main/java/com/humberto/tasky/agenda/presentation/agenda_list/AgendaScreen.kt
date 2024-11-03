@@ -45,10 +45,10 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffol
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
-import com.humberto.tasky.event.domain.Event
+import com.humberto.tasky.agenda.domain.event.Event
 import com.humberto.tasky.main.navigation.AgendaDetails
-import com.humberto.tasky.reminder.domain.Reminder
-import com.humberto.tasky.task.domain.Task
+import com.humberto.tasky.agenda.domain.reminder.Reminder
+import com.humberto.tasky.agenda.domain.task.Task
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.ZonedDateTime
 
