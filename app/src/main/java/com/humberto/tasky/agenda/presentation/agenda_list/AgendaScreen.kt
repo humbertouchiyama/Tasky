@@ -49,6 +49,7 @@ import com.humberto.tasky.agenda.domain.event.Event
 import com.humberto.tasky.main.navigation.AgendaDetails
 import com.humberto.tasky.agenda.domain.reminder.Reminder
 import com.humberto.tasky.agenda.domain.task.Task
+import com.humberto.tasky.core.presentation.ui.UiText
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.ZonedDateTime
 
@@ -199,20 +200,18 @@ private fun AgendaScreen(
         ) {
             TaskyCalendarHeader(
                 modifier = Modifier.padding(bottom = 8.dp),
+                selectedDate = state.selectedDate,
                 onSelectDate = { date ->
                     onAction(AgendaAction.OnSelectDate(date))
                 },
-                selectedDate = state.selectedDate
             )
-            if (state.selectedDateIsToday) {
-                Text(
-                    text = stringResource(id = R.string.today),
-                    modifier = Modifier
-                        .padding(top = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
+            Text(
+                text = state.dateLabel.asString(),
+                modifier = Modifier
+                    .padding(top = 8.dp),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.headlineSmall
+            )
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -248,7 +247,7 @@ private fun AgendaScreenPreview() {
     TaskyTheme {
         AgendaScreen(
             state = AgendaState(
-                selectedDateIsToday = true,
+                dateLabel = UiText.DynamicString("04 November 2024"),
                 initials = "HC",
                 agendaItems = listOf(
                     AgendaItem.TaskItem(
