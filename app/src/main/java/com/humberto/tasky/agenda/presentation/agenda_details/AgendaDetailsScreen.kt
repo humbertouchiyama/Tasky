@@ -52,7 +52,7 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioBu
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
-import com.humberto.tasky.core.presentation.ui.toFormattedUppercaseDateTime
+import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -110,7 +110,6 @@ private fun AgendaDetailsScreen(
     onAction: (AgendaDetailsAction) -> Unit
 ) {
     val agendaItem = state.agendaItem
-
     TaskyScaffold(
         topAppBar = {
             TaskyToolbar(
@@ -132,7 +131,7 @@ private fun AgendaDetailsScreen(
                 },
                 title = {
                     Text(
-                        text = ZonedDateTime.now().toFormattedUppercaseDateTime(),
+                        text = ZonedDateTime.now().toFormattedDateTime().uppercase(),
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },
@@ -214,10 +213,11 @@ private fun AgendaDetailsScreen(
                     )
                 }
             }
-            PhotosSection(
-                agendaItemType = agendaItem.agendaItemType,
-                photos = agendaItem.photosUrlList
-            )
+            if (agendaItem.agendaItemType == AgendaItemType.EVENT) {
+                PhotosSection(
+                    photos = agendaItem.photosUrlList
+                )
+            }
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)

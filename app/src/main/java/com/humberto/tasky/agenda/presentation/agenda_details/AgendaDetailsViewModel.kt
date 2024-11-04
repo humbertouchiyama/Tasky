@@ -69,9 +69,9 @@ class AgendaDetailsViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     val agendaItem = result.data
-                    _state.value = _state.value.copy(
-                        agendaItem = agendaItem.toAgendaDetailsUi()
-                    )
+                    _state.update {
+                        it.copy(agendaItem = agendaItem.toAgendaDetailsUi())
+                    }
                 }
                 is Result.Error -> {
                     eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))
