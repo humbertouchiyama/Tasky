@@ -1,4 +1,4 @@
-package com.humberto.tasky.event.domain
+package com.humberto.tasky.agenda.domain.event
 
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult

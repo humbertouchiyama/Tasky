@@ -1,8 +1,8 @@
-package com.humberto.tasky.task.data
+package com.humberto.tasky.agenda.data.task
 
 import com.humberto.tasky.core.database.entity.TaskEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
-import com.humberto.tasky.task.domain.Task
+import com.humberto.tasky.agenda.domain.task.Task
 import java.util.UUID
 
 fun TaskEntity.toTask(): Task {

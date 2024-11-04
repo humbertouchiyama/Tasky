@@ -1,8 +1,8 @@
 package com.humberto.tasky.agenda.domain
 
-import com.humberto.tasky.event.domain.Event
-import com.humberto.tasky.reminder.domain.Reminder
-import com.humberto.tasky.task.domain.Task
+import com.humberto.tasky.agenda.domain.event.Event
+import com.humberto.tasky.agenda.domain.reminder.Reminder
+import com.humberto.tasky.agenda.domain.task.Task
 import java.time.ZonedDateTime
 
 sealed class AgendaItem(val dateTime: ZonedDateTime) {

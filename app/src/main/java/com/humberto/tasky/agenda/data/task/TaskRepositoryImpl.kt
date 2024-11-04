@@ -1,12 +1,12 @@
-package com.humberto.tasky.task.data
+package com.humberto.tasky.agenda.data.task
 
 import android.database.sqlite.SQLiteFullException
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
-import com.humberto.tasky.task.domain.Task
-import com.humberto.tasky.task.domain.TaskRepository
+import com.humberto.tasky.agenda.domain.task.Task
+import com.humberto.tasky.agenda.domain.task.TaskRepository
 import javax.inject.Inject
 
 class TaskRepositoryImpl @Inject constructor(

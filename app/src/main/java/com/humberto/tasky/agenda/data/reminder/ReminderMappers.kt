@@ -1,8 +1,8 @@
-package com.humberto.tasky.reminder.data
+package com.humberto.tasky.agenda.data.reminder
 
 import com.humberto.tasky.core.database.entity.ReminderEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
-import com.humberto.tasky.reminder.domain.Reminder
+import com.humberto.tasky.agenda.domain.reminder.Reminder
 import java.util.UUID
 
 fun ReminderEntity.toReminder(): Reminder {

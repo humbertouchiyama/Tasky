@@ -1,4 +1,4 @@
-package com.humberto.tasky.reminder.domain
+package com.humberto.tasky.agenda.domain.reminder
 
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult

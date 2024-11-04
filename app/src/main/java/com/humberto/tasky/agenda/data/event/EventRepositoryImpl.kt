@@ -1,12 +1,12 @@
-package com.humberto.tasky.event.data
+package com.humberto.tasky.agenda.data.event
 
 import android.database.sqlite.SQLiteFullException
 import com.humberto.tasky.core.database.dao.EventDao
-import com.humberto.tasky.event.domain.Event
+import com.humberto.tasky.agenda.domain.event.Event
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
-import com.humberto.tasky.event.domain.EventRepository
+import com.humberto.tasky.agenda.domain.event.EventRepository
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(

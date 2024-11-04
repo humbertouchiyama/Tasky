@@ -26,7 +26,7 @@ import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.task.domain.Task
+import com.humberto.tasky.agenda.domain.task.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
 import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray

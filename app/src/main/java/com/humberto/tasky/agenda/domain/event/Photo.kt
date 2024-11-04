@@ -1,4 +1,4 @@
-package com.humberto.tasky.event.domain
+package com.humberto.tasky.agenda.domain.event
 
 data class Photo(
     val key: String,
