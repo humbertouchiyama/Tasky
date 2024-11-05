@@ -14,4 +14,5 @@ sealed interface AgendaDetailsAction {
     data class OnSelectFromTime(val fromTime: LocalTime): AgendaDetailsAction
     data class OnSelectToTime(val toTime: LocalTime): AgendaDetailsAction
     data class OnSelectAtTime(val atTime: LocalTime): AgendaDetailsAction
+    data class OnSelectReminderAt(val remindAt: Long): AgendaDetailsAction
 }
