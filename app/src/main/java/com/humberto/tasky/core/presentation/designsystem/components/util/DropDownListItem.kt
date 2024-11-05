@@ -9,19 +9,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DropDownListItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    verticalPadding: Dp = 16.dp,
     title: String
 ) {
     Column(
         modifier = modifier
             .clickable { onClick() }
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(horizontal = 16.dp, vertical = verticalPadding)
             .defaultMinSize(minWidth = 144.dp)
     ) {
         Text(

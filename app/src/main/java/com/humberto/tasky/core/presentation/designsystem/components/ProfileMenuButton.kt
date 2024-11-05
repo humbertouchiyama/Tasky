@@ -44,7 +44,10 @@ fun ProfileMenuButton(
                     DropDownListItem(
                         modifier = Modifier,
                         title = item.title,
-                        onClick = item.onClick
+                        onClick = {
+                            item.onClick()
+                            isDropDownOpen = false
+                        }
                     )
                 }
             }
