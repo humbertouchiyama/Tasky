@@ -11,12 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsAction
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toFormatted
 import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
+import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyTimePicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -126,7 +128,7 @@ fun DateTimeSection(
                 ) {
                     Row {
                         Text(
-                            text = stringResource(id = R.string.to),
+                            text = stringResource(id = R.string.to_label),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 3,
@@ -200,5 +202,19 @@ fun DateTimeSection(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DateTimeSectionPreview() {
+    TaskyTheme {
+        DateTimeSection(
+            isEditing = false,
+            onAction = {},
+            agendaItem = AgendaDetailsUi(
+                agendaItemType = AgendaItemType.EVENT
+            )
+        )
     }
 }

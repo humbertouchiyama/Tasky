@@ -5,16 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.event.EventRepository
+import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.eventDateTime
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaDetailsUi
 import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.map
 import com.humberto.tasky.core.presentation.ui.asUiText
-import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.main.navigation.AgendaDetails
-import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
-import com.humberto.tasky.agenda.domain.task.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,6 +120,9 @@ class AgendaDetailsViewModel @Inject constructor(
             is AgendaDetailsAction.OnSelectToTime -> {
                 updateAgendaItem { it.copy(toTime = agendaDetailsAction.toTime) }
             }
+            is AgendaDetailsAction.OnSelectReminderAt -> {
+                updateSelectedRemindAt(agendaDetailsAction.remindAt)
+            }
             else -> Unit
         }
     }
@@ -127,5 +131,11 @@ class AgendaDetailsViewModel @Inject constructor(
         _state.update { currentState ->
             currentState.copy(agendaItem = transform(currentState.agendaItem))
         }
+    }
+
+    private fun updateSelectedRemindAt(remindAtMinutes: Long) {
+        val remindAt = _state.value.agendaItem.eventDateTime
+            .minusMinutes(remindAtMinutes)
+        updateAgendaItem { it.copy(remindAt = remindAt) }
     }
 }

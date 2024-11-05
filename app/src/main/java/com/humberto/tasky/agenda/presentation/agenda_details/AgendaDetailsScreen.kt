@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,7 +43,10 @@ import com.humberto.tasky.agenda.presentation.agenda_details.components.AgendaIt
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AttendanceFilter
 import com.humberto.tasky.agenda.presentation.agenda_details.components.DateTimeSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.PhotosSection
+import com.humberto.tasky.agenda.presentation.agenda_details.components.ReminderDropdownField
 import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEditableField
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.getReminderOptions
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toRemindAtText
 import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
@@ -51,9 +54,11 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
+import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 
@@ -173,13 +178,15 @@ private fun AgendaDetailsScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
                     .padding(top = 32.dp)
             ) {
-                AgendaItemIndicator(agendaItemType = agendaItem.agendaItemType)
+                AgendaItemIndicator(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    agendaItemType = agendaItem.agendaItemType)
                 TaskyEditableField(
                     isEditing = state.isEditing,
                     modifier = Modifier
+                        .fillMaxWidth()
                         .padding(top = 8.dp)
                 ) {
                     Row(
@@ -200,7 +207,8 @@ private fun AgendaDetailsScreen(
                     color = MaterialTheme.colorScheme.tertiary
                 )
                 TaskyEditableField(
-                    isEditing = state.isEditing
+                    isEditing = state.isEditing,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = agendaItem.description
@@ -218,80 +226,67 @@ private fun AgendaDetailsScreen(
                     photos = agendaItem.photosUrlList
                 )
             }
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 32.dp)
-            ) {
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-                DateTimeSection(
-                    isEditing = state.isEditing,
-                    onAction = { action-> onAction(action) },
-                    agendaItem = agendaItem
-                )
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-                TaskyEditableField(
-                    isEditing = state.isEditing
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Notifications,
-                                contentDescription = null,
-                                tint = TaskyGray
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            DateTimeSection(
+                isEditing = state.isEditing,
+                onAction = { action-> onAction(action) },
+                agendaItem = agendaItem
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            ReminderDropdownField(
+                isEditing = state.isEditing,
+                remindAtText = agendaItem.toRemindAtText().asString(),
+                menuItems = getReminderOptions.map { (key, value) ->
+                    DropDownItem(
+                        title = value.asString(),
+                        onClick = {
+                            onAction(
+                                AgendaDetailsAction.OnSelectReminderAt(key)
                             )
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = "30 minutes before",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-                }
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.tertiary
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.heightIn(min = 36.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.visitors),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        },
                     )
-                    if(state.isEditing) {
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(RoundedCornerShape(5.dp))
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = PlusIcon,
-                                contentDescription = null,
-                                tint = TaskyGray
-                            )
+                }
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.tertiary
+            )
+            if(agendaItem.agendaItemType == AgendaItemType.EVENT) {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 32.dp)
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.heightIn(min = 36.dp)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.visitors),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        if(state.isEditing) {
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(5.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = PlusIcon,
+                                    contentDescription = null,
+                                    tint = TaskyGray
+                                )
+                            }
                         }
                     }
-                }
-                if(agendaItem.agendaItemType == AgendaItemType.EVENT) {
                     Spacer(modifier = Modifier.height(20.dp))
                     AttendanceFilter(
                         selectedFilter = state.selectedFilter,
@@ -323,7 +318,7 @@ private fun AgendaDetailsScreenPreview() {
                     toTime = LocalTime.now().plusMinutes(15),
                     atDate = LocalDate.now(),
                     atTime = LocalTime.now(),
-                    remindAt = "30 minutes before"
+                    remindAt = LocalDateTime.now().minusMinutes(30)
                 ),
                 isEditing = true
             ),

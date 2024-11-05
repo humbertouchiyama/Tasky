@@ -33,6 +33,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.event.Event
+import com.humberto.tasky.agenda.domain.reminder.Reminder
+import com.humberto.tasky.agenda.domain.task.Task
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
@@ -45,12 +48,10 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffol
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
-import com.humberto.tasky.agenda.domain.event.Event
+import com.humberto.tasky.core.presentation.ui.buildHeaderDate
 import com.humberto.tasky.main.navigation.AgendaDetails
-import com.humberto.tasky.agenda.domain.reminder.Reminder
-import com.humberto.tasky.agenda.domain.task.Task
-import com.humberto.tasky.core.presentation.ui.UiText
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 @Composable
@@ -247,7 +248,7 @@ private fun AgendaScreenPreview() {
     TaskyTheme {
         AgendaScreen(
             state = AgendaState(
-                dateLabel = UiText.DynamicString("04 November 2024"),
+                dateLabel = LocalDate.now().buildHeaderDate(),
                 initials = "HC",
                 agendaItems = listOf(
                     AgendaItem.TaskItem(

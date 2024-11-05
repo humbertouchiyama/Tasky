@@ -46,10 +46,15 @@
     <string name="filter_going">Going</string>
     <string name="filter_not_going">Not going</string>
     <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="to_label">To</string>
     <string name="at">At</string>
     <string name="add_title">Add title</string>
     <string name="saved_successful">Saved changes successfully!</string>
     <string name="delete_successful">Event delete successfully!</string>
     <string name="add_description">Add description, e.g., project timeline</string>
+    <string name="ten_minutes_before">10 minutes before</string>
+    <string name="thirty_minutes_before">30 minutes before</string>
+    <string name="one_hour_before">1 hour before</string>
+    <string name="six_hours_before">6 hours before</string>
+    <string name="one_day_before">1 day before</string>
 </resources>
