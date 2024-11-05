@@ -22,15 +22,15 @@ import com.humberto.tasky.core.presentation.designsystem.components.util.DropDow
 fun FloatingActionButtonWithDropDownMenu(
     menuItems: List<DropDownItem>
 ) {
-    var isEventDropDownOpen by rememberSaveable {
+    var isDropDownOpen by rememberSaveable {
         mutableStateOf(false)
     }
 
     Box {
         DropdownMenu(
-            expanded = isEventDropDownOpen,
+            expanded = isDropDownOpen,
             onDismissRequest = {
-                isEventDropDownOpen = false
+                isDropDownOpen = false
             },
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface)
@@ -39,7 +39,10 @@ fun FloatingActionButtonWithDropDownMenu(
                 DropDownListItem(
                     modifier = Modifier,
                     title = item.title,
-                    onClick = item.onClick
+                    onClick = {
+                        item.onClick()
+                        isDropDownOpen = false
+                    }
                 )
                 if (index < menuItems.size - 1) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.tertiary)
@@ -49,7 +52,7 @@ fun FloatingActionButtonWithDropDownMenu(
         TaskyFloatingActionButton(
             icon = PlusIcon,
             onClick = {
-                isEventDropDownOpen = true
+                isDropDownOpen = true
             },
             contentDescription = stringResource(id = R.string.add_new_event)
         )

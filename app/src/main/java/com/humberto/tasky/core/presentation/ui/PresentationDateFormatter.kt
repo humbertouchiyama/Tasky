@@ -12,7 +12,7 @@ fun LocalDate.displayUpperCaseMonth(): String {
     return this.month.getDisplayName(TextStyle.FULL, Locale.ENGLISH).uppercase()
 }
 
-fun LocalDate.toFormattedDateTime(): String {
+fun LocalDate.toFormattedDate(): String {
     return this.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
 }
 
@@ -29,6 +29,6 @@ fun LocalDate.buildHeaderDate(): UiText {
     return if (this == today) {
         UiText.StringResource(R.string.today)
     } else {
-        UiText.DynamicString(this.toFormattedDateTime())
+        UiText.DynamicString(this.toFormattedDate())
     }
 }

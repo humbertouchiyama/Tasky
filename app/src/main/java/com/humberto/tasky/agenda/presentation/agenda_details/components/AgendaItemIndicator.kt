@@ -23,7 +23,10 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyLightGreen
 
 
 @Composable
-fun AgendaItemIndicator(agendaItemType: AgendaItemType) {
+fun AgendaItemIndicator(
+    modifier: Modifier,
+    agendaItemType: AgendaItemType
+) {
     val color = when(agendaItemType) {
         AgendaItemType.TASK -> TaskyGreen
         AgendaItemType.EVENT -> TaskyLightGreen
@@ -35,6 +38,7 @@ fun AgendaItemIndicator(agendaItemType: AgendaItemType) {
         AgendaItemType.REMINDER -> stringResource(id = R.string.reminder)
     }
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

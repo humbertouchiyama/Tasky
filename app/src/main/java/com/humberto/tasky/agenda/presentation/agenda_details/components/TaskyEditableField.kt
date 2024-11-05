@@ -30,10 +30,9 @@ fun TaskyEditableField(
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 6.dp, end = 16.dp)
             .clickable(enabled = isEditing) { onClick() }
-            .padding(vertical = 20.dp),
+            .padding(vertical = 20.dp)
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
