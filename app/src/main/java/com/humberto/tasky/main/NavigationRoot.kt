@@ -9,7 +9,6 @@ import androidx.navigation.toRoute
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsScreenRoot
 import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenRoot
-import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 import com.humberto.tasky.main.navigation.AgendaDetails
@@ -122,10 +121,7 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                 navController.popBackStack()
             },
             onSaveClick = { editTextScreen ->
-                val key = when (editTextScreen.editTextScreenType) {
-                    EditTextScreenType.TITLE -> "title"
-                    EditTextScreenType.DESCRIPTION -> "description"
-                }
+                val key = editTextScreen.editTextScreenType.name.lowercase()
                 navController.previousBackStackEntry
                     ?.savedStateHandle
                     ?.set(key, editTextScreen.content)
