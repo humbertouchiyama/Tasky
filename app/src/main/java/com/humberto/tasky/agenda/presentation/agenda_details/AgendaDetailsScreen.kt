@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEdi
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.getReminderOptions
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toRemindAtText
 import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
+import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
@@ -57,6 +59,7 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
+import com.humberto.tasky.main.navigation.EditTextScreen
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -65,6 +68,9 @@ import java.time.ZonedDateTime
 @Composable
 fun AgendaDetailsScreenRoot(
     onBackClick: () -> Unit,
+    onEditTextClick: (EditTextScreen) -> Unit,
+    title: String,
+    description: String,
     viewModel: AgendaDetailsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -95,12 +101,16 @@ fun AgendaDetailsScreenRoot(
             }
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.updateTitle(title, description)
+    }
     val state by viewModel.state.collectAsStateWithLifecycle()
     AgendaDetailsScreen(
         state = state,
         onAction = { action ->
             when (action) {
                 is AgendaDetailsAction.OnBackClick -> onBackClick()
+                is AgendaDetailsAction.OnEditTextClick -> onEditTextClick(action.editTextScreen)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -185,6 +195,14 @@ private fun AgendaDetailsScreen(
                     agendaItemType = agendaItem.agendaItemType)
                 TaskyEditableField(
                     isEditing = state.isEditing,
+                    onClick = {
+                        onAction(AgendaDetailsAction.OnEditTextClick(
+                            EditTextScreen(
+                                editTextScreenType = EditTextScreenType.TITLE,
+                                content = agendaItem.title
+                            )
+                        ))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
@@ -208,6 +226,14 @@ private fun AgendaDetailsScreen(
                 )
                 TaskyEditableField(
                     isEditing = state.isEditing,
+                    onClick = {
+                        onAction(AgendaDetailsAction.OnEditTextClick(
+                            EditTextScreen(
+                                editTextScreenType = EditTextScreenType.DESCRIPTION,
+                                content = agendaItem.description
+                            )
+                        ))
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
@@ -247,7 +273,7 @@ private fun AgendaDetailsScreen(
                             onAction(
                                 AgendaDetailsAction.OnSelectReminderAt(key)
                             )
-                        },
+                        }
                     )
                 }
             )
