@@ -58,6 +58,16 @@ class AgendaDetailsViewModel @Inject constructor(
             )
         }
     }
+    
+    fun updateTitle(title: String, description: String) {
+        _state.update { currentState ->
+            val updatedAgendaItem = currentState.agendaItem.copy(
+                title = title,
+                description = description
+            )
+            currentState.copy(agendaItem = updatedAgendaItem)
+        }
+    }
 
     private fun getItemById(id: String, type: AgendaItemType) {
         viewModelScope.launch {

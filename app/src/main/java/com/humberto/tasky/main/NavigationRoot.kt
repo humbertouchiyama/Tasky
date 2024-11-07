@@ -8,10 +8,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsScreenRoot
 import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
+import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenRoot
+import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 import com.humberto.tasky.main.navigation.AgendaDetails
 import com.humberto.tasky.main.navigation.AgendaList
+import com.humberto.tasky.main.navigation.EditTextScreen
 import com.humberto.tasky.main.navigation.Login
 import com.humberto.tasky.main.navigation.Register
 
@@ -90,6 +93,8 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     }
     composable<AgendaDetails> { backStackEntry ->
         val agendaDetails: AgendaDetails = backStackEntry.toRoute<AgendaDetails>()
+        val title = backStackEntry.savedStateHandle.get<String>("title")
+        val description = backStackEntry.savedStateHandle.get<String>("description")
         AgendaDetailsScreenRoot(
             onBackClick = {
                 navController.navigate(
@@ -99,6 +104,32 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                         inclusive = true
                     }
                 }
+            },
+            onEditTextClick = { editTextScreen ->
+                navController.navigate(
+                    route = editTextScreen,
+                ) {
+                    popUpTo(agendaDetails)
+                }
+            },
+            title = title ?: "",
+            description = description ?: ""
+        )
+    }
+    composable<EditTextScreen> {
+        EditTextScreenRoot(
+            onGoBack = {
+                navController.popBackStack()
+            },
+            onSaveClick = { editTextScreen ->
+                val key = when (editTextScreen.editTextScreenType) {
+                    EditTextScreenType.TITLE -> "title"
+                    EditTextScreenType.DESCRIPTION -> "description"
+                }
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set(key, editTextScreen.content)
+                navController.popBackStack()
             }
         )
     }
