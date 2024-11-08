@@ -39,16 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
-import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AgendaItemIndicator
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AttendanceFilter
 import com.humberto.tasky.agenda.presentation.agenda_details.components.DateTimeSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.PhotosSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.ReminderDropdownField
 import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEditableField
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.getReminderOptions
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toRemindAtText
-import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toReminderText
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
@@ -61,7 +58,6 @@ import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
 import com.humberto.tasky.main.navigation.EditTextScreen
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 
@@ -192,14 +188,14 @@ private fun AgendaDetailsScreen(
             ) {
                 AgendaItemIndicator(
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    agendaItemType = agendaItem.agendaItemType)
+                    agendaItemDetails = agendaItem)
                 TaskyEditableField(
                     isEditing = state.isEditing,
                     onClick = {
                         onAction(AgendaDetailsAction.OnEditTextClick(
                             EditTextScreen(
                                 editTextScreenType = EditTextScreenType.TITLE,
-                                content = agendaItem.title
+                                content = state.title
                             )
                         ))
                     },
@@ -213,10 +209,10 @@ private fun AgendaDetailsScreen(
                         TaskyRadioButton(enabled = false)
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = agendaItem.title
+                            text = state.title
                                 .ifEmpty { stringResource(id = R.string.add_title) },
                             style = MaterialTheme.typography.headlineMedium,
-                            color = if(agendaItem.title.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                            color = if(state.title.isNotEmpty()) MaterialTheme.colorScheme.onSurface
                                 else TaskyGray
                         )
                     }
@@ -230,24 +226,24 @@ private fun AgendaDetailsScreen(
                         onAction(AgendaDetailsAction.OnEditTextClick(
                             EditTextScreen(
                                 editTextScreenType = EditTextScreenType.DESCRIPTION,
-                                content = agendaItem.description
+                                content = state.description
                             )
                         ))
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = agendaItem.description
+                        text = state.description
                             .ifEmpty { stringResource(id = R.string.add_description) },
                         style = MaterialTheme.typography.labelMedium,
-                        color = if(agendaItem.description.isNotEmpty()) MaterialTheme.colorScheme.onSurface
+                        color = if(state.description.isNotEmpty()) MaterialTheme.colorScheme.onSurface
                             else TaskyGray,
                         maxLines = 5,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
-            if (agendaItem.agendaItemType == AgendaItemType.EVENT) {
+            if (agendaItem is AgendaItemDetails.Event) {
                 PhotosSection(
                     photos = agendaItem.photosUrlList
                 )
@@ -258,20 +254,20 @@ private fun AgendaDetailsScreen(
             DateTimeSection(
                 isEditing = state.isEditing,
                 onAction = { action-> onAction(action) },
-                agendaItem = agendaItem
+                state = state
             )
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.tertiary
             )
             ReminderDropdownField(
                 isEditing = state.isEditing,
-                remindAtText = agendaItem.toRemindAtText().asString(),
-                menuItems = getReminderOptions.map { (key, value) ->
+                remindAtText = state.reminderType.toReminderText().asString(),
+                menuItems = ReminderType.entries.map { type ->
                     DropDownItem(
-                        title = value.asString(),
+                        title = type.toReminderText().asString(),
                         onClick = {
                             onAction(
-                                AgendaDetailsAction.OnSelectReminderAt(key)
+                                AgendaDetailsAction.OnSelectReminderType(type)
                             )
                         }
                     )
@@ -280,7 +276,7 @@ private fun AgendaDetailsScreen(
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.tertiary
             )
-            if(agendaItem.agendaItemType == AgendaItemType.EVENT) {
+            if(agendaItem is AgendaItemDetails.Event) {
                 Column(
                     modifier = Modifier
                         .padding(bottom = 32.dp)
@@ -315,7 +311,7 @@ private fun AgendaDetailsScreen(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     AttendanceFilter(
-                        selectedFilter = state.selectedFilter,
+                        selectedFilter = agendaItem.selectedFilter,
                         onSelectFilter = { selectedFilter ->
                             onAction(AgendaDetailsAction.OnSelectFilter(selectedFilter))
                         }
@@ -333,20 +329,18 @@ private fun AgendaDetailsScreenPreview() {
     TaskyTheme {
         AgendaDetailsScreen(
             state = AgendaDetailsState(
-                agendaItem = AgendaDetailsUi(
-                    id = "123",
-                    agendaItemType = AgendaItemType.EVENT,
-                    title = "Meeting",
-                    description = "Description",
-                    fromDate = LocalDate.now(),
-                    fromTime = LocalTime.now(),
+                id = "123",
+                title = "Meeting",
+                description = "Description",
+                fromDate = LocalDate.now(),
+                fromTime = LocalTime.now(),
+                reminderType = ReminderType.ThirtyMinutes,
+                isEditing = true,
+                agendaItem = AgendaItemDetails.Event(
                     toDate = LocalDate.now(),
                     toTime = LocalTime.now().plusMinutes(15),
-                    atDate = LocalDate.now(),
-                    atTime = LocalTime.now(),
-                    remindAt = LocalDateTime.now().minusMinutes(30)
+                    selectedFilter = FilterType.GOING
                 ),
-                isEditing = true
             ),
             onAction = {}
         )

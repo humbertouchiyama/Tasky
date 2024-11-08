@@ -10,11 +10,9 @@ sealed interface AgendaDetailsAction {
     data object OnEditClick: AgendaDetailsAction
     data object OnSaveClick: AgendaDetailsAction
     data class OnSelectFromDate(val fromDate: LocalDate): AgendaDetailsAction
-    data class OnSelectToDate(val toDate: LocalDate): AgendaDetailsAction
-    data class OnSelectAtDate(val atDate: LocalDate): AgendaDetailsAction
     data class OnSelectFromTime(val fromTime: LocalTime): AgendaDetailsAction
+    data class OnSelectToDate(val toDate: LocalDate): AgendaDetailsAction
     data class OnSelectToTime(val toTime: LocalTime): AgendaDetailsAction
-    data class OnSelectAtTime(val atTime: LocalTime): AgendaDetailsAction
-    data class OnSelectReminderAt(val remindAt: Long): AgendaDetailsAction
+    data class OnSelectReminderType(val reminderType: ReminderType): AgendaDetailsAction
     data class OnEditTextClick(val editTextScreen: EditTextScreen): AgendaDetailsAction
 }
