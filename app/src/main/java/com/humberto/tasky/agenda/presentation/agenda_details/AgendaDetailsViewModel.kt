@@ -9,9 +9,7 @@ import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.eventDateTime
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaDetailsUi
-import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaState
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.map
 import com.humberto.tasky.core.presentation.ui.asUiText
@@ -38,11 +36,13 @@ class AgendaDetailsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         AgendaDetailsState(
-            agendaItem = AgendaDetailsUi(
-                id = agendaDetailsArgs.agendaItemId,
-                agendaItemType = agendaDetailsArgs.agendaItemType,
-            ),
-            isEditing = agendaDetailsArgs.isEditing
+            id = agendaDetailsArgs.agendaItemId,
+            isEditing = agendaDetailsArgs.isEditing,
+            agendaItem = when(agendaDetailsArgs.agendaItemType) {
+                AgendaItemType.EVENT -> AgendaItemDetails.Event()
+                AgendaItemType.TASK -> AgendaItemDetails.Task()
+                AgendaItemType.REMINDER -> AgendaItemDetails.Reminder
+            },
         )
     )
     val state: StateFlow<AgendaDetailsState> = _state.asStateFlow()
@@ -61,11 +61,10 @@ class AgendaDetailsViewModel @Inject constructor(
     
     fun updateTitle(title: String, description: String) {
         _state.update { currentState ->
-            val updatedAgendaItem = currentState.agendaItem.copy(
+            currentState.copy(
                 title = title,
                 description = description
             )
-            currentState.copy(agendaItem = updatedAgendaItem)
         }
     }
 
@@ -80,9 +79,7 @@ class AgendaDetailsViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     val agendaItem = result.data
-                    _state.update {
-                        it.copy(agendaItem = agendaItem.toAgendaDetailsUi())
-                    }
+                    _state.value = agendaItem.toAgendaState()
                 }
                 is Result.Error -> {
                     eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))
@@ -98,7 +95,13 @@ class AgendaDetailsViewModel @Inject constructor(
     fun onAction(agendaDetailsAction: AgendaDetailsAction) {
         when(agendaDetailsAction) {
             is AgendaDetailsAction.OnSelectFilter -> {
-                _state.update { it.copy(selectedFilter = agendaDetailsAction.filterType) }
+                _state.update {
+                    it.copy(
+                        agendaItem = it.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                            copy(selectedFilter = agendaDetailsAction.filterType)
+                        },
+                    )
+                }
             }
             is AgendaDetailsAction.OnSaveClick -> {
                 toggleEditingState()
@@ -106,46 +109,57 @@ class AgendaDetailsViewModel @Inject constructor(
             AgendaDetailsAction.OnEditClick -> {
                 toggleEditingState()
             }
-            is AgendaDetailsAction.OnSelectAtDate -> {
-                updateAgendaItem { it.copy(atDate = agendaDetailsAction.atDate) }
-            }
-            is AgendaDetailsAction.OnSelectAtTime -> {
-                updateAgendaItem { it.copy(atTime = agendaDetailsAction.atTime) }
-            }
             is AgendaDetailsAction.OnSelectFromDate -> {
-                updateAgendaItem { it.copy(
+                _state.update { currentState ->
+                    currentState.copy(
                         fromDate = agendaDetailsAction.fromDate,
-                        toDate = agendaDetailsAction.fromDate
+                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                            copy(toDate = agendaDetailsAction.fromDate)
+                        }
                     )
                 }
             }
             is AgendaDetailsAction.OnSelectFromTime -> {
                 val newFromTime = agendaDetailsAction.fromTime
                 val newToTime = newFromTime.plusMinutes(30)
-                updateAgendaItem { it.copy(fromTime = newFromTime, toTime = newToTime) }
+
+                _state.update { currentState ->
+                    currentState.copy(
+                        fromTime = newFromTime,
+                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                            copy(toTime = newToTime)
+                        }
+                    )
+                }
             }
             is AgendaDetailsAction.OnSelectToDate -> {
-                updateAgendaItem { it.copy(toDate = agendaDetailsAction.toDate) }
+                _state.update { currentState ->
+                    currentState.copy(
+                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                            copy(toDate = agendaDetailsAction.toDate)
+                        }
+                    )
+                }
             }
             is AgendaDetailsAction.OnSelectToTime -> {
-                updateAgendaItem { it.copy(toTime = agendaDetailsAction.toTime) }
+                _state.update { currentState ->
+                    currentState.copy(
+                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                            copy(toTime = agendaDetailsAction.toTime)
+                        }
+                    )
+                }
             }
-            is AgendaDetailsAction.OnSelectReminderAt -> {
-                updateSelectedRemindAt(agendaDetailsAction.remindAt)
+            is AgendaDetailsAction.OnSelectReminderType -> {
+                _state.update { it.copy(reminderType = agendaDetailsAction.reminderType) }
             }
             else -> Unit
         }
     }
 
-    private fun updateAgendaItem(transform: (AgendaDetailsUi) -> AgendaDetailsUi) {
-        _state.update { currentState ->
-            currentState.copy(agendaItem = transform(currentState.agendaItem))
-        }
-    }
-
-    private fun updateSelectedRemindAt(remindAtMinutes: Long) {
-        val remindAt = _state.value.agendaItem.eventDateTime
-            .minusMinutes(remindAtMinutes)
-        updateAgendaItem { it.copy(remindAt = remindAt) }
+    private inline fun <reified T : AgendaItemDetails> AgendaItemDetails.updateIfType(
+        crossinline transform: T.() -> T
+    ): AgendaItemDetails {
+        return (this as? T)?.transform() ?: this
     }
 }

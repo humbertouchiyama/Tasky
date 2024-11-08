@@ -1,9 +1,16 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
-import com.humberto.tasky.agenda.presentation.agenda_details.model.AgendaDetailsUi
+import java.time.LocalDate
+import java.time.LocalTime
 
 data class AgendaDetailsState(
-    val agendaItem: AgendaDetailsUi,
+    val id: String? = null,
+    val agendaItem: AgendaItemDetails,
+    val title: String = "",
+    val description: String = "",
+    val fromDate: LocalDate = LocalDate.now(),
+    val fromTime: LocalTime = LocalTime.now(),
+    val reminderType: ReminderType = ReminderType.ThirtyMinutes,
     val isEditing: Boolean = false,
-    val selectedFilter: FilterType = FilterType.ALL,
+    val isSaving: Boolean = false,
 )
