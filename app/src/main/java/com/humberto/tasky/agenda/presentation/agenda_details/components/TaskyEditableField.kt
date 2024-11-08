@@ -49,7 +49,7 @@ fun TaskyEditableField(
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
     }
