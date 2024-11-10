@@ -85,6 +85,7 @@ fun AgendaDetailsScreenRoot(
                     R.string.saved_successful,
                     Toast.LENGTH_LONG
                 ).show()
+                onBackClick()
             }
             AgendaDetailsEvent.DeleteSuccess -> {
                 Toast.makeText(
@@ -92,7 +93,6 @@ fun AgendaDetailsScreenRoot(
                     R.string.delete_successful,
                     Toast.LENGTH_LONG
                 ).show()
-
                 onBackClick()
             }
         }

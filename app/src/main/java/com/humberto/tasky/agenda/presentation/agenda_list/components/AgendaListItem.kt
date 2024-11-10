@@ -96,7 +96,7 @@ fun AgendaListItem(
                     modifier = Modifier.padding(start = 8.dp)
                 ) {
                     Text(
-                        text = agendaItem.title,
+                        text = agendaItem.title.ifEmpty { stringResource(id = R.string.no_title) },
                         modifier = Modifier,
                         color = foregroundColor,
                         style = MaterialTheme.typography.headlineSmall.copy(

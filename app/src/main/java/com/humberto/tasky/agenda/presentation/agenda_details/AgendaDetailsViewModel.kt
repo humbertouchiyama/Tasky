@@ -9,9 +9,9 @@ import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaState
 import com.humberto.tasky.core.domain.util.Result
-import com.humberto.tasky.core.domain.util.map
 import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,9 +71,9 @@ class AgendaDetailsViewModel @Inject constructor(
     private fun getItemById(id: String, type: AgendaItemType) {
         viewModelScope.launch {
             val result = when (type) {
-                AgendaItemType.TASK -> taskRepository.getTask(id).map { AgendaItem.TaskItem(it) }
-                AgendaItemType.EVENT -> eventRepository.getEvent(id).map { AgendaItem.EventItem(it) }
-                AgendaItemType.REMINDER -> reminderRepository.getReminder(id).map { AgendaItem.ReminderItem(it) }
+                AgendaItemType.TASK -> taskRepository.getTask(id)
+                AgendaItemType.EVENT -> eventRepository.getEvent(id)
+                AgendaItemType.REMINDER -> reminderRepository.getReminder(id)
             }
 
             when (result) {
@@ -104,7 +104,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 }
             }
             is AgendaDetailsAction.OnSaveClick -> {
-                toggleEditingState()
+                saveItem()
             }
             AgendaDetailsAction.OnEditClick -> {
                 toggleEditingState()
@@ -162,4 +162,27 @@ class AgendaDetailsViewModel @Inject constructor(
     ): AgendaItemDetails {
         return (this as? T)?.transform() ?: this
     }
+
+    private fun saveItem() {
+        viewModelScope.launch {
+            _state.update { it.copy(isSaving = true) }
+            val state = _state.value
+            val result = when(val agendaItem = state.toAgendaItem()) {
+                is AgendaItem.Task -> taskRepository.createTask(agendaItem)
+                is AgendaItem.Event -> eventRepository.createEvent(agendaItem)
+                is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem)
+            }
+            when (result) {
+                is Result.Success -> {
+                    toggleEditingState()
+                    eventChannel.send(AgendaDetailsEvent.SaveSuccess)
+                }
+                is Result.Error -> {
+                    eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))
+                }
+            }
+            _state.update { it.copy(isSaving = false) }
+        }
+    }
+
 }
