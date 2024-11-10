@@ -14,6 +14,5 @@ data class EventEntity(
     val to: Long,
     val remindAt: Long,
     val attendeeIds: List<String>,
-    val photoKeys: List<String>,
-    val isGoing: Boolean
+    val photoKeys: List<String>
 )
