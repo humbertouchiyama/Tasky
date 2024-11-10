@@ -10,14 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsAction
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsState
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaItemDetails
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toFormatted
+import com.humberto.tasky.core.domain.util.toFormatted
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyTimePicker
@@ -77,6 +76,7 @@ fun DateTimeSection(
             Row {
                 Text(
                     text = stringResource(id = R.string.from),
+                    modifier = Modifier.width(40.dp),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -117,17 +117,14 @@ fun DateTimeSection(
                     Text(
                         text = stringResource(id = R.string.to_label),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
+                        modifier = Modifier.width(40.dp),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = agendaItem.toTime.toFormatted(),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }

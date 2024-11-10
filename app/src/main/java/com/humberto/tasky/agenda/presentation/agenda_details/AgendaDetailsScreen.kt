@@ -45,7 +45,6 @@ import com.humberto.tasky.agenda.presentation.agenda_details.components.DateTime
 import com.humberto.tasky.agenda.presentation.agenda_details.components.PhotosSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.ReminderDropdownField
 import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEditableField
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toReminderText
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
