@@ -33,9 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.domain.event.Event
-import com.humberto.tasky.agenda.domain.reminder.Reminder
-import com.humberto.tasky.agenda.domain.task.Task
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
@@ -251,37 +248,30 @@ private fun AgendaScreenPreview() {
                 dateLabel = LocalDate.now().buildHeaderDate(),
                 initials = "HC",
                 agendaItems = listOf(
-                    AgendaItem.TaskItem(
-                        Task(
-                            id = "1",
-                            title = "Task",
-                            description = "Description",
-                            time = ZonedDateTime.now(),
-                            remindAt = ZonedDateTime.now(),
-                            isDone = true
-                        )
+                    AgendaItem.Task(
+                        id = "1",
+                        title = "Task",
+                        description = "Description",
+                        from = ZonedDateTime.now(),
+                        remindAt = ZonedDateTime.now(),
+                        isDone = true
                     ).toAgendaItemUi(),
-                    AgendaItem.EventItem(
-                        Event(
-                            id = "2",
-                            title = "Event",
-                            description = "Description",
-                            from = ZonedDateTime.now(),
-                            to = ZonedDateTime.now().plusMinutes(30),
-                            remindAt = ZonedDateTime.now(),
-                            attendees = listOf(),
-                            photos = listOf(),
-                            isGoing = true
-                        )
+                    AgendaItem.Event(
+                        id = "2",
+                        title = "Event",
+                        description = "Description",
+                        from = ZonedDateTime.now(),
+                        to = ZonedDateTime.now().plusMinutes(30),
+                        remindAt = ZonedDateTime.now(),
+                        attendees = listOf(),
+                        photos = listOf(),
                     ).toAgendaItemUi(),
-                    AgendaItem.ReminderItem(
-                        Reminder(
-                            id = "3",
-                            title = "Reminder",
-                            description = "Description",
-                            time = ZonedDateTime.now(),
-                            remindAt = ZonedDateTime.now()
-                        )
+                    AgendaItem.Reminder(
+                        id = "3",
+                        title = "Reminder",
+                        description = "Description",
+                        from = ZonedDateTime.now(),
+                        remindAt = ZonedDateTime.now()
                     ).toAgendaItemUi(),
                 )
             ),

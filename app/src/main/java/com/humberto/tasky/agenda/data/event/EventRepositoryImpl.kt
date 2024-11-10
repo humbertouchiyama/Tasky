@@ -1,18 +1,17 @@
 package com.humberto.tasky.agenda.data.event
 
-import android.database.sqlite.SQLiteFullException
+import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.core.database.dao.EventDao
-import com.humberto.tasky.agenda.domain.event.Event
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
-import com.humberto.tasky.agenda.domain.event.EventRepository
 import javax.inject.Inject
 
 class EventRepositoryImpl @Inject constructor(
     private val eventDao: EventDao
 ) : EventRepository {
-    override suspend fun getEvent(eventId: String): Result<Event, DataError> {
+    override suspend fun getEvent(eventId: String): Result<AgendaItem, DataError> {
         val eventEntity = eventDao.getEvent(eventId)
         return eventEntity?.let {
             val attendees = eventDao
@@ -30,14 +29,10 @@ class EventRepositoryImpl @Inject constructor(
         } ?: Result.Error(DataError.Local.NOT_FOUND)
     }
 
-    override suspend fun createEvent(event: Event): EmptyResult<DataError> {
-        return try {
-            val eventEntity = event.toEventEntity()
-            eventDao.upsertEvent(eventEntity)
-            Result.Success(Unit)
-        } catch (e: SQLiteFullException) {
-            Result.Error(DataError.Local.DISK_FULL)
-        }
+    override suspend fun createEvent(agendaItem: AgendaItem.Event): EmptyResult<DataError> {
+        val eventEntity = agendaItem.toEventEntity()
+        eventDao.upsertEvent(eventEntity)
+        return Result.Success(Unit)
     }
 
     override suspend fun deleteEvent(eventId: String) {
