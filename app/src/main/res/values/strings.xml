@@ -59,4 +59,5 @@
     <string name="one_day_before">1 day before</string>
     <string name="edit_title">EDIT TITLE</string>
     <string name="edit_description">EDIT DESCRIPTION</string>
+    <string name="no_title">(no title)</string>
 </resources>
