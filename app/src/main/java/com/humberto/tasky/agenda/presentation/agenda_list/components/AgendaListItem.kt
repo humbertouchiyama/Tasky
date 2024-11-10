@@ -22,11 +22,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
-import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.domain.task.Task
 import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
 import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
@@ -154,15 +153,13 @@ private fun AgendaListItemPreview() {
     TaskyTheme {
         AgendaListItem(
             agendaItem =
-            AgendaItem.TaskItem(
-                Task(
-                    id = "1",
-                    title = "Meeting",
-                    description = "Description",
-                    time = ZonedDateTime.now(),
-                    remindAt = ZonedDateTime.now(),
-                    isDone = true
-                )
+            AgendaItem.Task(
+                id = "1",
+                title = "Meeting",
+                description = "Description",
+                from = ZonedDateTime.now(),
+                remindAt = ZonedDateTime.now(),
+                isDone = true
             ).toAgendaItemUi(),
             onOpenItem = { },
             onEditItem = { },

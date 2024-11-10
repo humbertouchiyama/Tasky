@@ -1,18 +1,18 @@
 package com.humberto.tasky.agenda.data.task
 
 import android.database.sqlite.SQLiteFullException
+import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
-import com.humberto.tasky.agenda.domain.task.Task
-import com.humberto.tasky.agenda.domain.task.TaskRepository
 import javax.inject.Inject
 
 class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao
 ): TaskRepository {
-    override suspend fun getTask(taskId: String): Result<Task, DataError> {
+    override suspend fun getTask(taskId: String): Result<AgendaItem, DataError> {
         val task = taskDao.getTask(taskId)?.toTask()
         return if(task != null) {
             Result.Success(task)
@@ -21,7 +21,7 @@ class TaskRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun createTask(task: Task): EmptyResult<DataError> {
+    override suspend fun createTask(task: AgendaItem.Task): EmptyResult<DataError> {
         return try {
             taskDao.upsertTask(task.toTaskEntity())
             Result.Success(Unit)

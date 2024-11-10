@@ -1,27 +1,27 @@
 package com.humberto.tasky.agenda.data.task
 
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.core.database.entity.TaskEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
-import com.humberto.tasky.agenda.domain.task.Task
 import java.util.UUID
 
-fun TaskEntity.toTask(): Task {
-    return Task(
+fun TaskEntity.toTask(): AgendaItem {
+    return AgendaItem.Task(
         id = id,
         title = title,
         description = description,
-        time = time.toZonedDateTime("UTC"),
+        from = time.toZonedDateTime("UTC"),
         remindAt = remindAt.toZonedDateTime("UTC"),
         isDone = isDone
     )
 }
 
-fun Task.toTaskEntity(): TaskEntity {
+fun AgendaItem.Task.toTaskEntity(): TaskEntity {
     return TaskEntity(
         id = id ?: UUID.randomUUID().toString(),
         title = title,
         description = description,
-        time = time.toInstant().toEpochMilli(),
+        time = from.toInstant().toEpochMilli(),
         remindAt = remindAt.toInstant().toEpochMilli(),
         isDone = isDone
     )

@@ -1,8 +1,8 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.mapper
 
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
-import com.humberto.tasky.agenda.domain.AgendaItem
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -10,25 +10,25 @@ import java.util.UUID
 
 fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
     return when (this) {
-        is AgendaItem.TaskItem -> AgendaItemUi(
-            id = task.id ?: UUID.randomUUID().toString(),
-            title = task.title,
-            description = task.description ?: "",
-            dateTime = task.time.toFormattedDateTime(),
+        is AgendaItem.Task -> AgendaItemUi(
+            id = id ?: UUID.randomUUID().toString(),
+            title = title,
+            description = description ?: "",
+            dateTime = from.toFormattedDateTime(),
             agendaItemType = AgendaItemType.TASK
         )
-        is AgendaItem.EventItem -> AgendaItemUi(
-            id = event.id ?: UUID.randomUUID().toString(),
-            title = event.title,
-            description = event.description ?: "",
-            dateTime = "${event.from.toFormattedDateTime()} - ${event.to.toFormattedDateTime()}",
+        is AgendaItem.Event -> AgendaItemUi(
+            id = id ?: UUID.randomUUID().toString(),
+            title = title,
+            description = description ?: "",
+            dateTime = "${from.toFormattedDateTime()} - ${to.toFormattedDateTime()}",
             agendaItemType = AgendaItemType.EVENT
         )
-        is AgendaItem.ReminderItem -> AgendaItemUi(
-            id = reminder.id ?: UUID.randomUUID().toString(),
-            title = reminder.title,
-            description = reminder.description ?: "",
-            dateTime = reminder.time.toFormattedDateTime(),
+        is AgendaItem.Reminder -> AgendaItemUi(
+            id = id ?: UUID.randomUUID().toString(),
+            title = title,
+            description = description ?: "",
+            dateTime = from.toFormattedDateTime(),
             agendaItemType = AgendaItemType.REMINDER
         )
     }

@@ -2,12 +2,6 @@ package com.humberto.tasky.agenda.data
 
 import android.database.sqlite.SQLiteFullException
 import androidx.room.withTransaction
-import com.humberto.tasky.agenda.domain.AgendaRepository
-import com.humberto.tasky.core.data.networking.safeCall
-import com.humberto.tasky.core.database.AgendaDatabase
-import com.humberto.tasky.core.database.dao.EventDao
-import com.humberto.tasky.core.database.dao.ReminderDao
-import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.agenda.data.event.toAttendee
 import com.humberto.tasky.agenda.data.event.toEvent
 import com.humberto.tasky.agenda.data.event.toEventEntity
@@ -17,9 +11,12 @@ import com.humberto.tasky.agenda.data.reminder.toReminderEntity
 import com.humberto.tasky.agenda.data.task.toTask
 import com.humberto.tasky.agenda.data.task.toTaskEntity
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.domain.event.Event
-import com.humberto.tasky.agenda.domain.reminder.Reminder
-import com.humberto.tasky.agenda.domain.task.Task
+import com.humberto.tasky.agenda.domain.AgendaRepository
+import com.humberto.tasky.core.data.networking.safeCall
+import com.humberto.tasky.core.database.AgendaDatabase
+import com.humberto.tasky.core.database.dao.EventDao
+import com.humberto.tasky.core.database.dao.ReminderDao
+import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
@@ -88,23 +85,15 @@ class AgendaRepositoryImpl @Inject constructor(
             tasksFlow,
             eventsFlow,
             remindersFlow
-        ) {
-                tasks,
-                events,
-                reminders ->
-            val combinedList =
-                tasks.map { AgendaItem.TaskItem(it) } +
-                        events.map { AgendaItem.EventItem(it) } +
-                        reminders.map { AgendaItem.ReminderItem(it) }
-
-            combinedList.sortedBy { it.dateTime }
+        ) { tasks, events, reminders ->
+            (tasks + events + reminders).sortedBy { it.from }
         }
     }
 
     override suspend fun upsertFullAgenda(
-        tasks: List<Task>,
-        events: List<Event>,
-        reminders: List<Reminder>
+        tasks: List<AgendaItem.Task>,
+        events: List<AgendaItem.Event>,
+        reminders: List<AgendaItem.Reminder>
     ): EmptyResult<DataError.Local> {
         return try {
             taskDao.upsertTasks(tasks.map { it.toTaskEntity() })
