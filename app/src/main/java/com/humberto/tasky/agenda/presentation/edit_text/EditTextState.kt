@@ -4,5 +4,5 @@ import androidx.compose.foundation.text.input.TextFieldState
 
 data class EditTextState(
     val editTextScreenType: EditTextScreenType,
-    val content: TextFieldState = TextFieldState()
+    val textToBeUpdated: TextFieldState = TextFieldState()
 )
