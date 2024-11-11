@@ -10,7 +10,7 @@ import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
-import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaState
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAgendaItem
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
@@ -59,11 +59,11 @@ class AgendaDetailsViewModel @Inject constructor(
         }
     }
     
-    fun updateTitle(title: String, description: String) {
+    fun updateTitleAndDescription(title: String?, description: String?) {
         _state.update { currentState ->
             currentState.copy(
-                title = title,
-                description = description
+                title = title ?: currentState.title,
+                description = description ?: currentState.description
             )
         }
     }
@@ -79,7 +79,7 @@ class AgendaDetailsViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     val agendaItem = result.data
-                    _state.value = agendaItem.toAgendaState()
+                    _state.value = _state.value.updateWithAgendaItem(agendaItem)
                 }
                 is Result.Error -> {
                     eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))

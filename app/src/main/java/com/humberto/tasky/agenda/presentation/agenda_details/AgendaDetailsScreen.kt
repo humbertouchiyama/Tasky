@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +56,7 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
 import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
-import com.humberto.tasky.main.navigation.EditTextScreen
+import com.humberto.tasky.main.navigation.EditTextArgs
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -63,7 +64,7 @@ import java.time.ZonedDateTime
 @Composable
 fun AgendaDetailsScreenRoot(
     onBackClick: () -> Unit,
-    onEditTextClick: (EditTextScreen) -> Unit,
+    onEditTextClick: (EditTextArgs) -> Unit,
     title: String,
     description: String,
     viewModel: AgendaDetailsViewModel = hiltViewModel()
@@ -97,7 +98,7 @@ fun AgendaDetailsScreenRoot(
         }
     }
     LaunchedEffect(Unit) {
-        viewModel.updateTitle(title, description)
+        viewModel.updateTitleAndDescription(title, description)
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
     AgendaDetailsScreen(
@@ -105,7 +106,7 @@ fun AgendaDetailsScreenRoot(
         onAction = { action ->
             when (action) {
                 is AgendaDetailsAction.OnBackClick -> onBackClick()
-                is AgendaDetailsAction.OnEditTextClick -> onEditTextClick(action.editTextScreen)
+                is AgendaDetailsAction.OnEditTextClick -> onEditTextClick(action.editTextArgs)
                 else -> Unit
             }
             viewModel.onAction(action)
@@ -159,7 +160,13 @@ private fun AgendaDetailsScreen(
                             }),
                         contentAlignment = Alignment.CenterEnd,
                     ) {
-                        if(state.isEditing) {
+                        if(state.isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(15.dp),
+                                strokeWidth = 1.5.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else if(state.isEditing) {
                             Text(
                                 text = stringResource(id = R.string.save),
                                 style = MaterialTheme.typography.titleSmall
@@ -192,9 +199,9 @@ private fun AgendaDetailsScreen(
                     isEditing = state.isEditing,
                     onClick = {
                         onAction(AgendaDetailsAction.OnEditTextClick(
-                            EditTextScreen(
+                            EditTextArgs(
                                 editTextScreenType = EditTextScreenType.TITLE,
-                                content = state.title
+                                textToBeUpdated = state.title
                             )
                         ))
                     },
@@ -223,9 +230,9 @@ private fun AgendaDetailsScreen(
                     isEditing = state.isEditing,
                     onClick = {
                         onAction(AgendaDetailsAction.OnEditTextClick(
-                            EditTextScreen(
+                            EditTextArgs(
                                 editTextScreenType = EditTextScreenType.DESCRIPTION,
-                                content = state.description
+                                textToBeUpdated = state.description
                             )
                         ))
                     },

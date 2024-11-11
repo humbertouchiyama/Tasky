@@ -1,6 +1,6 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
-import com.humberto.tasky.main.navigation.EditTextScreen
+import com.humberto.tasky.main.navigation.EditTextArgs
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -14,5 +14,5 @@ sealed interface AgendaDetailsAction {
     data class OnSelectToDate(val toDate: LocalDate): AgendaDetailsAction
     data class OnSelectToTime(val toTime: LocalTime): AgendaDetailsAction
     data class OnSelectReminderType(val reminderType: ReminderType): AgendaDetailsAction
-    data class OnEditTextClick(val editTextScreen: EditTextScreen): AgendaDetailsAction
+    data class OnEditTextClick(val editTextArgs: EditTextArgs): AgendaDetailsAction
 }

@@ -36,13 +36,12 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyGreen
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
-import com.humberto.tasky.main.navigation.EditTextScreen
-import timber.log.Timber
+import com.humberto.tasky.main.navigation.EditTextArgs
 
 @Composable
 fun EditTextScreenRoot(
     onGoBack: () -> Unit,
-    onSaveClick: (EditTextScreen) -> Unit,
+    onSaveClick: (EditTextArgs) -> Unit,
     viewModel: EditTextViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -52,11 +51,12 @@ fun EditTextScreenRoot(
             when (action) {
                 is EditTextAction.OnBackClick -> onGoBack()
                 is EditTextAction.OnSaveClick -> {
-                    Timber.d("OnSaveClick Screen")
-                    onSaveClick(EditTextScreen(
-                        editTextScreenType = state.editTextScreenType,
-                        content = action.content
-                    ))
+                    onSaveClick(
+                        EditTextArgs(
+                            editTextScreenType = state.editTextScreenType,
+                            textToBeUpdated = action.updatedText
+                        )
+                    )
                 }
                 else -> Unit
             }
@@ -117,9 +117,11 @@ private fun EditTextScreen(
                             .size(width = 48.dp, height = 36.dp)
                             .padding(end = 8.dp)
                             .clickable(onClick = {
-                                onAction(EditTextAction.OnSaveClick(
-                                    content = state.content.text.toString()
-                                ))
+                                onAction(
+                                    EditTextAction.OnSaveClick(
+                                        updatedText = state.textToBeUpdated.text.toString()
+                                    )
+                                )
                             }),
                         contentAlignment = Alignment.CenterEnd,
                     ) {
@@ -138,7 +140,7 @@ private fun EditTextScreen(
                 .fillMaxSize()
         ) {
             BasicTextField(
-                state = state.content,
+                state = state.textToBeUpdated,
                 textStyle = textStyle,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
