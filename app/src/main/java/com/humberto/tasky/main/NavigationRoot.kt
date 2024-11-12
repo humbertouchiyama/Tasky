@@ -9,11 +9,12 @@ import androidx.navigation.toRoute
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsScreenRoot
 import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenRoot
+import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.auth.presentation.login.LoginScreenRoot
 import com.humberto.tasky.auth.presentation.registration.RegisterScreenRoot
 import com.humberto.tasky.main.navigation.AgendaDetails
 import com.humberto.tasky.main.navigation.AgendaList
-import com.humberto.tasky.main.navigation.EditTextScreen
+import com.humberto.tasky.main.navigation.EditTextArgs
 import com.humberto.tasky.main.navigation.Login
 import com.humberto.tasky.main.navigation.Register
 
@@ -92,8 +93,11 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     }
     composable<AgendaDetails> { backStackEntry ->
         val agendaDetails: AgendaDetails = backStackEntry.toRoute<AgendaDetails>()
-        val title = backStackEntry.savedStateHandle.get<String>("title")
-        val description = backStackEntry.savedStateHandle.get<String>("description")
+        val editTextScreenType: EditTextScreenType? = backStackEntry.savedStateHandle["editTextScreenType"]
+        val textToBeUpdated: String? = backStackEntry.savedStateHandle["textToBeUpdated"]
+        val editTextArgs = if (editTextScreenType != null && textToBeUpdated != null) {
+            EditTextArgs(editTextScreenType, textToBeUpdated)
+        } else null
         AgendaDetailsScreenRoot(
             onBackClick = {
                 navController.navigate(
@@ -104,27 +108,27 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                     }
                 }
             },
-            onEditTextClick = { editTextScreen ->
+            onEditTextClick = { onClickEditTextArgs ->
                 navController.navigate(
-                    route = editTextScreen,
+                    route = onClickEditTextArgs,
                 ) {
                     popUpTo(agendaDetails)
                 }
             },
-            title = title ?: "",
-            description = description ?: ""
+            editTextArgs = editTextArgs
         )
     }
-    composable<EditTextScreen> {
+    composable<EditTextArgs> {
         EditTextScreenRoot(
             onGoBack = {
                 navController.popBackStack()
             },
-            onSaveClick = { editTextScreen ->
-                val key = editTextScreen.editTextScreenType.name.lowercase()
+            onSaveClick = { editTextArgs ->
                 navController.previousBackStackEntry
-                    ?.savedStateHandle
-                    ?.set(key, editTextScreen.content)
+                    ?.savedStateHandle?.apply {
+                        set("editTextScreenType", editTextArgs.editTextScreenType)
+                        set("textToBeUpdated", editTextArgs.textToBeUpdated)
+                    }
                 navController.popBackStack()
             }
         )

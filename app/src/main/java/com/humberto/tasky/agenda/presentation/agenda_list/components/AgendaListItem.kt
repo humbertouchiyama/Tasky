@@ -1,6 +1,7 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,6 +75,7 @@ fun AgendaListItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
+            .clickable { onOpenItem() }
             .padding(horizontal = 16.dp)
             .padding(top = 16.dp, bottom = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)

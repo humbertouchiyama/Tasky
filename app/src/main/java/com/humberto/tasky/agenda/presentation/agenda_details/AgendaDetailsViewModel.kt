@@ -11,9 +11,11 @@ import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAgendaItem
+import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
+import com.humberto.tasky.main.navigation.EditTextArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,12 +61,13 @@ class AgendaDetailsViewModel @Inject constructor(
         }
     }
     
-    fun updateTitleAndDescription(title: String?, description: String?) {
+    fun updateStateWithEditTextArgs(editTextArgs: EditTextArgs?) {
         _state.update { currentState ->
-            currentState.copy(
-                title = title ?: currentState.title,
-                description = description ?: currentState.description
-            )
+            when(editTextArgs?.editTextScreenType) {
+                EditTextScreenType.TITLE -> currentState.copy(title = editTextArgs.textToBeUpdated)
+                EditTextScreenType.DESCRIPTION -> currentState.copy(description = editTextArgs.textToBeUpdated)
+                else -> currentState
+            }
         }
     }
 
