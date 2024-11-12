@@ -65,8 +65,7 @@ import java.time.ZonedDateTime
 fun AgendaDetailsScreenRoot(
     onBackClick: () -> Unit,
     onEditTextClick: (EditTextArgs) -> Unit,
-    title: String,
-    description: String,
+    editTextArgs: EditTextArgs?,
     viewModel: AgendaDetailsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -98,7 +97,7 @@ fun AgendaDetailsScreenRoot(
         }
     }
     LaunchedEffect(Unit) {
-        viewModel.updateTitleAndDescription(title, description)
+        viewModel.updateStateWithEditTextArgs(editTextArgs)
     }
     val state by viewModel.state.collectAsStateWithLifecycle()
     AgendaDetailsScreen(
