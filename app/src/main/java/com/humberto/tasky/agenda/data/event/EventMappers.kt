@@ -27,7 +27,7 @@ fun EventEntity.toEvent(
 
 fun AgendaItem.Event.toEventEntity(): EventEntity {
     return EventEntity(
-        id = id ?: UUID.randomUUID().toString(),
+        id = id,
         title = title,
         description = description,
         from = from.toInstant().toEpochMilli(),

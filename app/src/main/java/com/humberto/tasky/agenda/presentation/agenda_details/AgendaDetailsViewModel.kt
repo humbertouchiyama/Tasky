@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +39,7 @@ class AgendaDetailsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         AgendaDetailsState(
-            id = agendaDetailsArgs.agendaItemId,
+            id = agendaDetailsArgs.agendaItemId ?: UUID.randomUUID().toString(),
             isEditing = agendaDetailsArgs.isEditing,
             agendaItem = when(agendaDetailsArgs.agendaItemType) {
                 AgendaItemType.EVENT -> AgendaItemDetails.Event()

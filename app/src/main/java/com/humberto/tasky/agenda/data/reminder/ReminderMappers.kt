@@ -17,7 +17,7 @@ fun ReminderEntity.toReminder(): AgendaItem {
 
 fun AgendaItem.Reminder.toReminderEntity(): ReminderEntity {
     return ReminderEntity(
-        id = id ?: UUID.randomUUID().toString(),
+        id = id,
         title = title,
         description = description,
         time = from.toInstant().toEpochMilli(),

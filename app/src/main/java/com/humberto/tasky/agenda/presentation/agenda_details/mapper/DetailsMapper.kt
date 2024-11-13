@@ -11,7 +11,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.util.UUID
 
 fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetailsState {
     val from = agendaItem.from.withZoneSameInstant(ZoneId.systemDefault())
@@ -59,7 +58,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
     val from = fromDate.atTimeToUtc(fromTime)
     return when (agendaItem) {
         is AgendaItemDetails.Task -> AgendaItem.Task(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description,
             from = from,
@@ -67,7 +66,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             isDone = agendaItem.isDone,
         )
         is AgendaItemDetails.Event -> AgendaItem.Event(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description,
             from = from,
@@ -77,7 +76,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             photos = listOf(), // TODO
         )
         AgendaItemDetails.Reminder -> AgendaItem.Reminder(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description,
             from = from,
