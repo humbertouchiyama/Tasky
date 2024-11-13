@@ -11,21 +11,21 @@ import java.util.UUID
 fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
     return when (this) {
         is AgendaItem.Task -> AgendaItemUi(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description ?: "",
             dateTime = from.toFormattedDateTime(),
             agendaItemType = AgendaItemType.TASK
         )
         is AgendaItem.Event -> AgendaItemUi(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description ?: "",
             dateTime = "${from.toFormattedDateTime()} - ${to.toFormattedDateTime()}",
             agendaItemType = AgendaItemType.EVENT
         )
         is AgendaItem.Reminder -> AgendaItemUi(
-            id = id ?: UUID.randomUUID().toString(),
+            id = id,
             title = title,
             description = description ?: "",
             dateTime = from.toFormattedDateTime(),

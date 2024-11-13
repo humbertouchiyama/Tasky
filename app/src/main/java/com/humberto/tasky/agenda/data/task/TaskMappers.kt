@@ -18,7 +18,7 @@ fun TaskEntity.toTask(): AgendaItem {
 
 fun AgendaItem.Task.toTaskEntity(): TaskEntity {
     return TaskEntity(
-        id = id ?: UUID.randomUUID().toString(),
+        id = id,
         title = title,
         description = description,
         time = from.toInstant().toEpochMilli(),

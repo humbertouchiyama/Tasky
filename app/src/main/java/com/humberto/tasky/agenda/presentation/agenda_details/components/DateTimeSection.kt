@@ -152,6 +152,7 @@ private fun DateTimeSectionPreview() {
             isEditing = false,
             onAction = {},
             state = AgendaDetailsState(
+                id = "123",
                 agendaItem = AgendaItemDetails.Event()
             )
         )

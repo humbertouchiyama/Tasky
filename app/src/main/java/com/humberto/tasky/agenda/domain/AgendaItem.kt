@@ -12,7 +12,7 @@ sealed class AgendaItem(
     open val remindAt: ZonedDateTime
 ) {
     data class Event(
-        override val id: String?,
+        override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
@@ -23,7 +23,7 @@ sealed class AgendaItem(
     ) : AgendaItem(id, title, description, from, remindAt)
 
     data class Task(
-        override val id: String?,
+        override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
@@ -32,7 +32,7 @@ sealed class AgendaItem(
     ) : AgendaItem(id, title, description, from, remindAt)
 
     data class Reminder(
-        override val id: String?,
+        override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
