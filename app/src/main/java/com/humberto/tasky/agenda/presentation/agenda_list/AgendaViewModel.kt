@@ -37,7 +37,6 @@ class AgendaViewModel @Inject constructor(
 
     init {
         buildUserInitials()
-        getAgendaForDate(LocalDate.now())
     }
 
     private fun buildUserInitials() {
@@ -52,17 +51,24 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
+    fun updateSelectedDate(newSelectedDate: LocalDate) {
+        _agendaState.update { state ->
+            newSelectedDate.let {
+                state.copy(
+                    selectedDate = it,
+                    upperCaseMonth = newSelectedDate.displayUpperCaseMonth(),
+                    dateLabel = newSelectedDate.buildHeaderDate()
+                )
+            }
+        }
+        getAgendaForDate(newSelectedDate)
+    }
+
     fun onAction(action: AgendaAction) {
         when(action) {
             is AgendaAction.OnSelectDate -> {
                 val selectedDate = action.selectedDate
-                _agendaState.update { state ->
-                    state.copy(
-                        selectedDate = selectedDate,
-                        upperCaseMonth = selectedDate.displayUpperCaseMonth(),
-                        dateLabel = selectedDate.buildHeaderDate()
-                    )
-                }
+                updateSelectedDate(selectedDate)
                 getAgendaForDate(selectedDate)
             }
             AgendaAction.OnLogoutClick -> {

@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,7 @@ import java.time.ZonedDateTime
 fun AgendaScreenRoot(
     onLogoutSuccess: () -> Unit,
     onGoToAgendaDetailsClick: (AgendaDetails) -> Unit,
+    selectedDateEpochDay: Long?,
     viewModel: AgendaViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -77,6 +79,11 @@ fun AgendaScreenRoot(
 
                 onLogoutSuccess()
             }
+        }
+    }
+    LaunchedEffect(Unit) {
+        selectedDateEpochDay?.let {
+            viewModel.updateSelectedDate( LocalDate.ofEpochDay(it) )
         }
     }
     val state by viewModel.agendaState.collectAsStateWithLifecycle()
@@ -154,7 +161,8 @@ private fun AgendaScreen(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
                                         agendaItemType = AgendaItemType.EVENT,
-                                        isEditing = true
+                                        isEditing = true,
+                                        selectedDateEpochDay = state.selectedDate.toEpochDay()
                                     )
                                 )
                             )
@@ -167,7 +175,8 @@ private fun AgendaScreen(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
                                         agendaItemType = AgendaItemType.TASK,
-                                        isEditing = true
+                                        isEditing = true,
+                                        selectedDateEpochDay = state.selectedDate.toEpochDay()
                                     )
                                 )
                             )
@@ -180,7 +189,8 @@ private fun AgendaScreen(
                                 AgendaAction.OnNewAgendaItemClick(
                                     AgendaDetails(
                                         agendaItemType = AgendaItemType.REMINDER,
-                                        isEditing = true
+                                        isEditing = true,
+                                        selectedDateEpochDay = state.selectedDate.toEpochDay()
                                     )
                                 )
                             )
@@ -228,7 +238,8 @@ private fun AgendaScreen(
                             AgendaDetails(
                                 agendaItemId = agendaItem.id,
                                 agendaItemType = agendaItem.agendaItemType,
-                                isEditing = true
+                                isEditing = true,
+                                selectedDateEpochDay = state.selectedDate.toEpochDay()
                             )
                         )) },
                         onDeleteItem = { onAction(AgendaAction.OnDeleteAgendaItemClick(agendaItem)) },
@@ -273,7 +284,8 @@ private fun AgendaScreenPreview() {
                         from = ZonedDateTime.now(),
                         remindAt = ZonedDateTime.now()
                     ).toAgendaItemUi(),
-                )
+                ),
+                selectedDate = LocalDate.now()
             ),
             onAction = {},
         )

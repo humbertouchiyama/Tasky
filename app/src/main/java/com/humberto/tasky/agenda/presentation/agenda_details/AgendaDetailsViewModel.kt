@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 
@@ -45,7 +46,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 AgendaItemType.EVENT -> AgendaItemDetails.Event()
                 AgendaItemType.TASK -> AgendaItemDetails.Task()
                 AgendaItemType.REMINDER -> AgendaItemDetails.Reminder
-            },
+            }
         )
     )
     val state: StateFlow<AgendaDetailsState> = _state.asStateFlow()
@@ -54,11 +55,22 @@ class AgendaDetailsViewModel @Inject constructor(
     val events = eventChannel.receiveAsFlow()
 
     init {
-        if (agendaDetailsArgs.agendaItemId != null) {
+        agendaDetailsArgs.agendaItemId?.let { id ->
             getItemById(
-                id = agendaDetailsArgs.agendaItemId,
+                id = id,
                 type = agendaDetailsArgs.agendaItemType
             )
+        }
+        agendaDetailsArgs.selectedDateEpochDay?.let { selectedDateEpochDay ->
+            _state.update { currentState ->
+                val selectedLocalDate = LocalDate.ofEpochDay(selectedDateEpochDay)
+                currentState.copy(
+                    fromDate = selectedLocalDate,
+                    agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        copy(toDate = selectedLocalDate)
+                    }
+                )
+            }
         }
     }
     
@@ -170,8 +182,7 @@ class AgendaDetailsViewModel @Inject constructor(
     private fun saveItem() {
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
-            val state = _state.value
-            val result = when(val agendaItem = state.toAgendaItem()) {
+            val result = when(val agendaItem = _state.value.toAgendaItem()) {
                 is AgendaItem.Task -> taskRepository.createTask(agendaItem)
                 is AgendaItem.Event -> eventRepository.createEvent(agendaItem)
                 is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem)

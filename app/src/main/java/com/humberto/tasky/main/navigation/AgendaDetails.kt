@@ -7,5 +7,6 @@ import kotlinx.serialization.Serializable
 data class AgendaDetails(
     val agendaItemId: String? = null,
     val agendaItemType: AgendaItemType,
-    val isEditing: Boolean = false
+    val isEditing: Boolean = false,
+    val selectedDateEpochDay: Long? = null
 )
