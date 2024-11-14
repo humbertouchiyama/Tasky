@@ -74,6 +74,7 @@ fun fromRegisterToLogin(navController: NavHostController) {
 
 private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
     composable<AgendaList> {
+        val selectedDateEpochDay: Long? = it.savedStateHandle["selectedDateEpochDay"]
         AgendaScreenRoot(
             onLogoutSuccess = {
                 navController.navigate(Login) {
@@ -88,7 +89,8 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
                 ) {
                     popUpTo(AgendaList)
                 }
-            }
+            },
+            selectedDateEpochDay = selectedDateEpochDay
         )
     }
     composable<AgendaDetails> { backStackEntry ->
@@ -99,14 +101,11 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             EditTextArgs(editTextScreenType, textToBeUpdated)
         } else null
         AgendaDetailsScreenRoot(
-            onBackClick = {
-                navController.navigate(
-                    route = AgendaList
-                ) {
-                    popUpTo(agendaDetails) {
-                        inclusive = true
-                    }
-                }
+            onBackClick = { selectedDateEpochDay ->
+                navController.previousBackStackEntry
+                    ?.savedStateHandle
+                    ?.set("selectedDateEpochDay", selectedDateEpochDay ?: agendaDetails.selectedDateEpochDay )
+                navController.popBackStack()
             },
             onEditTextClick = { onClickEditTextArgs ->
                 navController.navigate(

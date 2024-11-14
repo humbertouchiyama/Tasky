@@ -55,21 +55,22 @@ import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffol
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
-import com.humberto.tasky.core.presentation.ui.toFormattedDateTime
+import com.humberto.tasky.core.presentation.ui.toFormattedDate
 import com.humberto.tasky.main.navigation.EditTextArgs
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZonedDateTime
 
 @Composable
 fun AgendaDetailsScreenRoot(
-    onBackClick: () -> Unit,
+    onBackClick: (Long?) -> Unit,
     onEditTextClick: (EditTextArgs) -> Unit,
     editTextArgs: EditTextArgs?,
     viewModel: AgendaDetailsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val state by viewModel.state.collectAsStateWithLifecycle()
     ObserveAsEvents(viewModel.events) { event ->
+        val selectedDateEpochDay = state.fromDate.toEpochDay()
         when(event) {
             is AgendaDetailsEvent.Error -> {
                 Toast.makeText(
@@ -84,7 +85,7 @@ fun AgendaDetailsScreenRoot(
                     R.string.saved_successful,
                     Toast.LENGTH_LONG
                 ).show()
-                onBackClick()
+                onBackClick(selectedDateEpochDay)
             }
             AgendaDetailsEvent.DeleteSuccess -> {
                 Toast.makeText(
@@ -92,19 +93,18 @@ fun AgendaDetailsScreenRoot(
                     R.string.delete_successful,
                     Toast.LENGTH_LONG
                 ).show()
-                onBackClick()
+                onBackClick(selectedDateEpochDay)
             }
         }
     }
     LaunchedEffect(Unit) {
         viewModel.updateStateWithEditTextArgs(editTextArgs)
     }
-    val state by viewModel.state.collectAsStateWithLifecycle()
     AgendaDetailsScreen(
         state = state,
         onAction = { action ->
             when (action) {
-                is AgendaDetailsAction.OnBackClick -> onBackClick()
+                is AgendaDetailsAction.OnBackClick -> onBackClick(null)
                 is AgendaDetailsAction.OnEditTextClick -> onEditTextClick(action.editTextArgs)
                 else -> Unit
             }
@@ -128,7 +128,9 @@ private fun AgendaDetailsScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .clickable(onClick = {
-                                onAction(AgendaDetailsAction.OnBackClick)
+                                onAction(
+                                    AgendaDetailsAction.OnBackClick
+                                )
                             }),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -141,7 +143,7 @@ private fun AgendaDetailsScreen(
                 },
                 title = {
                     Text(
-                        text = ZonedDateTime.now().toFormattedDateTime().uppercase(),
+                        text = state.fromDate.toFormattedDate().uppercase(),
                         style = MaterialTheme.typography.titleSmall,
                     )
                 },

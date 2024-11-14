@@ -6,6 +6,8 @@ import com.humberto.tasky.core.presentation.ui.UiText
 import java.time.Duration
 import java.time.ZonedDateTime
 
+typealias Minutes = Long
+
 enum class ReminderType {
     TenMinutes,
     ThirtyMinutes,
@@ -19,7 +21,7 @@ fun AgendaItem.getReminderType(): ReminderType? {
     return ReminderType.entries.find { it.toReminderMinutes() == minutesDifference }
 }
 
-private fun ReminderType.toReminderMinutes(): Long {
+private fun ReminderType.toReminderMinutes(): Minutes {
     return when (this) {
         ReminderType.TenMinutes -> 10L
         ReminderType.ThirtyMinutes -> 30L
