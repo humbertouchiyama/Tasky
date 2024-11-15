@@ -14,4 +14,6 @@ data class AgendaState(
     val isLoggingOut: Boolean = false,
     val agendaItems: List<AgendaItemUi> = listOf(),
     val isLoadingAgendaItems: Boolean = false,
+    val confirmingItemToBeDeleted: AgendaItemUi? = null,
+    val isDeletingItem: Boolean = false
 )

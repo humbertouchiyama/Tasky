@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,9 +41,12 @@ import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyActionButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyCalendarHeader
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyDialog
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyTextButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
@@ -117,6 +121,53 @@ private fun AgendaScreen(
             onAction(AgendaAction.OnSelectDate(date))
         }
     )
+
+    if(state.confirmingItemToBeDeleted != null) {
+        val itemTitle = state.confirmingItemToBeDeleted.title.ifEmpty { stringResource(id = R.string.no_title) }
+        TaskyDialog(
+            dialogTitle = {
+                Text(
+                    text = stringResource(
+                        id = R.string.delete_item,
+                        state.confirmingItemToBeDeleted.agendaItemType.name.lowercase()
+                    ),
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            onDismiss = {
+                onAction(AgendaAction.OnDismissDeleteAgendaItemClick)
+            },
+            dialogContent = {
+                Text(
+                    text = stringResource(
+                        id = R.string.are_you_sure_you_want_to_delete,
+                        itemTitle
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            primaryButton = {
+                TaskyActionButton(
+                    text = stringResource(id = R.string.ok),
+                    isLoading = state.isDeletingItem,
+                    onClick = {
+                        onAction(AgendaAction.OnConfirmDeleteAgendaItemClick)
+                    },
+                )
+            },
+            secondaryButton = {
+                TaskyTextButton(
+                    text = stringResource(id = R.string.cancel).uppercase(),
+                    onClick = {
+                        onAction(AgendaAction.OnDismissDeleteAgendaItemClick)
+                    },
+                )
+            }
+        )
+    }
 
     TaskyScaffold(
         topAppBar = {
@@ -274,8 +325,9 @@ private fun AgendaScreenPreview() {
                         from = ZonedDateTime.now(),
                         to = ZonedDateTime.now().plusMinutes(30),
                         remindAt = ZonedDateTime.now(),
+                        isUserEventCreator = true,
                         attendees = listOf(),
-                        photos = listOf(),
+                        photos = listOf()
                     ).toAgendaItemUi(),
                     AgendaItem.Reminder(
                         id = "3",

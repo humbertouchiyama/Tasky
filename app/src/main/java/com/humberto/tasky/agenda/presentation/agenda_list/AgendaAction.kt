@@ -9,7 +9,9 @@ sealed interface AgendaAction {
     data class OnNewAgendaItemClick(val agendaDetails: AgendaDetails): AgendaAction
     data class OnOpenAgendaItemClick(val agendaDetails: AgendaDetails): AgendaAction
     data class OnEditAgendaItemClick(val agendaDetails: AgendaDetails): AgendaAction
-    data class OnDeleteAgendaItemClick(val agendaItemUi: AgendaItemUi): AgendaAction
+    data class OnDeleteAgendaItemClick(val itemToBeDeleted: AgendaItemUi): AgendaAction
+    data object OnConfirmDeleteAgendaItemClick: AgendaAction
+    data object OnDismissDeleteAgendaItemClick: AgendaAction
     data class OnSelectDate(
         val selectedDate: LocalDate
     ): AgendaAction
