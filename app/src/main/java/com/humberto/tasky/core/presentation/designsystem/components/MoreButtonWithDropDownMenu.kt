@@ -47,7 +47,10 @@ fun MoreButtonWithDropDownMenu(
             menuItems.forEachIndexed { index, item ->
                 DropDownListItem(
                     title = item.title,
-                    onClick = item.onClick
+                    onClick = {
+                        item.onClick()
+                        isDropDownOpen = false
+                    }
                 )
                 if (index < menuItems.size - 1) {
                     HorizontalDivider(color = MaterialTheme.colorScheme.tertiary)
