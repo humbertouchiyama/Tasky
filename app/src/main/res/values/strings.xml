@@ -60,4 +60,6 @@
     <string name="edit_title">EDIT TITLE</string>
     <string name="edit_description">EDIT DESCRIPTION</string>
     <string name="no_title">(no title)</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete \"%s\"?</string>
+    <string name="delete_item">Delete %s</string>
 </resources>

@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.domain.event.EventRepository
+import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository
+import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.domain.repository.SessionManager
@@ -26,7 +29,9 @@ class AgendaViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val applicationScope: CoroutineScope,
     private val agendaRepository: AgendaRepository,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
+    private val taskRepository: TaskRepository,
+    private val reminderRepository: ReminderRepository
 ): ViewModel() {
 
     private val _agendaState = MutableStateFlow(AgendaState())
@@ -37,6 +42,7 @@ class AgendaViewModel @Inject constructor(
 
     init {
         buildUserInitials()
+        getAgendaForDate(LocalDate.now())
     }
 
     private fun buildUserInitials() {
@@ -74,7 +80,23 @@ class AgendaViewModel @Inject constructor(
             AgendaAction.OnLogoutClick -> {
                 logout()
             }
-            is AgendaAction.OnDeleteAgendaItemClick -> {}
+            is AgendaAction.OnDeleteAgendaItemClick -> {
+                _agendaState.update { state ->
+                    state.copy(
+                        confirmingItemToBeDeleted = action.itemToBeDeleted
+                    )
+                }
+            }
+            AgendaAction.OnConfirmDeleteAgendaItemClick -> {
+                deleteItem()
+            }
+            AgendaAction.OnDismissDeleteAgendaItemClick -> {
+                _agendaState.update { state ->
+                    state.copy(
+                        confirmingItemToBeDeleted = null
+                    )
+                }
+            }
             else -> Unit
         }
     }
@@ -93,6 +115,25 @@ class AgendaViewModel @Inject constructor(
                         )
                     }
                 }
+        }
+    }
+
+    private fun deleteItem() {
+        viewModelScope.launch {
+            _agendaState.update { it.copy(isDeletingItem = true) }
+            _agendaState.value.confirmingItemToBeDeleted?.let {
+                when(it.agendaItemType) {
+                    AgendaItemType.TASK -> taskRepository.deleteTask(it.id)
+                    AgendaItemType.EVENT -> eventRepository.deleteEvent(it.id)
+                    AgendaItemType.REMINDER -> reminderRepository.deleteReminder(it.id)
+                }
+            }
+            _agendaState.update {
+                it.copy(
+                    isDeletingItem = false,
+                    confirmingItemToBeDeleted = null
+                )
+            }
         }
     }
 
