@@ -46,7 +46,6 @@ fun TaskyActionButton(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(vertical = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
@@ -61,6 +60,35 @@ fun TaskyActionButton(
                 text = text,
                 modifier = Modifier
                     .alpha(if(isLoading) 0f else 1f),
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+fun TaskyTextButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        shape = RoundedCornerShape(100f),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = text,
                 fontWeight = FontWeight.Medium
             )
         }

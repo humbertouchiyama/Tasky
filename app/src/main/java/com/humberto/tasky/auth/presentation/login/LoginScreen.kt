@@ -159,6 +159,7 @@ private fun LoginScreen(
             TaskyActionButton(
                 text = stringResource(id = R.string.get_started),
                 isLoading = state.isLoggingIn,
+                modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     onAction(LoginAction.OnLoginClick)
                 },
