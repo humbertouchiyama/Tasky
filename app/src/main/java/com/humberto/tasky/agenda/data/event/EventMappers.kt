@@ -22,6 +22,7 @@ fun EventEntity.toEvent(
         remindAt = remindAt.toZonedDateTime("UTC"),
         attendees = attendees,
         photos = photos,
+        isUserEventCreator = isUserEventCreator
     )
 }
 
@@ -33,8 +34,9 @@ fun AgendaItem.Event.toEventEntity(): EventEntity {
         from = from.toInstant().toEpochMilli(),
         to = to.toInstant().toEpochMilli(),
         remindAt = remindAt.toInstant().toEpochMilli(),
+        isUserEventCreator = isUserEventCreator,
         attendeeIds = attendees.map { it.userId },
-        photoKeys = photos.map { it.key },
+        photoKeys = photos.map { it.key }
     )
 }
 

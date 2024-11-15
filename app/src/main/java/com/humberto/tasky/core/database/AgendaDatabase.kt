@@ -23,10 +23,7 @@ import com.humberto.tasky.core.database.entity.TaskEntity
         AttendeeEntity::class,
         PhotoEntity::class
     ],
-    version = 2,
-    autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = AgendaDatabase.Migration1To2::class)
-    ]
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class AgendaDatabase: RoomDatabase() {
@@ -34,7 +31,4 @@ abstract class AgendaDatabase: RoomDatabase() {
     abstract val taskDao: TaskDao
     abstract val eventDao: EventDao
     abstract val reminderDao: ReminderDao
-
-    @DeleteColumn(tableName = "EventEntity", columnName = "isGoing")
-    class Migration1To2 : AutoMigrationSpec
 }
