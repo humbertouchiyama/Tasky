@@ -169,6 +169,20 @@ class AgendaDetailsViewModel @Inject constructor(
             is AgendaDetailsAction.OnSelectReminderType -> {
                 _state.update { it.copy(reminderType = agendaDetailsAction.reminderType) }
             }
+            AgendaDetailsAction.OnManageItemStateButtonClick -> {
+                _state.update { state ->
+                    //TODO properly handle action depending on item state
+                    state.copy(
+                        isConfirmingToDelete = true
+                    )
+                }
+            }
+            AgendaDetailsAction.OnConfirmDeleteClick -> {
+                deleteItem()
+            }
+            AgendaDetailsAction.OnDismissDeleteClick -> {
+                _state.update { it.copy(isConfirmingToDelete = false) }
+            }
             else -> Unit
         }
     }
@@ -200,4 +214,21 @@ class AgendaDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun deleteItem() {
+        viewModelScope.launch {
+            _state.update { it.copy(isDeleting = true) }
+            when(_state.value.agendaItem) {
+                is AgendaItemDetails.Event -> eventRepository.deleteEvent(_state.value.id)
+                AgendaItemDetails.Reminder -> reminderRepository.deleteReminder(_state.value.id)
+                is AgendaItemDetails.Task -> taskRepository.deleteTask(_state.value.id)
+            }
+            eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
+            _state.update {
+                it.copy(
+                    isDeleting = false,
+                    isConfirmingToDelete = false
+                )
+            }
+        }
+    }
 }

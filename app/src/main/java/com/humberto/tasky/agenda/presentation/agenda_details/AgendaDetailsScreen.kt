@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,6 +44,7 @@ import com.humberto.tasky.R
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AgendaItemIndicator
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AttendanceFilter
 import com.humberto.tasky.agenda.presentation.agenda_details.components.DateTimeSection
+import com.humberto.tasky.agenda.presentation.agenda_details.components.ManageAgendaItemStateButton
 import com.humberto.tasky.agenda.presentation.agenda_details.components.PhotosSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.ReminderDropdownField
 import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEditableField
@@ -50,8 +52,11 @@ import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyActionButton
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyDialog
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyScaffold
+import com.humberto.tasky.core.presentation.designsystem.components.TaskyTextButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyToolbar
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
 import com.humberto.tasky.core.presentation.ui.ObserveAsEvents
@@ -120,6 +125,54 @@ private fun AgendaDetailsScreen(
     onAction: (AgendaDetailsAction) -> Unit
 ) {
     val agendaItem = state.agendaItem
+    if(state.isConfirmingToDelete) {
+        val itemTitle = state.title.ifEmpty { stringResource(id = R.string.no_title) }
+        val itemType = when(agendaItem) {
+            is AgendaItemDetails.Task -> stringResource(id = R.string.delete_task)
+            is AgendaItemDetails.Event -> stringResource(id = R.string.delete_event)
+            AgendaItemDetails.Reminder -> stringResource(id = R.string.delete_reminder)
+        }
+        TaskyDialog(
+            dialogTitle = {
+                Text(
+                    text = itemType,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            onDismiss = {
+                onAction(AgendaDetailsAction.OnDismissDeleteClick)
+            },
+            dialogContent = {
+                Text(
+                    text = stringResource(
+                        id = R.string.are_you_sure_you_want_to_delete,
+                        itemTitle
+                    ),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            primaryButton = {
+                TaskyActionButton(
+                    text = stringResource(id = R.string.ok),
+                    isLoading = state.isDeleting,
+                    onClick = {
+                        onAction(AgendaDetailsAction.OnConfirmDeleteClick)
+                    },
+                )
+            },
+            secondaryButton = {
+                TaskyTextButton(
+                    text = stringResource(id = R.string.cancel).uppercase(),
+                    onClick = {
+                        onAction(AgendaDetailsAction.OnDismissDeleteClick)
+                    },
+                )
+            }
+        )
+    }
     TaskyScaffold(
         topAppBar = {
             TaskyToolbar(
@@ -220,7 +273,9 @@ private fun AgendaDetailsScreen(
                                 .ifEmpty { stringResource(id = R.string.add_title) },
                             style = MaterialTheme.typography.headlineMedium,
                             color = if(state.title.isNotEmpty()) MaterialTheme.colorScheme.onSurface
-                                else TaskyGray
+                                else TaskyGray,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
@@ -326,6 +381,12 @@ private fun AgendaDetailsScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
+            ManageAgendaItemStateButton(
+                onClick = { onAction(AgendaDetailsAction.OnManageItemStateButtonClick) },
+                modifier = Modifier,
+                agendaItem = agendaItem
+            )
         }
     }
 }
