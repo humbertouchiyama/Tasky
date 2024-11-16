@@ -50,7 +50,7 @@
     <string name="at">At</string>
     <string name="add_title">Add title</string>
     <string name="saved_successful">Saved changes successfully!</string>
-    <string name="delete_successful">Event delete successfully!</string>
+    <string name="delete_successful">Item deleted successfully!</string>
     <string name="add_description">Add description, e.g., project timeline</string>
     <string name="ten_minutes_before">10 minutes before</string>
     <string name="thirty_minutes_before">30 minutes before</string>
@@ -60,6 +60,9 @@
     <string name="edit_title">EDIT TITLE</string>
     <string name="edit_description">EDIT DESCRIPTION</string>
     <string name="no_title">(no title)</string>
+    <string name="delete_task">Delete task</string>
+    <string name="delete_reminder">Delete reminder</string>
+    <string name="delete_event">Delete event</string>
+    <string name="leave_event">Leave event</string>
     <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete \"%s\"?</string>
-    <string name="delete_item">Delete %s</string>
 </resources>

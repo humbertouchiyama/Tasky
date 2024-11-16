@@ -81,21 +81,13 @@ class AgendaViewModel @Inject constructor(
                 logout()
             }
             is AgendaAction.OnDeleteAgendaItemClick -> {
-                _agendaState.update { state ->
-                    state.copy(
-                        confirmingItemToBeDeleted = action.itemToBeDeleted
-                    )
-                }
+                _agendaState.update { it.copy(confirmingItemToBeDeleted = action.itemToBeDeleted) }
             }
             AgendaAction.OnConfirmDeleteAgendaItemClick -> {
                 deleteItem()
             }
             AgendaAction.OnDismissDeleteAgendaItemClick -> {
-                _agendaState.update { state ->
-                    state.copy(
-                        confirmingItemToBeDeleted = null
-                    )
-                }
+                _agendaState.update { it.copy(confirmingItemToBeDeleted = null) }
             }
             else -> Unit
         }

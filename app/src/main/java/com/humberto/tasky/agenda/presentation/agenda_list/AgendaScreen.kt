@@ -124,13 +124,15 @@ private fun AgendaScreen(
 
     if(state.confirmingItemToBeDeleted != null) {
         val itemTitle = state.confirmingItemToBeDeleted.title.ifEmpty { stringResource(id = R.string.no_title) }
+        val itemType = when(state.confirmingItemToBeDeleted.agendaItemType) {
+            AgendaItemType.TASK -> stringResource(id = R.string.delete_task)
+            AgendaItemType.EVENT -> stringResource(id = R.string.delete_event)
+            AgendaItemType.REMINDER -> stringResource(id = R.string.delete_reminder)
+        }
         TaskyDialog(
             dialogTitle = {
                 Text(
-                    text = stringResource(
-                        id = R.string.delete_item,
-                        state.confirmingItemToBeDeleted.agendaItemType.name.lowercase()
-                    ),
+                    text = itemType,
                     textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface

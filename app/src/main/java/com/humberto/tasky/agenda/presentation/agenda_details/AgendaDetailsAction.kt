@@ -15,4 +15,7 @@ sealed interface AgendaDetailsAction {
     data class OnSelectToTime(val toTime: LocalTime): AgendaDetailsAction
     data class OnSelectReminderType(val reminderType: ReminderType): AgendaDetailsAction
     data class OnEditTextClick(val editTextArgs: EditTextArgs): AgendaDetailsAction
+    data object OnManageItemStateButtonClick: AgendaDetailsAction
+    data object OnConfirmDeleteClick: AgendaDetailsAction
+    data object OnDismissDeleteClick: AgendaDetailsAction
 }
