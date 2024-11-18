@@ -20,10 +20,10 @@ import androidx.compose.ui.window.Dialog
 fun TaskyDialog(
     onDismiss: () -> Unit,
     dialogTitle: @Composable () -> Unit,
-    dialogContent: @Composable () -> Unit,
     primaryButton: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     secondaryButton: @Composable RowScope.() -> Unit = {},
+    dialogContent: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onDismiss

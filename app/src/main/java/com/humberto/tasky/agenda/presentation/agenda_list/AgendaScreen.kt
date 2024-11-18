@@ -141,16 +141,6 @@ private fun AgendaScreen(
             onDismiss = {
                 onAction(AgendaAction.OnDismissDeleteAgendaItemClick)
             },
-            dialogContent = {
-                Text(
-                    text = stringResource(
-                        id = R.string.are_you_sure_you_want_to_delete,
-                        itemTitle
-                    ),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
             primaryButton = {
                 TaskyActionButton(
                     text = stringResource(id = R.string.ok),
@@ -168,7 +158,16 @@ private fun AgendaScreen(
                     },
                 )
             }
-        )
+        ) {
+            Text(
+                text = stringResource(
+                    id = R.string.are_you_sure_you_want_to_delete,
+                    itemTitle
+                ),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 
     TaskyScaffold(
