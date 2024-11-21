@@ -1,10 +1,12 @@
 package com.humberto.tasky.agenda.presentation.agenda_details.mapper
 
 import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.event.Attendee
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsState
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaItemDetails
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.agenda.presentation.agenda_details.getReminderType
+import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 import com.humberto.tasky.agenda.presentation.agenda_details.toReminderDateFromDateTime
 import java.time.LocalDate
 import java.time.LocalTime
@@ -38,6 +40,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                 agendaItem = AgendaItemDetails.Event(
                     toTime = to.toLocalTime(),
                     toDate = to.toLocalDate(),
+                    attendees = agendaItem.attendees.map { it.toAttendeeUi() }
                 ),
             )
         }
@@ -72,7 +75,13 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             from = from,
             remindAt = remindAt,
             to = agendaItem.toDate.atTimeToUtc(agendaItem.toTime),
-            attendees = listOf(), // TODO
+            isUserEventCreator = agendaItem.isUserEventCreator,
+            attendees = agendaItem.attendees.map {
+                it.toAttendee(
+                    eventId = id,
+                    remindAt = remindAt
+                )
+            },
             photos = listOf(), // TODO
         )
         AgendaItemDetails.Reminder -> AgendaItem.Reminder(
@@ -83,6 +92,27 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             remindAt = remindAt
         )
     }
+}
+
+fun AttendeeUi.toAttendee(eventId: String, remindAt: ZonedDateTime): Attendee {
+    return Attendee(
+        userId = userId,
+        email = email,
+        fullName = fullName,
+        eventId = eventId,
+        isGoing = isGoing,
+        remindAt = remindAt
+    )
+}
+
+fun Attendee.toAttendeeUi(): AttendeeUi {
+    return AttendeeUi(
+        userId = userId,
+        email = email,
+        fullName = fullName,
+        isGoing = isGoing,
+        isAttendeeEventCreator = false
+    )
 }
 
 private fun LocalDate.atTimeToUtc(localTime: LocalTime): ZonedDateTime {

@@ -9,4 +9,5 @@ interface EventRepository {
     suspend fun getEvent(eventId: String): Result<AgendaItem, DataError>
     suspend fun createEvent(agendaItem: AgendaItem.Event): EmptyResult<DataError>
     suspend fun deleteEvent(eventId: String)
+    suspend fun checkAttendeeExists(email: String): Result<Attendee, DataError>
 }

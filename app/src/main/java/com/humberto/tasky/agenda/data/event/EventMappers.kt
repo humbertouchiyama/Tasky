@@ -3,14 +3,12 @@ package com.humberto.tasky.agenda.data.event
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.event.Attendee
 import com.humberto.tasky.agenda.domain.event.Photo
-import com.humberto.tasky.core.database.entity.AttendeeEntity
 import com.humberto.tasky.core.database.entity.EventEntity
+import com.humberto.tasky.core.database.entity.LocalAttendee
 import com.humberto.tasky.core.database.entity.PhotoEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
-import java.util.UUID
 
 fun EventEntity.toEvent(
-    attendees: List<Attendee>,
     photos: List<Photo>
 ): AgendaItem {
     return AgendaItem.Event(
@@ -20,22 +18,28 @@ fun EventEntity.toEvent(
         from = from.toZonedDateTime("UTC"),
         to = to.toZonedDateTime("UTC"),
         remindAt = remindAt.toZonedDateTime("UTC"),
-        attendees = attendees,
+        attendees = attendees.map { it.toAttendee() },
         photos = photos,
         isUserEventCreator = isUserEventCreator
     )
 }
 
 fun AgendaItem.Event.toEventEntity(): EventEntity {
+    val remindAtEpoch = remindAt.toInstant().toEpochMilli()
     return EventEntity(
         id = id,
         title = title,
         description = description,
         from = from.toInstant().toEpochMilli(),
         to = to.toInstant().toEpochMilli(),
-        remindAt = remindAt.toInstant().toEpochMilli(),
+        remindAt = remindAtEpoch,
         isUserEventCreator = isUserEventCreator,
-        attendeeIds = attendees.map { it.userId },
+        attendees = attendees.map {
+            it.toLocalAttendee(
+                eventId = id,
+                remindAt = remindAtEpoch
+            )
+        },
         photoKeys = photos.map { it.key }
     )
 }
@@ -47,14 +51,7 @@ fun PhotoEntity.toPhoto(): Photo {
     )
 }
 
-fun Photo.toPhotoEntity(): PhotoEntity {
-    return PhotoEntity(
-        key = key,
-        url = url
-    )
-}
-
-fun AttendeeEntity.toAttendee(): Attendee {
+fun LocalAttendee.toAttendee(): Attendee {
     return Attendee(
         userId = userId,
         email = email,
@@ -65,13 +62,13 @@ fun AttendeeEntity.toAttendee(): Attendee {
     )
 }
 
-fun Attendee.toAttendeeEntity(): AttendeeEntity {
-    return AttendeeEntity(
+fun Attendee.toLocalAttendee(eventId: String, remindAt: Long): LocalAttendee {
+    return LocalAttendee(
         userId = userId,
         email = email,
         fullName = fullName,
         eventId = eventId,
         isGoing = isGoing,
-        remindAt = remindAt.toInstant().toEpochMilli()
+        remindAt = remindAt
     )
 }
