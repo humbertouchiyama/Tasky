@@ -44,9 +44,9 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 @Composable
 fun TaskyTextField(
     state: TextFieldState,
-    endIcon: ImageVector?,
     hint: String,
     modifier: Modifier = Modifier,
+    endIcon: ImageVector? = null,
     hasError: Boolean? = false,
     keyboardType: KeyboardType = KeyboardType.Text,
     isFocused: Boolean,

@@ -19,7 +19,7 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun TaskyDialog(
     onDismiss: () -> Unit,
-    dialogTitle: @Composable () -> Unit,
+    dialogHeader: @Composable () -> Unit,
     primaryButton: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     secondaryButton: @Composable RowScope.() -> Unit = {},
@@ -32,10 +32,11 @@ fun TaskyDialog(
             modifier = modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .padding(vertical = 24.dp, horizontal = 16.dp),
+                .padding(16.dp)
+                .padding(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            dialogTitle()
+            dialogHeader()
             dialogContent()
 
             Row(

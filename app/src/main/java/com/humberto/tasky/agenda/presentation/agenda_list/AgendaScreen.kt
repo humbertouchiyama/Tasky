@@ -130,7 +130,7 @@ private fun AgendaScreen(
             AgendaItemType.REMINDER -> stringResource(id = R.string.delete_reminder)
         }
         TaskyDialog(
-            dialogTitle = {
+            dialogHeader = {
                 Text(
                     text = itemType,
                     textAlign = TextAlign.Start,
@@ -198,7 +198,9 @@ private fun AgendaScreen(
                         menuItems = listOf(DropDownItem(
                             title = stringResource(R.string.logout),
                             onClick = { onAction(AgendaAction.OnLogoutClick) }
-                        ))
+                        )),
+                        backgroundColor = MaterialTheme.colorScheme.tertiary,
+                        textColor = MaterialTheme.colorScheme.onTertiary
                     )
                 }
             )

@@ -18,4 +18,7 @@ sealed interface AgendaDetailsAction {
     data object OnManageItemStateButtonClick: AgendaDetailsAction
     data object OnConfirmDeleteClick: AgendaDetailsAction
     data object OnDismissDeleteClick: AgendaDetailsAction
+    data object OnOpenAttendeeDialog: AgendaDetailsAction
+    data object OnDismissAttendeeDialog: AgendaDetailsAction
+    data object OnAddAttendeeClick: AgendaDetailsAction
 }
