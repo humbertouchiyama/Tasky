@@ -65,4 +65,9 @@
     <string name="delete_event">Delete event</string>
     <string name="leave_event">Leave event</string>
     <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete \"%s\"?</string>
+    <string name="creator">creator</string>
+    <string name="add_visitor">Add visitor</string>
+    <string name="add">ADD</string>
+    <string name="user_not_found">User not found!</string>
+    <string name="you_cant_add_yourself">You can\'t add yourself to the event!</string>
 </resources>

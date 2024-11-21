@@ -1,5 +1,7 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
+import androidx.compose.foundation.text.input.TextFieldState
+import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -23,7 +25,11 @@ sealed interface AgendaItemDetails {
         val toTime: LocalTime = LocalTime.now().plusMinutes(30L),
         val selectedFilter: FilterType = FilterType.ALL,
         val photosUrlList: List<String> = listOf(),
-        val isUserEventCreator: Boolean = true
+        val isUserEventCreator: Boolean = true,
+        val isAddingAttendee: Boolean = false,
+        val isCheckingIfAttendeeExists: Boolean = false,
+        val attendees: List<AttendeeUi> = listOf(),
+        val newAttendeeEmail: TextFieldState = TextFieldState(),
     ): AgendaItemDetails
 
     data class Task(val isDone: Boolean = false): AgendaItemDetails

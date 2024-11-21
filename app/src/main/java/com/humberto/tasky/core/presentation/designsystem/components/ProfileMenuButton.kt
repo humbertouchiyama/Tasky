@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +27,9 @@ import com.humberto.tasky.core.presentation.designsystem.components.util.DropDow
 fun ProfileMenuButton(
     initials: String,
     menuItems: List<DropDownItem> = emptyList(),
+    backgroundColor: Color,
+    textColor: Color,
+    clickable: Boolean = true
 ) {
     var isDropDownOpen by rememberSaveable {
         mutableStateOf(false)
@@ -56,8 +60,8 @@ fun ProfileMenuButton(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.tertiary)
-                .clickable(onClick = {
+                .background(backgroundColor)
+                .clickable(enabled = clickable, onClick = {
                     isDropDownOpen = true
                 }),
             contentAlignment = Alignment.Center,
@@ -66,7 +70,7 @@ fun ProfileMenuButton(
                 text = initials,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = textColor
             )
         }
     }

@@ -3,6 +3,7 @@ package com.humberto.tasky.agenda.presentation.agenda_details
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,13 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
+import com.humberto.tasky.agenda.presentation.agenda_details.components.AddEventAttendeeDialog
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AgendaItemIndicator
 import com.humberto.tasky.agenda.presentation.agenda_details.components.AttendanceFilter
+import com.humberto.tasky.agenda.presentation.agenda_details.components.AttendeeListItem
 import com.humberto.tasky.agenda.presentation.agenda_details.components.DateTimeSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.ManageAgendaItemStateButton
 import com.humberto.tasky.agenda.presentation.agenda_details.components.PhotosSection
 import com.humberto.tasky.agenda.presentation.agenda_details.components.ReminderDropdownField
 import com.humberto.tasky.agenda.presentation.agenda_details.components.TaskyEditableField
+import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.presentation.designsystem.PlusIcon
 import com.humberto.tasky.core.presentation.designsystem.TaskyGray
@@ -133,7 +138,7 @@ private fun AgendaDetailsScreen(
             AgendaItemDetails.Reminder -> stringResource(id = R.string.delete_reminder)
         }
         TaskyDialog(
-            dialogTitle = {
+            dialogHeader = {
                 Text(
                     text = itemType,
                     textAlign = TextAlign.Start,
@@ -338,6 +343,11 @@ private fun AgendaDetailsScreen(
                 color = MaterialTheme.colorScheme.tertiary
             )
             if(agendaItem is AgendaItemDetails.Event) {
+                AddEventAttendeeDialog(
+                    onDismiss = { onAction(AgendaDetailsAction.OnDismissAttendeeDialog) },
+                    onAdd = { onAction(AgendaDetailsAction.OnAddAttendeeClick) },
+                    agendaItem = agendaItem
+                )
                 Column(
                     modifier = Modifier
                         .padding(bottom = 32.dp)
@@ -358,6 +368,7 @@ private fun AgendaDetailsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
+                                    .clickable { onAction(AgendaDetailsAction.OnOpenAttendeeDialog) }
                                     .clip(RoundedCornerShape(5.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
@@ -378,6 +389,10 @@ private fun AgendaDetailsScreen(
                         }
                     )
                     Spacer(modifier = Modifier.height(20.dp))
+                    AttendeeList(
+                        attendeeList = agendaItem.attendees,
+                        selectedAttendanceFilter = agendaItem.selectedFilter
+                    )
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -386,6 +401,55 @@ private fun AgendaDetailsScreen(
                 modifier = Modifier,
                 agendaItem = agendaItem
             )
+        }
+    }
+}
+
+@Composable
+fun AttendeeList(
+    modifier: Modifier = Modifier,
+    attendeeList: List<AttendeeUi>,
+    selectedAttendanceFilter: FilterType
+) {
+    val goingList = attendeeList.filter { it.isGoing }
+    val notGoingList = attendeeList.filter { !it.isGoing }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (selectedAttendanceFilter == FilterType.ALL || selectedAttendanceFilter == FilterType.GOING) {
+            if (goingList.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.filter_going),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                goingList.forEach { attendee ->
+                    AttendeeListItem(
+                        onDeleteClick = { },
+                        attendee = attendee
+                    )
+                }
+            }
+        }
+
+        if (selectedAttendanceFilter == FilterType.ALL || selectedAttendanceFilter == FilterType.NOT_GOING) {
+            if (notGoingList.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.filter_not_going),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                notGoingList.forEach { attendee ->
+                    AttendeeListItem(
+                        onDeleteClick = { },
+                        attendee = attendee
+                    )
+                }
+            }
         }
     }
 }
@@ -406,7 +470,23 @@ private fun AgendaDetailsScreenPreview() {
                 agendaItem = AgendaItemDetails.Event(
                     toDate = LocalDate.now(),
                     toTime = LocalTime.now().plusMinutes(15),
-                    selectedFilter = FilterType.GOING
+                    selectedFilter = FilterType.GOING,
+                    attendees = listOf(
+                        AttendeeUi(
+                            userId = "1",
+                            fullName = "Humberto Costa",
+                            email = "email@test.com",
+                            isGoing = true,
+                            isAttendeeEventCreator = true
+                        ),
+                        AttendeeUi(
+                            userId = "2",
+                            fullName = "Humberto Costa",
+                            email = "email2@test.com",
+                            isGoing = false,
+                            isAttendeeEventCreator = false
+                        ),
+                    )
                 ),
             ),
             onAction = {}
