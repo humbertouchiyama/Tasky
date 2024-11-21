@@ -3,7 +3,6 @@ package com.humberto.tasky.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.humberto.tasky.core.database.entity.AttendeeEntity
 import com.humberto.tasky.core.database.entity.EventEntity
 import com.humberto.tasky.core.database.entity.PhotoEntity
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +34,4 @@ interface EventDao {
 
     @Query("SELECT * FROM photoentity WHERE `key` IN (:keys)")
     suspend fun getPhotosByKeys(keys: List<String>): List<PhotoEntity>
-
-    @Query("SELECT * FROM attendeeentity WHERE `userId` IN (:ids)")
-    suspend fun getAttendeesByIds(ids: List<String>): List<AttendeeEntity>
 }

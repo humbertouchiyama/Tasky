@@ -1,11 +1,9 @@
 package com.humberto.tasky.core.database.entity
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 
-@Entity
-data class AttendeeEntity(
-    @PrimaryKey(autoGenerate = false)
+@Serializable
+data class LocalAttendee(
     val userId: String,
     val email: String,
     val fullName: String,

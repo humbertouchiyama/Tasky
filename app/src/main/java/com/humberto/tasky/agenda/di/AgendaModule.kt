@@ -6,13 +6,13 @@ import com.humberto.tasky.agenda.data.event.EventRepositoryImpl
 import com.humberto.tasky.agenda.data.reminder.ReminderRepositoryImpl
 import com.humberto.tasky.agenda.data.task.TaskRepositoryImpl
 import com.humberto.tasky.agenda.domain.AgendaRepository
+import com.humberto.tasky.agenda.domain.event.EventRepository
+import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.core.database.AgendaDatabase
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
-import com.humberto.tasky.agenda.domain.event.EventRepository
-import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
-import com.humberto.tasky.agenda.domain.task.TaskRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,9 +50,13 @@ class AgendaModule {
 
     @Provides
     fun providesEventRepository(
-        eventDao: EventDao
+        eventDao: EventDao,
+        agendaApiService: AgendaApiService
     ): EventRepository {
-        return EventRepositoryImpl(eventDao)
+        return EventRepositoryImpl(
+            eventDao,
+            agendaApiService
+        )
     }
 
     @Provides

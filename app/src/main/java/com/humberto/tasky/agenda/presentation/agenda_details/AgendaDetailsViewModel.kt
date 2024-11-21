@@ -1,18 +1,26 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
+import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAttendeeUi
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAgendaItem
+import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
+import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.util.onError
+import com.humberto.tasky.core.domain.util.onSuccess
+import com.humberto.tasky.core.presentation.ui.UiText
 import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
 import com.humberto.tasky.main.navigation.EditTextArgs
@@ -66,7 +74,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 val selectedLocalDate = LocalDate.ofEpochDay(selectedDateEpochDay)
                 currentState.copy(
                     fromDate = selectedLocalDate,
-                    agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                    agendaItem = currentState.agendaItem.updateIfEvent {
                         copy(toDate = selectedLocalDate)
                     }
                 )
@@ -113,7 +121,7 @@ class AgendaDetailsViewModel @Inject constructor(
             is AgendaDetailsAction.OnSelectFilter -> {
                 _state.update {
                     it.copy(
-                        agendaItem = it.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        agendaItem = it.agendaItem.updateIfEvent {
                             copy(selectedFilter = agendaDetailsAction.filterType)
                         },
                     )
@@ -129,7 +137,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         fromDate = agendaDetailsAction.fromDate,
-                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        agendaItem = currentState.agendaItem.updateIfEvent {
                             copy(toDate = agendaDetailsAction.fromDate)
                         }
                     )
@@ -142,7 +150,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         fromTime = newFromTime,
-                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        agendaItem = currentState.agendaItem.updateIfEvent {
                             copy(toTime = newToTime)
                         }
                     )
@@ -151,7 +159,7 @@ class AgendaDetailsViewModel @Inject constructor(
             is AgendaDetailsAction.OnSelectToDate -> {
                 _state.update { currentState ->
                     currentState.copy(
-                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        agendaItem = currentState.agendaItem.updateIfEvent {
                             copy(toDate = agendaDetailsAction.toDate)
                         }
                     )
@@ -160,7 +168,7 @@ class AgendaDetailsViewModel @Inject constructor(
             is AgendaDetailsAction.OnSelectToTime -> {
                 _state.update { currentState ->
                     currentState.copy(
-                        agendaItem = currentState.agendaItem.updateIfType<AgendaItemDetails.Event> {
+                        agendaItem = currentState.agendaItem.updateIfEvent {
                             copy(toTime = agendaDetailsAction.toTime)
                         }
                     )
@@ -183,14 +191,39 @@ class AgendaDetailsViewModel @Inject constructor(
             AgendaDetailsAction.OnDismissDeleteClick -> {
                 _state.update { it.copy(isConfirmingToDelete = false) }
             }
+            AgendaDetailsAction.OnOpenAttendeeDialog -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        agendaItem = currentState.agendaItem.updateIfEvent {
+                            copy(isAddingAttendee = true)
+                        }
+                    )
+                }
+            }
+            AgendaDetailsAction.OnDismissAttendeeDialog -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        agendaItem = currentState.agendaItem.updateIfEvent {
+                            copy(isAddingAttendee = false)
+                        }
+                    )
+                }
+            }
+            AgendaDetailsAction.OnAddAttendeeClick -> {
+                checkAndAddAttendee()
+            }
             else -> Unit
         }
     }
 
-    private inline fun <reified T : AgendaItemDetails> AgendaItemDetails.updateIfType(
-        crossinline transform: T.() -> T
+    private inline fun <T : AgendaItemDetails> T.updateIfEvent(
+        transform: AgendaItemDetails.Event.() -> AgendaItemDetails.Event
     ): AgendaItemDetails {
-        return (this as? T)?.transform() ?: this
+        return if (this is AgendaItemDetails.Event) {
+            transform()
+        } else {
+            this
+        }
     }
 
     private fun saveItem() {
@@ -228,6 +261,49 @@ class AgendaDetailsViewModel @Inject constructor(
                     isDeleting = false,
                     isConfirmingToDelete = false
                 )
+            }
+        }
+    }
+
+    private fun checkAndAddAttendee() {
+        viewModelScope.launch {
+            val agendaItem = _state.value.agendaItem
+            if (agendaItem is AgendaItemDetails.Event) {
+                _state.update {
+                    it.copy(agendaItem = agendaItem.copy(isCheckingIfAttendeeExists = true))
+                }
+                eventRepository
+                    .checkAttendeeExists(
+                        email = agendaItem.newAttendeeEmail.text.toString()
+                    ).onSuccess { attendee ->
+                        _state.update {
+                            it.copy(
+                                agendaItem = agendaItem.copy(
+                                    attendees = agendaItem.attendees + attendee.toAttendeeUi(),
+                                    newAttendeeEmail = TextFieldState(),
+                                    isAddingAttendee = false,
+                                    isCheckingIfAttendeeExists = false
+                                )
+                            )
+                        }
+                    }.onError { error ->
+                        when(error) {
+                            DataError.Network.NOT_FOUND -> {
+                                eventChannel.send(AgendaDetailsEvent.Error(
+                                    UiText.StringResource(R.string.user_not_found)
+                                ))
+                            }
+                            DataError.Network.CONFLICT -> {
+                                eventChannel.send(AgendaDetailsEvent.Error(
+                                    UiText.StringResource(R.string.you_cant_add_yourself)
+                                ))
+                            }
+                            else -> eventChannel.send(AgendaDetailsEvent.Error(error.asUiText()))
+                        }
+                        _state.update {
+                            it.copy(agendaItem = agendaItem.copy(isCheckingIfAttendeeExists = false))
+                        }
+                    }
             }
         }
     }

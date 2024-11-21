@@ -2,7 +2,6 @@ package com.humberto.tasky.agenda.data
 
 import android.database.sqlite.SQLiteFullException
 import androidx.room.withTransaction
-import com.humberto.tasky.agenda.data.event.toAttendee
 import com.humberto.tasky.agenda.data.event.toEvent
 import com.humberto.tasky.agenda.data.event.toEventEntity
 import com.humberto.tasky.agenda.data.event.toPhoto
@@ -61,14 +60,10 @@ class AgendaRepositoryImpl @Inject constructor(
             endOfDay = endOfDay
         ).map { eventEntities ->
             eventEntities.map { eventEntity ->
-                val attendees = eventDao
-                    .getAttendeesByIds(eventEntity.attendeeIds)
-                    .map { it.toAttendee() }
                 val photos = eventDao
                     .getPhotosByKeys(eventEntity.photoKeys)
                     .map { it.toPhoto() }
                 eventEntity.toEvent(
-                    attendees = attendees,
                     photos = photos
                 )
             }
