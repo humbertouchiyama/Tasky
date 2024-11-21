@@ -37,70 +37,68 @@ fun AddEventAttendeeDialog(
     onAdd: () -> Unit,
     agendaItem: AgendaItemDetails.Event
 ) {
-    if(agendaItem.isAddingAttendee) {
-        var isFocused by remember { mutableStateOf(false) }
-        val focusRequester = remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-        }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
-        TaskyDialog(
-            dialogHeader = {
+    TaskyDialog(
+        dialogHeader = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.add_visitor),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(top = 16.dp)
+                )
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .clickable {
+                            onDismiss()
+                        }
+                        .padding(start = 8.dp)
+                        .align(Alignment.TopEnd)
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.add_visitor),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                    Icon(
+                        imageVector = CrossIcon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(top = 16.dp)
+                            .size(18.dp)
                     )
-                    Box(
-                        modifier = Modifier
-                            .clickable {
-                                onDismiss()
-                            }
-                            .padding(start = 8.dp)
-                            .align(Alignment.TopEnd)
-                    ) {
-                        Icon(
-                            imageVector = CrossIcon,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier
-                                .size(18.dp)
-                        )
-                    }
                 }
-            },
-            onDismiss = onDismiss,
-            primaryButton = {
-                TaskyActionButton(
-                    text = stringResource(id = R.string.add),
-                    isLoading = agendaItem.isCheckingIfAttendeeExists,
-                    onClick = onAdd,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
-        ) {
-            TaskyTextField(
-                state = agendaItem.newAttendeeEmail,
-                keyboardType = KeyboardType.Email,
-                hint = stringResource(id = R.string.email_address),
-                modifier = Modifier.fillMaxWidth(),
-                isFocused = isFocused,
-                onFocusChange = {
-                    isFocused = it.isFocused
-                },
-                focusRequester = focusRequester,
-                imeAction = ImeAction.Go
+        },
+        onDismiss = onDismiss,
+        primaryButton = {
+            TaskyActionButton(
+                text = stringResource(id = R.string.add),
+                isLoading = agendaItem.isCheckingIfAttendeeExists,
+                onClick = onAdd,
+                modifier = Modifier.fillMaxWidth()
             )
         }
+    ) {
+        TaskyTextField(
+            state = agendaItem.newAttendeeEmail,
+            keyboardType = KeyboardType.Email,
+            hint = stringResource(id = R.string.email_address),
+            modifier = Modifier.fillMaxWidth(),
+            isFocused = isFocused,
+            onFocusChange = {
+                isFocused = it.isFocused
+            },
+            focusRequester = focusRequester,
+            imeAction = ImeAction.Go
+        )
     }
 }
 
