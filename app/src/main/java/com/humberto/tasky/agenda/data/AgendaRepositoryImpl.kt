@@ -92,7 +92,7 @@ class AgendaRepositoryImpl @Inject constructor(
     ): EmptyResult<DataError.Local> {
         return try {
             taskDao.upsertTasks(tasks.map { it.toTaskEntity() })
-            eventDao.upsertEvents(events.map { it.toEventEntity(hostId = null) })
+            eventDao.upsertEvents(events.map { it.toEventEntity() })
             reminderDao.upsertReminders(reminders.map { it.toReminderEntity() })
             Result.Success(Unit)
         } catch (e: SQLiteFullException) {

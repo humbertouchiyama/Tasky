@@ -40,8 +40,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                 agendaItem = AgendaItemDetails.Event(
                     toTime = to.toLocalTime(),
                     toDate = to.toLocalDate(),
-                    attendees = agendaItem.attendees.map { it.toAttendeeUi() },
-                    eventCreator = agendaItem.eventCreator
+                    attendees = agendaItem.attendees.map { it.toAttendeeUi() }
                 ),
             )
         }
@@ -77,8 +76,6 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             remindAt = remindAt,
             to = agendaItem.toDate.atTimeToUtc(agendaItem.toTime),
             isUserEventCreator = agendaItem.isUserEventCreator,
-            eventCreator = agendaItem.eventCreator,
-            localAttendee = agendaItem.localAttendee,
             attendees = agendaItem.attendees.map {
                 it.toAttendee(
                     eventId = id,

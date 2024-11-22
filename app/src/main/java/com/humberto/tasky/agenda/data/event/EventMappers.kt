@@ -9,9 +9,7 @@ import com.humberto.tasky.core.database.entity.PhotoEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
 
 fun EventEntity.toEvent(
-    photos: List<Photo>,
-    eventCreator: LocalAttendee? = null,
-    localAttendee: LocalAttendee? = null
+    photos: List<Photo>
 ): AgendaItem {
     return AgendaItem.Event(
         id = id,
@@ -20,19 +18,13 @@ fun EventEntity.toEvent(
         from = from.toZonedDateTime("UTC"),
         to = to.toZonedDateTime("UTC"),
         remindAt = remindAt.toZonedDateTime("UTC"),
-        attendees = attendees.map {
-            it.toAttendee(
-                isEventCreator = it.userId == eventCreator?.userId
-            )
-        },
+        attendees = attendees.map { it.toAttendee() },
         photos = photos,
-        isUserEventCreator = isUserEventCreator,
-        eventCreator = eventCreator?.toAttendee(isEventCreator = true),
-        localAttendee = localAttendee?.toAttendee(isEventCreator = localAttendee.userId == eventCreator?.userId)
+        isUserEventCreator = isUserEventCreator
     )
 }
 
-fun AgendaItem.Event.toEventEntity(hostId: String?): EventEntity {
+fun AgendaItem.Event.toEventEntity(): EventEntity {
     val remindAtEpoch = remindAt.toInstant().toEpochMilli()
     return EventEntity(
         id = id,
@@ -43,8 +35,7 @@ fun AgendaItem.Event.toEventEntity(hostId: String?): EventEntity {
         remindAt = remindAtEpoch,
         isUserEventCreator = isUserEventCreator,
         attendees = attendees.map { it.toLocalAttendee() },
-        photoKeys = photos.map { it.key },
-        host = eventCreator?.userId ?: hostId ?: ""
+        photoKeys = photos.map { it.key }
     )
 }
 
@@ -55,7 +46,7 @@ fun PhotoEntity.toPhoto(): Photo {
     )
 }
 
-fun LocalAttendee.toAttendee(isEventCreator: Boolean): Attendee {
+fun LocalAttendee.toAttendee(): Attendee {
     return Attendee(
         userId = userId,
         email = email,
@@ -74,6 +65,7 @@ fun Attendee.toLocalAttendee(): LocalAttendee {
         fullName = fullName,
         eventId = eventId!!,
         isGoing = isGoing,
-        remindAt = remindAt!!.toInstant().toEpochMilli()
+        remindAt = remindAt!!.toInstant().toEpochMilli(),
+        isEventCreator = isEventCreator
     )
 }

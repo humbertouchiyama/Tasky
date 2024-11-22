@@ -13,7 +13,6 @@ data class EventEntity(
     val from: Long,
     val to: Long,
     val remindAt: Long,
-    val host: String,
     val isUserEventCreator: Boolean,
     val attendees: List<LocalAttendee>,
     val photoKeys: List<String>

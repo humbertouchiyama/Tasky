@@ -20,9 +20,7 @@ sealed class AgendaItem(
         val to: ZonedDateTime,
         val attendees: List<Attendee>,
         val photos: List<Photo>,
-        val isUserEventCreator: Boolean,
-        val eventCreator: Attendee? = null,
-        val localAttendee: Attendee? = null,
+        val isUserEventCreator: Boolean
     ) : AgendaItem(id, title, description, from, remindAt)
 
     data class Task(
