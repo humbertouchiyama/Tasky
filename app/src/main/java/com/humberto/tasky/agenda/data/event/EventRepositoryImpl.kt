@@ -23,18 +23,12 @@ class EventRepositoryImpl @Inject constructor(
 
     override suspend fun getEvent(eventId: String): Result<AgendaItem, DataError> {
         val eventEntity = eventDao.getEvent(eventId)
-        return eventEntity?.let { event ->
+        return eventEntity?.let {
             val photos = eventDao
                 .getPhotosByKeys(eventEntity.photoKeys)
                 .map { it.toPhoto() }
-            val localAttendee = event.attendees.find { it.userId == localUserId }
-            val eventCreator = event.attendees.find { it.userId == eventEntity.host }
             Result.Success(
-                eventEntity.toEvent(
-                    photos = photos,
-                    eventCreator = eventCreator,
-                    localAttendee = localAttendee
-                )
+                eventEntity.toEvent(photos = photos)
             )
         } ?: Result.Error(DataError.Local.NOT_FOUND)
     }
@@ -45,14 +39,14 @@ class EventRepositoryImpl @Inject constructor(
                 attendees = agendaItem.addEventCreatorIfNonExistent()
             )
 
-        val eventEntity = itemWithEventCreator.toEventEntity(hostId = localUserId)
+        val eventEntity = itemWithEventCreator.toEventEntity()
         eventDao.upsertEvent(eventEntity)
         return Result.Success(Unit)
     }
 
     private fun AgendaItem.Event.addEventCreatorIfNonExistent(): List<Attendee> {
-        if (attendees.any { it.userId == localUserId }) return attendees
         val authInfo = sessionManager.get() ?: return attendees
+        if (attendees.any { it.userId == localUserId }) return attendees
         val eventCreator = Attendee(
             userId = authInfo.userId,
             email = "",
