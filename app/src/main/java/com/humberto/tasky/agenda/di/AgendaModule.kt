@@ -13,6 +13,7 @@ import com.humberto.tasky.core.database.AgendaDatabase
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
+import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,11 +52,13 @@ class AgendaModule {
     @Provides
     fun providesEventRepository(
         eventDao: EventDao,
-        agendaApiService: AgendaApiService
+        agendaApiService: AgendaApiService,
+        sessionManager: SessionManager
     ): EventRepository {
         return EventRepositoryImpl(
             eventDao,
-            agendaApiService
+            agendaApiService,
+            sessionManager
         )
     }
 
