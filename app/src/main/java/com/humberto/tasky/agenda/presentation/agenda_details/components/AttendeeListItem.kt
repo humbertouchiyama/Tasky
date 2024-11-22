@@ -59,7 +59,7 @@ fun AttendeeListItem(
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if(attendee.isAttendeeEventCreator) {
+        if(attendee.isEventCreator) {
             Text(
                 text = stringResource(id = R.string.creator),
                 fontSize = 14.sp,
@@ -95,7 +95,7 @@ private fun AttendeeListItemPreview() {
                 fullName = "Humberto Costa",
                 email = "test@email.com",
                 isGoing = true,
-                isAttendeeEventCreator = false
+                isEventCreator = false
             ),
         )
     }

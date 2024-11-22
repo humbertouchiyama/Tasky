@@ -5,5 +5,5 @@ data class AttendeeUi(
     val fullName: String,
     val email: String,
     val isGoing: Boolean,
-    val isAttendeeEventCreator: Boolean
+    val isEventCreator: Boolean
 )

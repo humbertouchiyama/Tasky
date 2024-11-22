@@ -428,14 +428,14 @@ private fun AgendaDetailsScreenPreview() {
                             fullName = "Humberto Costa",
                             email = "email@test.com",
                             isGoing = true,
-                            isAttendeeEventCreator = true
+                            isEventCreator = true
                         ),
                         AttendeeUi(
                             userId = "2",
                             fullName = "Humberto Costa",
                             email = "email2@test.com",
                             isGoing = false,
-                            isAttendeeEventCreator = false
+                            isEventCreator = false
                         ),
                     )
                 ),

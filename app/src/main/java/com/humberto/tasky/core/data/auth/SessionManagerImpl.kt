@@ -34,4 +34,8 @@ class SessionManagerImpl @Inject constructor(
             .putString(KEY_AUTH_INFO, json)
             .apply()
     }
+
+    override fun getUserId(): String? {
+        return get()?.userId
+    }
 }

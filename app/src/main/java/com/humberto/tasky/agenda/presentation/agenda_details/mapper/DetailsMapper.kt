@@ -40,7 +40,8 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                 agendaItem = AgendaItemDetails.Event(
                     toTime = to.toLocalTime(),
                     toDate = to.toLocalDate(),
-                    attendees = agendaItem.attendees.map { it.toAttendeeUi() }
+                    attendees = agendaItem.attendees.map { it.toAttendeeUi() },
+                    eventCreator = agendaItem.eventCreator
                 ),
             )
         }
@@ -76,6 +77,8 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             remindAt = remindAt,
             to = agendaItem.toDate.atTimeToUtc(agendaItem.toTime),
             isUserEventCreator = agendaItem.isUserEventCreator,
+            eventCreator = agendaItem.eventCreator,
+            localAttendee = agendaItem.localAttendee,
             attendees = agendaItem.attendees.map {
                 it.toAttendee(
                     eventId = id,
@@ -101,7 +104,8 @@ fun AttendeeUi.toAttendee(eventId: String, remindAt: ZonedDateTime): Attendee {
         fullName = fullName,
         eventId = eventId,
         isGoing = isGoing,
-        remindAt = remindAt
+        remindAt = remindAt,
+        isEventCreator = isEventCreator
     )
 }
 
@@ -111,7 +115,7 @@ fun Attendee.toAttendeeUi(): AttendeeUi {
         email = email,
         fullName = fullName,
         isGoing = isGoing,
-        isAttendeeEventCreator = false
+        isEventCreator = isEventCreator
     )
 }
 
