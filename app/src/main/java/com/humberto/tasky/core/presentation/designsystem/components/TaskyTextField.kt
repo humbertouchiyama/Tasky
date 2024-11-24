@@ -49,8 +49,8 @@ fun TaskyTextField(
     endIcon: ImageVector? = null,
     hasError: Boolean? = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    isFocused: Boolean,
-    onFocusChange: (FocusState) -> Unit,
+    isFocused: Boolean = false,
+    onFocusChange: (FocusState) -> Unit = {},
     focusRequester: FocusRequester,
     imeAction: ImeAction = ImeAction.Done
 ) {

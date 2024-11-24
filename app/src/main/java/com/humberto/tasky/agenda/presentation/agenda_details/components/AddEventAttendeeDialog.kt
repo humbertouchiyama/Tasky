@@ -10,11 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -31,6 +27,7 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyActionButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDialog
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyTextField
+import kotlinx.coroutines.delay
 
 @Composable
 fun AddEventAttendeeDialog(
@@ -38,10 +35,10 @@ fun AddEventAttendeeDialog(
     onAdd: () -> Unit,
     agendaItem: AgendaItemDetails.Event
 ) {
-    var isFocused by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
+        delay(100)
         focusRequester.requestFocus()
     }
 
@@ -93,10 +90,6 @@ fun AddEventAttendeeDialog(
             keyboardType = KeyboardType.Email,
             hint = stringResource(id = R.string.email_address),
             modifier = Modifier.fillMaxWidth(),
-            isFocused = isFocused,
-            onFocusChange = {
-                isFocused = it.isFocused
-            },
             focusRequester = focusRequester,
             imeAction = ImeAction.Go
         )
