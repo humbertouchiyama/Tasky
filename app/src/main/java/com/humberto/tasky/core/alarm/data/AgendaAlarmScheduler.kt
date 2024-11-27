@@ -44,13 +44,19 @@ class AgendaAlarmScheduler @Inject constructor(
         }
     }
 
-    override fun cancelAlarm(alarmId: String) {
-        val intent = Intent(context, AlarmReceiver::class.java)
+    override fun cancelAlarm(alarmItem: AlarmItem) {
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra(AlarmReceiver.ALARM_ID, alarmItem.id)
+            putExtra(AlarmReceiver.ALARM_TITLE, alarmItem.title)
+            putExtra(AlarmReceiver.ALARM_DESCRIPTION, alarmItem.description)
+            putExtra(AlarmReceiver.ITEM_TYPE, alarmItem.itemType.name)
+            putExtra(AlarmReceiver.ITEM_DATE, alarmItem.itemDate)
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            alarmId.hashCode(),
+            alarmItem.id.hashCode(),
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
     }

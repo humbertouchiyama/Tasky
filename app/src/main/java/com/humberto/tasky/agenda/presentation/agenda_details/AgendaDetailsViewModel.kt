@@ -254,12 +254,13 @@ class AgendaDetailsViewModel @Inject constructor(
     private fun deleteItem() {
         viewModelScope.launch {
             _state.update { it.copy(isDeleting = true) }
-            when(_state.value.agendaItem) {
-                is AgendaItemDetails.Event -> eventRepository.deleteEvent(_state.value.id)
-                AgendaItemDetails.Reminder -> reminderRepository.deleteReminder(_state.value.id)
-                is AgendaItemDetails.Task -> taskRepository.deleteTask(_state.value.id)
+            val agendaItem = _state.value.toAgendaItem()
+            when(agendaItem) {
+                is AgendaItem.Event -> eventRepository.deleteEvent(_state.value.id)
+                is AgendaItem.Reminder -> reminderRepository.deleteReminder(_state.value.id)
+                is AgendaItem.Task -> taskRepository.deleteTask(_state.value.id)
             }
-            alarmScheduler.cancelAlarm(_state.value.id)
+            alarmScheduler.cancelAlarm(agendaItem.toAlarmItem())
             eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
             _state.update {
                 it.copy(
