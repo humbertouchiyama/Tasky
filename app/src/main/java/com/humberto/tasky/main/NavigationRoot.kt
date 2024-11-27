@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsScreenRoot
 import com.humberto.tasky.agenda.presentation.agenda_list.AgendaScreenRoot
@@ -93,7 +94,13 @@ private fun NavGraphBuilder.agendaGraph(navController: NavHostController) {
             selectedDateEpochDay = selectedDateEpochDay
         )
     }
-    composable<AgendaDetails> { backStackEntry ->
+    composable<AgendaDetails>(
+        deepLinks = listOf(
+            navDeepLink<AgendaDetails>(
+                basePath = "tasky://agenda_item",
+            )
+        )
+    ) { backStackEntry ->
         val agendaDetails: AgendaDetails = backStackEntry.toRoute<AgendaDetails>()
         val editTextScreenType: EditTextScreenType? = backStackEntry.savedStateHandle["editTextScreenType"]
         val textToBeUpdated: String? = backStackEntry.savedStateHandle["textToBeUpdated"]
