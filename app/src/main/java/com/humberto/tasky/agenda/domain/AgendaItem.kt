@@ -5,7 +5,7 @@ import com.humberto.tasky.agenda.domain.event.Photo
 import java.time.ZonedDateTime
 
 sealed class AgendaItem(
-    open val id: String?,
+    open val id: String,
     open val title: String,
     open val description: String?,
     open val from: ZonedDateTime,

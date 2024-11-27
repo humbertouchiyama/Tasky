@@ -14,8 +14,9 @@ import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAttendeeUi
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAgendaItem
-import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
+import com.humberto.tasky.core.alarm.domain.AlarmScheduler
+import com.humberto.tasky.core.alarm.mapper.toAlarmItem
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.onError
@@ -41,7 +42,8 @@ class AgendaDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val eventRepository: EventRepository,
-    private val reminderRepository: ReminderRepository
+    private val reminderRepository: ReminderRepository,
+    private val alarmScheduler: AlarmScheduler
 ): ViewModel() {
 
     private val agendaDetailsArgs = savedStateHandle.toRoute<AgendaDetails>()
@@ -229,13 +231,15 @@ class AgendaDetailsViewModel @Inject constructor(
     private fun saveItem() {
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
-            val result = when(val agendaItem = _state.value.toAgendaItem()) {
+            val agendaItem = _state.value.toAgendaItem()
+            val result = when(agendaItem) {
                 is AgendaItem.Task -> taskRepository.createTask(agendaItem)
                 is AgendaItem.Event -> eventRepository.createEvent(agendaItem)
                 is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem)
             }
             when (result) {
                 is Result.Success -> {
+                    alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
                     toggleEditingState()
                     eventChannel.send(AgendaDetailsEvent.SaveSuccess)
                 }
@@ -255,6 +259,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 AgendaItemDetails.Reminder -> reminderRepository.deleteReminder(_state.value.id)
                 is AgendaItemDetails.Task -> taskRepository.deleteTask(_state.value.id)
             }
+            alarmScheduler.cancelAlarm(_state.value.id)
             eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
             _state.update {
                 it.copy(
