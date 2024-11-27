@@ -13,6 +13,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetailsState {
     val from = agendaItem.from.withZoneSameInstant(ZoneId.systemDefault())
@@ -57,8 +58,8 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
 }
 
 fun AgendaDetailsState.toAgendaItem(): AgendaItem {
-    val remindAt = reminderType.toReminderDateFromDateTime(fromDate.atTimeToUtc(fromTime))
-    val from = fromDate.atTimeToUtc(fromTime)
+    val remindAt = reminderType.toReminderDateFromDateTime(fromDate.atTimeNoSecondsToUtc(fromTime))
+    val from = fromDate.atTimeNoSecondsToUtc(fromTime)
     return when (agendaItem) {
         is AgendaItemDetails.Task -> AgendaItem.Task(
             id = id,
@@ -74,7 +75,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             description = description,
             from = from,
             remindAt = remindAt,
-            to = agendaItem.toDate.atTimeToUtc(agendaItem.toTime),
+            to = agendaItem.toDate.atTimeNoSecondsToUtc(agendaItem.toTime),
             isUserEventCreator = agendaItem.isUserEventCreator,
             attendees = agendaItem.attendees.map {
                 it.toAttendee(
@@ -116,7 +117,8 @@ fun Attendee.toAttendeeUi(): AttendeeUi {
     )
 }
 
-private fun LocalDate.atTimeToUtc(localTime: LocalTime): ZonedDateTime {
-    val zonedDateTime = this.atTime(localTime).atZone(ZoneOffset.systemDefault())
+private fun LocalDate.atTimeNoSecondsToUtc(localTime: LocalTime): ZonedDateTime {
+    val truncatedTime = localTime.truncatedTo(ChronoUnit.MINUTES)
+    val zonedDateTime = this.atTime(truncatedTime).atZone(ZoneOffset.systemDefault())
     return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC)
 }
