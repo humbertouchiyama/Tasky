@@ -26,6 +26,7 @@ import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemDetails
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
@@ -70,6 +71,11 @@ fun AgendaListItem(
         else -> TaskyBrown
     }
 
+    val isSelected = when (agendaItem.itemDetails) {
+        is AgendaItemDetails.Task -> agendaItem.itemDetails.isDone
+        else -> false
+    }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -88,7 +94,7 @@ fun AgendaListItem(
                 modifier = Modifier.weight(1f)
             ) {
                 TaskyRadioButton(
-                    selected = agendaItem.isItemChecked == true,
+                    selected = isSelected,
                     enabled = agendaItem.isItemCheckable,
                     onClick = { onCheckItem() },
                     radioButtonColor = foregroundColor,
@@ -104,7 +110,7 @@ fun AgendaListItem(
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.W600,
                             textDecoration =
-                                if (agendaItem.isItemChecked == true) TextDecoration.LineThrough
+                                if (isSelected) TextDecoration.LineThrough
                                 else TextDecoration.None
                         ),
                         maxLines = 1,
