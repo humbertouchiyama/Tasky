@@ -1,6 +1,7 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.model
 
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import java.time.ZonedDateTime
 
 data class AgendaItemUi(
     val id: String,
@@ -8,8 +9,22 @@ data class AgendaItemUi(
     val description: String = "",
     val dateTime: String,
     val agendaItemType: AgendaItemType,
-    val isItemChecked: Boolean? = false,
+    val from: ZonedDateTime,
+    val remindAt: ZonedDateTime,
+
+    val itemDetails: AgendaItemDetails
 ) {
     val isItemCheckable
         get() = agendaItemType == AgendaItemType.TASK
+}
+
+sealed interface AgendaItemDetails {
+    data class Event(
+        val to: ZonedDateTime,
+        val isUserEventCreator: Boolean
+    ): AgendaItemDetails
+
+    data class Task(val isDone: Boolean = false): AgendaItemDetails
+
+    data object Reminder: AgendaItemDetails
 }
