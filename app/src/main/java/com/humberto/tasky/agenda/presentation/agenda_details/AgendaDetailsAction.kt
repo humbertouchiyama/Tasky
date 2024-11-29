@@ -21,4 +21,8 @@ sealed interface AgendaDetailsAction {
     data object OnOpenAttendeeDialog: AgendaDetailsAction
     data object OnDismissAttendeeDialog: AgendaDetailsAction
     data object OnAddAttendeeClick: AgendaDetailsAction
+    data class SubmitNotificationPermissionInfo(
+        val showNotificationRationale: Boolean
+    ): AgendaDetailsAction
+    data object DismissRationaleDialog: AgendaDetailsAction
 }

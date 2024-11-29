@@ -214,6 +214,20 @@ class AgendaDetailsViewModel @Inject constructor(
             AgendaDetailsAction.OnAddAttendeeClick -> {
                 checkAndAddAttendee()
             }
+            is AgendaDetailsAction.SubmitNotificationPermissionInfo -> {
+                _state.update {
+                    it.copy(
+                        showNotificationRationale = agendaDetailsAction.showNotificationRationale
+                    )
+                }
+            }
+            AgendaDetailsAction.DismissRationaleDialog -> {
+                _state.update {
+                    it.copy(
+                        showNotificationRationale = false
+                    )
+                }
+            }
             else -> Unit
         }
     }
