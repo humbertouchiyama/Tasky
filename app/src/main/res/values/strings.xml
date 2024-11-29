@@ -70,4 +70,7 @@
     <string name="add">ADD</string>
     <string name="user_not_found">User not found!</string>
     <string name="you_cant_add_yourself">You can\'t add yourself to the event!</string>
+    <string name="allow">Allow</string>
+    <string name="permission_required">Permission required</string>
+    <string name="notification_rationale">Stay on top of your schedule with timely notifications for events, tasks, and reminders.</string>
 </resources>

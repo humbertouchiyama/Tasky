@@ -1,6 +1,11 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
+import android.Manifest
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -127,6 +132,72 @@ private fun AgendaDetailsScreen(
     state: AgendaDetailsState,
     onAction: (AgendaDetailsAction) -> Unit
 ) {
+    val context = LocalContext.current
+    val activity = context as ComponentActivity
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {
+        val showNotificationRationale = activity.shouldShowNotificationPermissionRationale()
+        onAction(
+            AgendaDetailsAction.SubmitNotificationPermissionInfo(
+                showNotificationRationale = showNotificationRationale
+            )
+        )
+    }
+    LaunchedEffect(key1 = true) {
+        // TODO deal with permission denied twice
+        // TODO ask notification permission when user taps on save instead of launch
+        val showNotificationRationale = activity.shouldShowNotificationPermissionRationale()
+
+        onAction(
+            AgendaDetailsAction.SubmitNotificationPermissionInfo(
+                showNotificationRationale = showNotificationRationale
+            )
+        )
+        if (!showNotificationRationale) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+    if (state.showNotificationRationale) {
+        TaskyDialog(
+            dialogHeader = {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(id = R.string.permission_required),
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            onDismiss = {
+                onAction(AgendaDetailsAction.DismissRationaleDialog)
+            },
+            primaryButton = {
+                TaskyActionButton(
+                    text = stringResource(id = R.string.allow),
+                    isLoading = false,
+                    onClick = {
+                        onAction(AgendaDetailsAction.DismissRationaleDialog)
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                )
+            },
+            secondaryButton = {
+                TaskyTextButton(
+                    text = stringResource(id = R.string.cancel),
+                    onClick = {
+                        onAction(AgendaDetailsAction.DismissRationaleDialog)
+                    },
+                )
+            }
+        ) {
+            Text(
+                text = stringResource(id = R.string.notification_rationale),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
     val agendaItem = state.agendaItem
     if(state.isConfirmingToDelete) {
         val itemTitle = state.title.ifEmpty { stringResource(id = R.string.no_title) }
@@ -403,6 +474,11 @@ private fun AgendaDetailsScreen(
             )
         }
     }
+}
+
+fun ComponentActivity.shouldShowNotificationPermissionRationale(): Boolean {
+    return Build.VERSION.SDK_INT >= 33 &&
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
 }
 
 @Preview

@@ -16,7 +16,8 @@ data class AgendaDetailsState(
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val isConfirmingToDelete: Boolean = false,
-    val isDeleting: Boolean = false
+    val isDeleting: Boolean = false,
+    val showNotificationRationale: Boolean = false
 )
 
 sealed interface AgendaItemDetails {
