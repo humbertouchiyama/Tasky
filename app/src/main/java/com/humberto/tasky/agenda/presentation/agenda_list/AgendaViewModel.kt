@@ -123,7 +123,7 @@ class AgendaViewModel @Inject constructor(
                     AgendaItemType.EVENT -> eventRepository.deleteEvent(it.id)
                     AgendaItemType.REMINDER -> reminderRepository.deleteReminder(it.id)
                 }
-                alarmScheduler.cancelAlarm(it.toAgendaItem().toAlarmItem())
+                alarmScheduler.cancelAlarm(it.id)
             }
             _agendaState.update {
                 it.copy(

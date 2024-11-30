@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import com.humberto.tasky.core.alarm.domain.AlarmItem
 import com.humberto.tasky.core.alarm.domain.AlarmScheduler
+import com.humberto.tasky.core.alarm.mapper.toParcelable
 import com.humberto.tasky.core.alarm.presentation.AlarmReceiver
 import javax.inject.Inject
 
@@ -21,11 +22,7 @@ class AgendaAlarmScheduler @Inject constructor(
         if (alarmItem.triggerAt < now) return
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra(AlarmReceiver.ALARM_ID, alarmItem.id)
-            putExtra(AlarmReceiver.ALARM_TITLE, alarmItem.title)
-            putExtra(AlarmReceiver.ALARM_DESCRIPTION, alarmItem.description)
-            putExtra(AlarmReceiver.ITEM_TYPE, alarmItem.itemType.name)
-            putExtra(AlarmReceiver.ITEM_DATE, alarmItem.itemDate)
+            putExtra(AlarmReceiver.ALARM_INFO, alarmItem.toParcelable())
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -44,17 +41,11 @@ class AgendaAlarmScheduler @Inject constructor(
         }
     }
 
-    override fun cancelAlarm(alarmItem: AlarmItem) {
-        val intent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra(AlarmReceiver.ALARM_ID, alarmItem.id)
-            putExtra(AlarmReceiver.ALARM_TITLE, alarmItem.title)
-            putExtra(AlarmReceiver.ALARM_DESCRIPTION, alarmItem.description)
-            putExtra(AlarmReceiver.ITEM_TYPE, alarmItem.itemType.name)
-            putExtra(AlarmReceiver.ITEM_DATE, alarmItem.itemDate)
-        }
+    override fun cancelAlarm(id: String) {
+        val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            alarmItem.id.hashCode(),
+            id.hashCode(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )

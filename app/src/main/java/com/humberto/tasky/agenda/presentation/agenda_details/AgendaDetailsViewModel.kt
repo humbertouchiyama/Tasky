@@ -274,7 +274,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 is AgendaItem.Reminder -> reminderRepository.deleteReminder(_state.value.id)
                 is AgendaItem.Task -> taskRepository.deleteTask(_state.value.id)
             }
-            alarmScheduler.cancelAlarm(agendaItem.toAlarmItem())
+            alarmScheduler.cancelAlarm(agendaItem.id)
             eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
             _state.update {
                 it.copy(
