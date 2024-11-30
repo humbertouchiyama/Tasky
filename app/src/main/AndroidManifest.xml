@@ -33,8 +33,7 @@
 
                 <data
                     android:scheme="tasky"
-                    android:host="agenda_item"
-                    android:pathPattern=".*" />
+                    android:host="agenda_item" />
             </intent-filter>
         </activity>
 

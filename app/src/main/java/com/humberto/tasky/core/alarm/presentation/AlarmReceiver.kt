@@ -10,9 +10,9 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.humberto.tasky.R
+import com.humberto.tasky.core.alarm.data.AlarmItemParcelable
 import com.humberto.tasky.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -23,33 +23,31 @@ class AlarmReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         createNotificationChannel()
-        val id = intent.getStringExtra(ALARM_ID)
-        val title = intent.getStringExtra(ALARM_TITLE)?.takeIf { it.isNotEmpty() } ?: context.getString(R.string.no_title)
-        val description = intent.getStringExtra(ALARM_DESCRIPTION)
-        val itemType = intent.getStringExtra(ITEM_TYPE)
-        val selectedDate = intent.getLongExtra(ITEM_DATE, LocalDate.now().toEpochDay())
+        val alarmInfo = intent.getParcelableExtra(ALARM_INFO, AlarmItemParcelable::class.java)
 
-        val activityIntent = Intent(context, MainActivity::class.java).apply {
-            data =
-                "tasky://agenda_item/${itemType}?agendaItemId=${id}&isEditing=${0}&selectedDateEpochDay=${selectedDate}"
-            .toUri()
+        alarmInfo?.let {
+            val activityIntent = Intent(context, MainActivity::class.java).apply {
+                data =
+                    "tasky://agenda_item/${it.itemType}?agendaItemId=${it.id}&isEditing=${0}&selectedDateEpochDay=${it.itemDateEpochDay}"
+                .toUri()
+            }
+
+            val pendingIntent = TaskStackBuilder.create(context).run {
+                addNextIntentWithParentStack(activityIntent)
+                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+            }
+
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.tasky_logo_notif)
+                .setContentTitle(it.title)
+                .setContentText(it.description)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .build()
+
+            notificationManager.notify(it.id.hashCode(), notification)
         }
-
-        val pendingIntent = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(activityIntent)
-            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.tasky_logo_notif)
-            .setContentTitle(title)
-            .setContentText(description)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .build()
-
-        notificationManager.notify(id.hashCode(), notification)
     }
 
     private fun createNotificationChannel() {
@@ -65,10 +63,6 @@ class AlarmReceiver: BroadcastReceiver() {
         private const val CHANNEL_NAME = "Tasky Agenda Alarms"
         private const val CHANNEL_ID = "tasky_alarms"
 
-        const val ALARM_ID = "ALARM_ID"
-        const val ALARM_TITLE = "ALARM_TITLE"
-        const val ALARM_DESCRIPTION = "ALARM_DESCRIPTION"
-        const val ITEM_TYPE = "ITEM_TYPE"
-        const val ITEM_DATE = "ITEM_DATE"
+        const val ALARM_INFO = "ALARM_INFO"
     }
 }
