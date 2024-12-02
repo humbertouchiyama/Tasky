@@ -1,5 +1,6 @@
 package com.humberto.tasky.core.alarm.di
 
+import android.app.AlarmManager
 import android.app.NotificationManager
 import android.content.Context
 import com.humberto.tasky.core.alarm.data.AgendaAlarmScheduler
@@ -18,13 +19,22 @@ object AlarmModule {
     @Provides
     @Singleton
     fun provideAgendaAlarmScheduler(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        alarmManager: AlarmManager
     ): AlarmScheduler {
-        return AgendaAlarmScheduler(context)
+        return AgendaAlarmScheduler(
+            context,
+            alarmManager
+        )
     }
 
     @Provides
     fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
         return context.getSystemService(NotificationManager::class.java)!!
+    }
+
+    @Provides
+    fun provideAlarmManager(@ApplicationContext context: Context): AlarmManager {
+        return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 }

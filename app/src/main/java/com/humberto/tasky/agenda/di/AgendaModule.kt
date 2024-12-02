@@ -71,8 +71,12 @@ class AgendaModule {
 
     @Provides
     fun providesTaskRepository(
-        reminderDao: TaskDao
+        reminderDao: TaskDao,
+        agendaApi: AgendaApiService
     ): TaskRepository {
-        return TaskRepositoryImpl(reminderDao)
+        return TaskRepositoryImpl(
+            reminderDao,
+            agendaApi
+        )
     }
 }
