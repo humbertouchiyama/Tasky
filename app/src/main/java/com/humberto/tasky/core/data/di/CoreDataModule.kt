@@ -1,10 +1,14 @@
 package com.humberto.tasky.core.data.di
 
 import android.content.Context
+import android.net.ConnectivityManager
+import androidx.core.content.getSystemService
 import com.humberto.tasky.BuildConfig
+import com.humberto.tasky.core.data.AndroidConnectivityObserver
 import com.humberto.tasky.core.data.auth.AccessTokenAuthenticator
 import com.humberto.tasky.core.data.auth.SessionManagerImpl
 import com.humberto.tasky.core.data.networking.AccessTokenService
+import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.Lazy
 import dagger.Module
@@ -105,5 +109,22 @@ class CoreDataModule {
                 json.asConverterFactory(
                     "application/json; charset=UTF8".toMediaType()))
             .build()
+    }
+
+    @Provides
+    fun provideConnectivityManager(
+        @ApplicationContext context: Context
+    ): ConnectivityManager {
+        return context.getSystemService<ConnectivityManager>()!!
+    }
+
+    @Provides
+    @Singleton
+    fun providesConnectivityObserver(
+        connectivityManager: ConnectivityManager
+    ): ConnectivityObserver {
+        return AndroidConnectivityObserver(
+            connectivityManager
+        )
     }
 }
