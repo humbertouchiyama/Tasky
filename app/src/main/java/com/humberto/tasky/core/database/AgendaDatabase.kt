@@ -7,6 +7,7 @@ import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.database.entity.EventEntity
+import com.humberto.tasky.core.database.entity.ModifiedTaskEntity
 import com.humberto.tasky.core.database.entity.PhotoEntity
 import com.humberto.tasky.core.database.entity.ReminderEntity
 import com.humberto.tasky.core.database.entity.TaskEntity
@@ -14,6 +15,7 @@ import com.humberto.tasky.core.database.entity.TaskEntity
 @Database(
     entities = [
         TaskEntity::class,
+        ModifiedTaskEntity::class,
         EventEntity::class,
         ReminderEntity::class,
         PhotoEntity::class

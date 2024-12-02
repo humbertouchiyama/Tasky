@@ -12,10 +12,9 @@ import com.humberto.tasky.core.alarm.presentation.AlarmReceiver
 import javax.inject.Inject
 
 class AgendaAlarmScheduler @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val alarmManager: AlarmManager
 ): AlarmScheduler {
-
-    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override fun scheduleAlarm(alarmItem: AlarmItem) {
         val now = System.currentTimeMillis()
