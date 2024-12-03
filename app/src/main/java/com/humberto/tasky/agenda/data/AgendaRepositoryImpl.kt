@@ -13,12 +13,14 @@ import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.database.AgendaDatabase
+import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.util.onSuccess
 import com.humberto.tasky.core.domain.util.toEndOfDayUtc
 import com.humberto.tasky.core.domain.util.toStartOfDayUtc
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -109,6 +112,23 @@ class AgendaRepositoryImpl @Inject constructor(
                     async { taskDao.deleteAllTasks() }
                 ).awaitAll()
             }
+        }
+    }
+
+    override suspend fun syncDeletedAgendaItems() {
+        val deletedTaskIds = taskDao.getModifiedTaskIdsByType(
+            type = ModificationType.Deleted
+        )
+        safeCall {
+            agendaApiService.syncAgenda(
+                SyncAgendaRequest(
+                    deletedEventIds = listOf(), // TODO will be implemented
+                    deletedTaskIds = deletedTaskIds,
+                    deletedReminderIds = listOf(), // TODO will be implemented
+                )
+            )
+        }.onSuccess {
+            taskDao.deleteModifiedTasks(deletedTaskIds)
         }
     }
 }

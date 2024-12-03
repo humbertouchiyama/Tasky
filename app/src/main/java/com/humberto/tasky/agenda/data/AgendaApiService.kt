@@ -13,6 +13,11 @@ interface AgendaApiService {
     @GET("/logout")
     suspend fun logout(): Response<Unit>
 
+    @POST("/syncAgenda")
+    suspend fun syncAgenda(
+        @Body syncAgendaRequest: SyncAgendaRequest
+    ): Response<Unit>
+
     @GET("/attendee")
     suspend fun checkAttendeeExists(
         @Query("email") email: String

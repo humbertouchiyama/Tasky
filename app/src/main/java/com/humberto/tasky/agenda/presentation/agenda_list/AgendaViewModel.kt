@@ -7,11 +7,10 @@ import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.agenda.presentation.AgendaItemType
-import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.alarm.domain.AlarmScheduler
-import com.humberto.tasky.core.alarm.mapper.toAlarmItem
+import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.presentation.ui.buildHeaderDate
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
@@ -19,9 +18,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -35,7 +36,8 @@ class AgendaViewModel @Inject constructor(
     private val eventRepository: EventRepository,
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
-    private val alarmScheduler: AlarmScheduler
+    private val alarmScheduler: AlarmScheduler,
+    connectivityObserver: ConnectivityObserver
 ): ViewModel() {
 
     private val _agendaState = MutableStateFlow(AgendaState())
@@ -44,9 +46,18 @@ class AgendaViewModel @Inject constructor(
     private val eventChannel = Channel<AgendaEvent>()
     val events = eventChannel.receiveAsFlow()
 
+    private val isConnected = connectivityObserver
+        .isConnected
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            false
+        )
+
     init {
         buildUserInitials()
         getAgendaForDate(LocalDate.now())
+        observeConnectivity()
     }
 
     private fun buildUserInitials() {
@@ -145,6 +156,16 @@ class AgendaViewModel @Inject constructor(
             eventChannel.send(AgendaEvent.LogoutSuccess)
             _agendaState.update { state ->
                 state.copy(isLoggingOut = false)
+            }
+        }
+    }
+
+    private fun observeConnectivity() {
+        viewModelScope.launch {
+            isConnected.collect { connected ->
+                if (connected) {
+                    agendaRepository.syncDeletedAgendaItems()
+                }
             }
         }
     }
