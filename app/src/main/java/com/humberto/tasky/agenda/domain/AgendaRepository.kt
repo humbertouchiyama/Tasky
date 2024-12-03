@@ -14,4 +14,5 @@ interface AgendaRepository {
         reminders: List<AgendaItem.Reminder>
     ): EmptyResult<DataError.Local>
     suspend fun deleteAllAgenda()
+    suspend fun syncDeletedAgendaItems()
 }

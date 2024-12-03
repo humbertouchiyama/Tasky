@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.entity.ModifiedTaskEntity
 import com.humberto.tasky.core.database.entity.TaskEntity
 import kotlinx.coroutines.flow.Flow
@@ -32,9 +33,12 @@ interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertModifiedTask(modifiedTaskEntity: ModifiedTaskEntity)
 
-    @Query("SELECT * from modifiedtaskentity ORDER BY timestamp ASC")
-    fun getAllModifiedTasks(): Flow<List<ModifiedTaskEntity>>
+    @Query("SELECT * from modifiedtaskentity WHERE modificationType = :type")
+    fun getModifiedTasksByType(type: ModificationType): Flow<List<ModifiedTaskEntity>>
 
-    @Query("DELETE FROM modifiedtaskentity WHERE taskId=:taskId")
-    suspend fun deleteModifiedTask(taskId: String)
+    @Query("SELECT taskId from modifiedtaskentity WHERE modificationType = :type")
+    suspend fun getModifiedTaskIdsByType(type: ModificationType): List<String>
+
+    @Query("DELETE FROM modifiedtaskentity WHERE taskId IN (:taskIds)")
+    suspend fun deleteModifiedTasks(taskIds: List<String>)
 }
