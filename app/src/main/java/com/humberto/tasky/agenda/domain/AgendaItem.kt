@@ -2,6 +2,7 @@ package com.humberto.tasky.agenda.domain
 
 import com.humberto.tasky.agenda.domain.event.Attendee
 import com.humberto.tasky.agenda.domain.event.Photo
+import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import java.time.ZonedDateTime
 
 sealed class AgendaItem(
@@ -9,34 +10,34 @@ sealed class AgendaItem(
     open val title: String,
     open val description: String?,
     open val from: ZonedDateTime,
-    open val remindAt: ZonedDateTime
+    open val reminderType: ReminderType
 ) {
     data class Event(
         override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
-        override val remindAt: ZonedDateTime,
+        override val reminderType: ReminderType,
         val to: ZonedDateTime,
         val attendees: List<Attendee>,
         val photos: List<Photo>,
         val isUserEventCreator: Boolean
-    ) : AgendaItem(id, title, description, from, remindAt)
+    ) : AgendaItem(id, title, description, from, reminderType)
 
     data class Task(
         override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
-        override val remindAt: ZonedDateTime,
+        override val reminderType: ReminderType,
         val isDone: Boolean
-    ) : AgendaItem(id, title, description, from, remindAt)
+    ) : AgendaItem(id, title, description, from, reminderType)
 
     data class Reminder(
         override val id: String,
         override val title: String,
         override val description: String?,
         override val from: ZonedDateTime,
-        override val remindAt: ZonedDateTime
-    ) : AgendaItem(id, title, description, from, remindAt)
+        override val reminderType: ReminderType
+    ) : AgendaItem(id, title, description, from, reminderType)
 }

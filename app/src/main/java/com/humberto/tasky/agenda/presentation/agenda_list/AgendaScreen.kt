@@ -36,6 +36,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
@@ -321,7 +322,7 @@ private fun AgendaScreenPreview() {
                         title = "Task",
                         description = "Description",
                         from = ZonedDateTime.now(),
-                        remindAt = ZonedDateTime.now(),
+                        reminderType = ReminderType.ThirtyMinutes,
                         isDone = true
                     ).toAgendaItemUi(),
                     AgendaItem.Event(
@@ -330,7 +331,7 @@ private fun AgendaScreenPreview() {
                         description = "Description",
                         from = ZonedDateTime.now(),
                         to = ZonedDateTime.now().plusMinutes(30),
-                        remindAt = ZonedDateTime.now(),
+                        reminderType = ReminderType.ThirtyMinutes,
                         isUserEventCreator = true,
                         attendees = listOf(),
                         photos = listOf()
@@ -340,7 +341,7 @@ private fun AgendaScreenPreview() {
                         title = "Reminder",
                         description = "Description",
                         from = ZonedDateTime.now(),
-                        remindAt = ZonedDateTime.now()
+                        reminderType = ReminderType.ThirtyMinutes
                     ).toAgendaItemUi(),
                 ),
                 selectedDate = LocalDate.now()

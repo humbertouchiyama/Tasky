@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemDetails
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
@@ -166,7 +167,7 @@ private fun AgendaListItemPreview() {
                 title = "Meeting",
                 description = "Description",
                 from = ZonedDateTime.now(),
-                remindAt = ZonedDateTime.now(),
+                reminderType = ReminderType.ThirtyMinutes,
                 isDone = true
             ).toAgendaItemUi(),
             onOpenItem = { },

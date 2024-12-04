@@ -4,10 +4,7 @@ import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.event.Attendee
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaDetailsState
 import com.humberto.tasky.agenda.presentation.agenda_details.AgendaItemDetails
-import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
-import com.humberto.tasky.agenda.presentation.agenda_details.getReminderType
 import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
-import com.humberto.tasky.agenda.presentation.agenda_details.toReminderDateFromDateTime
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -24,7 +21,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
             description = agendaItem.description ?: "",
             fromDate = from.toLocalDate(),
             fromTime = from.toLocalTime(),
-            reminderType = agendaItem.getReminderType() ?: ReminderType.ThirtyMinutes,
+            reminderType = agendaItem.reminderType,
             agendaItem = AgendaItemDetails.Task(
                 isDone = agendaItem.isDone
             ),
@@ -37,7 +34,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                 description = agendaItem.description ?: "",
                 fromTime = from.toLocalTime(),
                 fromDate = from.toLocalDate(),
-                reminderType = agendaItem.getReminderType() ?: ReminderType.ThirtyMinutes,
+                reminderType = agendaItem.reminderType,
                 agendaItem = AgendaItemDetails.Event(
                     toTime = to.toLocalTime(),
                     toDate = to.toLocalDate(),
@@ -51,14 +48,13 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
             description = agendaItem.description ?: "",
             fromDate = from.toLocalDate(),
             fromTime = from.toLocalTime(),
-            reminderType = agendaItem.getReminderType() ?: ReminderType.ThirtyMinutes,
+            reminderType = agendaItem.reminderType,
             agendaItem = AgendaItemDetails.Reminder
         )
     }
 }
 
 fun AgendaDetailsState.toAgendaItem(): AgendaItem {
-    val remindAt = reminderType.toReminderDateFromDateTime(fromDate.atTimeNoSecondsToUtc(fromTime))
     val from = fromDate.atTimeNoSecondsToUtc(fromTime)
     return when (agendaItem) {
         is AgendaItemDetails.Task -> AgendaItem.Task(
@@ -66,7 +62,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             title = title,
             description = description,
             from = from,
-            remindAt = remindAt,
+            reminderType = reminderType,
             isDone = agendaItem.isDone,
         )
         is AgendaItemDetails.Event -> AgendaItem.Event(
@@ -74,13 +70,12 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             title = title,
             description = description,
             from = from,
-            remindAt = remindAt,
+            reminderType = reminderType,
             to = agendaItem.toDate.atTimeNoSecondsToUtc(agendaItem.toTime),
             isUserEventCreator = agendaItem.isUserEventCreator,
             attendees = agendaItem.attendees.map {
                 it.toAttendee(
-                    eventId = id,
-                    remindAt = remindAt
+                    eventId = id
                 )
             },
             photos = listOf(), // TODO
@@ -90,19 +85,18 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
             title = title,
             description = description,
             from = from,
-            remindAt = remindAt
+            reminderType = reminderType
         )
     }
 }
 
-fun AttendeeUi.toAttendee(eventId: String, remindAt: ZonedDateTime): Attendee {
+fun AttendeeUi.toAttendee(eventId: String): Attendee {
     return Attendee(
         userId = userId,
         email = email,
         fullName = fullName,
         eventId = eventId,
         isGoing = isGoing,
-        remindAt = remindAt,
         isEventCreator = isEventCreator
     )
 }

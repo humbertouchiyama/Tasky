@@ -7,13 +7,14 @@ import com.humberto.tasky.core.alarm.domain.AlarmItem
 import java.time.ZoneId
 
 fun AgendaItem.toAlarmItem(): AlarmItem {
-    val remindAtLocalZone = remindAt.withZoneSameInstant(ZoneId.systemDefault())
     val fromLocalZone = from.withZoneSameInstant(ZoneId.systemDefault())
+    val fromMillis = fromLocalZone.toInstant().toEpochMilli()
+    val remindAt = fromMillis - reminderType.duration.inWholeMilliseconds
     return AlarmItem(
         id = id,
         title = title,
         description = description,
-        triggerAt = remindAtLocalZone.toInstant().toEpochMilli(),
+        triggerAt = remindAt,
         itemType = when(this) {
             is AgendaItem.Event -> AgendaItemType.EVENT
             is AgendaItem.Reminder -> AgendaItemType.REMINDER
