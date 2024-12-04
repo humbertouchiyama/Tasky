@@ -5,9 +5,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
-import com.humberto.tasky.core.database.ModificationType
-import com.humberto.tasky.core.database.entity.ModifiedTaskEntity
+import com.humberto.tasky.core.database.entity.DeletedTaskSyncEntity
 import com.humberto.tasky.core.database.entity.TaskEntity
+import com.humberto.tasky.core.database.entity.TaskPendingSyncEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,14 +31,20 @@ interface TaskDao {
     suspend fun deleteAllTasks()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertModifiedTask(modifiedTaskEntity: ModifiedTaskEntity)
+    suspend fun insertTaskPendingSync(taskPendingSyncEntity: TaskPendingSyncEntity)
 
-    @Query("SELECT * from modifiedtaskentity WHERE modificationType = :type")
-    fun getModifiedTasksByType(type: ModificationType): Flow<List<ModifiedTaskEntity>>
+    @Query("SELECT * from taskpendingsyncentity WHERE userId = :userId")
+    suspend fun getTasksPendingSync(userId: String): List<TaskPendingSyncEntity>
 
-    @Query("SELECT taskId from modifiedtaskentity WHERE modificationType = :type")
-    suspend fun getModifiedTaskIdsByType(type: ModificationType): List<String>
+    @Query("DELETE FROM taskpendingsyncentity WHERE taskId = :taskId")
+    suspend fun deleteTaskPendingSync(taskId: String)
 
-    @Query("DELETE FROM modifiedtaskentity WHERE taskId IN (:taskIds)")
-    suspend fun deleteModifiedTasks(taskIds: List<String>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeletedTaskSync(deletedTaskSyncEntity: DeletedTaskSyncEntity)
+
+    @Query("SELECT taskId from deletedtasksyncentity WHERE userId = :userId")
+    suspend fun getDeletedTaskSync(userId: String): List<String>
+
+    @Query("DELETE FROM deletedtasksyncentity WHERE taskId IN (:taskIds)")
+    suspend fun deleteDeletedTasksSync(taskIds: List<String>)
 }

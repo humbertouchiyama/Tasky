@@ -12,10 +12,15 @@ import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.alarm.domain.AlarmScheduler
 import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.repository.SessionManager
+import com.humberto.tasky.core.domain.util.onError
+import com.humberto.tasky.core.domain.util.onSuccess
+import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.core.presentation.ui.buildHeaderDate
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,7 +62,6 @@ class AgendaViewModel @Inject constructor(
     init {
         buildUserInitials()
         getAgendaForDate(LocalDate.now())
-        observeConnectivity()
     }
 
     private fun buildUserInitials() {
@@ -128,13 +132,16 @@ class AgendaViewModel @Inject constructor(
     private fun deleteItem() {
         viewModelScope.launch {
             _agendaState.update { it.copy(isDeletingItem = true) }
-            _agendaState.value.confirmingItemToBeDeleted?.let {
-                when(it.agendaItemType) {
-                    AgendaItemType.TASK -> taskRepository.deleteTask(it.id)
-                    AgendaItemType.EVENT -> eventRepository.deleteEvent(it.id)
-                    AgendaItemType.REMINDER -> reminderRepository.deleteReminder(it.id)
+            _agendaState.value.confirmingItemToBeDeleted?.let { itemUi ->
+                when(itemUi.agendaItemType) {
+                    AgendaItemType.TASK -> taskRepository.deleteTask(itemUi.id)
+                    AgendaItemType.EVENT -> eventRepository.deleteEvent(itemUi.id)
+                    AgendaItemType.REMINDER -> reminderRepository.deleteReminder(itemUi.id)
+                }.onSuccess {
+                    alarmScheduler.cancelAlarm(itemUi.id)
+                }.onError { error ->
+                    eventChannel.send(AgendaEvent.Error(error.asUiText()))
                 }
-                alarmScheduler.cancelAlarm(it.id)
             }
             _agendaState.update {
                 it.copy(
@@ -160,11 +167,21 @@ class AgendaViewModel @Inject constructor(
         }
     }
 
-    private fun observeConnectivity() {
+    fun syncAllPendingItems() {
         viewModelScope.launch {
             isConnected.collect { connected ->
-                if (connected) {
-                    agendaRepository.syncDeletedAgendaItems()
+                if(connected && !_agendaState.value.isSyncingPendingItems) {
+                    _agendaState.update { state ->
+                        state.copy(isSyncingPendingItems = true)
+                    }
+                    listOf(
+                        async { agendaRepository.syncDeletedAgendaItems() },
+                        async { taskRepository.syncPendingTasks() }
+                    ).awaitAll()
+                    _agendaState.update { state ->
+                        state.copy(isSyncingPendingItems = false)
+                    }
+                    return@collect
                 }
             }
         }

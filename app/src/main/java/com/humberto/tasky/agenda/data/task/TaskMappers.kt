@@ -1,13 +1,11 @@
 package com.humberto.tasky.agenda.data.task
 
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.core.database.ModificationType
-import com.humberto.tasky.core.database.entity.ModifiedTaskEntity
 import com.humberto.tasky.core.database.entity.TaskEntity
+import com.humberto.tasky.core.database.entity.TaskPendingSyncEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
-import java.util.UUID
 
-fun TaskEntity.toTask(): AgendaItem {
+fun TaskEntity.toTask(): AgendaItem.Task {
     return AgendaItem.Task(
         id = id,
         title = title,
@@ -40,14 +38,9 @@ fun AgendaItem.Task.toTaskRequest(): TaskRequest {
     )
 }
 
-fun AgendaItem.Task.toModifiedTaskEntity(modificationType: ModificationType): ModifiedTaskEntity {
-    return ModifiedTaskEntity(
-        taskId = id,
-        title = title,
-        description = description,
-        time = from.toInstant().toEpochMilli(),
-        remindAt = remindAt.toInstant().toEpochMilli(),
-        isDone = isDone,
-        modificationType = modificationType
+fun TaskEntity.toTaskPendingSyncEntity(userId: String): TaskPendingSyncEntity {
+    return TaskPendingSyncEntity(
+        userId = userId,
+        task = this
     )
 }

@@ -13,10 +13,10 @@ import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.database.AgendaDatabase
-import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
+import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -40,7 +39,11 @@ class AgendaRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao,
     private val eventDao: EventDao,
     private val reminderDao: ReminderDao,
+    private val sessionManager: SessionManager
 ): AgendaRepository {
+
+    private val localUserId: String?
+        get() = sessionManager.getUserId()
 
     override suspend fun logout(): EmptyResult<DataError.Network> {
         return safeCall {
@@ -116,9 +119,10 @@ class AgendaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncDeletedAgendaItems() {
-        val deletedTaskIds = taskDao.getModifiedTaskIdsByType(
-            type = ModificationType.Deleted
+        val deletedTaskIds = taskDao.getDeletedTaskSync(
+            userId = localUserId!!
         )
+        if(deletedTaskIds.isEmpty()) return
         safeCall {
             agendaApiService.syncAgenda(
                 SyncAgendaRequest(
@@ -128,7 +132,7 @@ class AgendaRepositoryImpl @Inject constructor(
                 )
             )
         }.onSuccess {
-            taskDao.deleteModifiedTasks(deletedTaskIds)
+            taskDao.deleteDeletedTasksSync(deletedTaskIds)
         }
     }
 }

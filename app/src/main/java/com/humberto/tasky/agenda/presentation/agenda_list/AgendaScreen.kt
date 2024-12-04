@@ -90,6 +90,9 @@ fun AgendaScreenRoot(
             viewModel.updateSelectedDate( LocalDate.ofEpochDay(it) )
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.syncAllPendingItems()
+    }
     val state by viewModel.agendaState.collectAsStateWithLifecycle()
     AgendaScreen(
         state = state,
