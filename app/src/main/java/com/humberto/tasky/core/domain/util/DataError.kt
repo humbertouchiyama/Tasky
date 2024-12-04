@@ -19,3 +19,13 @@ sealed interface DataError: Error {
         NOT_FOUND
     }
 }
+
+fun DataError.isRetryable(): Boolean {
+    return when (this) {
+        DataError.Network.REQUEST_TIMEOUT,
+        DataError.Network.TOO_MANY_REQUESTS,
+        DataError.Network.NO_INTERNET,
+        DataError.Network.SERVER_ERROR -> true
+        else -> false
+    }
+}

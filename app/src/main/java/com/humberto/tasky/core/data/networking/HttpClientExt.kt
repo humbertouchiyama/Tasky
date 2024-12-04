@@ -33,6 +33,7 @@ inline fun <reified T> responseToResult(response: Response<T>): Result<T, DataEr
             } ?: Result.Error(DataError.Network.UNKNOWN)
         }
         response.code() == 401 -> Result.Error(DataError.Network.UNAUTHORIZED)
+        response.code() == 404 -> Result.Error(DataError.Network.NOT_FOUND)
         response.code() == 408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
         response.code() == 409 -> Result.Error(DataError.Network.CONFLICT)
         response.code() == 413 -> Result.Error(DataError.Network.PAYLOAD_TOO_LARGE)

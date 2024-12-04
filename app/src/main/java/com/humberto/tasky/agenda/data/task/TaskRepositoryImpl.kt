@@ -5,19 +5,26 @@ import com.humberto.tasky.agenda.data.AgendaApiService
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.core.data.networking.safeCall
-import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.dao.TaskDao
-import com.humberto.tasky.core.database.entity.ModifiedTaskEntity
+import com.humberto.tasky.core.database.entity.DeletedTaskSyncEntity
+import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.util.isRetryable
 import com.humberto.tasky.core.domain.util.onError
+import com.humberto.tasky.core.domain.util.onSuccess
 import javax.inject.Inject
 
 class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao,
-    private val agendaApi: AgendaApiService
+    private val agendaApi: AgendaApiService,
+    private val sessionManager: SessionManager
 ): TaskRepository {
+
+    private val localUserId: String?
+        get() = sessionManager.getUserId()
+
     override suspend fun getTask(taskId: String): Result<AgendaItem, DataError> {
         val task = taskDao.getTask(taskId)?.toTask()
         return if(task != null) {
@@ -29,14 +36,15 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun createTask(task: AgendaItem.Task): EmptyResult<DataError> {
         return try {
+            val taskEntity = task.toTaskEntity()
+            taskDao.upsertTask(taskEntity)
             val result = safeCall {
-                taskDao.upsertTask(task.toTaskEntity())
                 agendaApi.createTask(task.toTaskRequest())
             }.onError { error ->
-                if(error == DataError.Network.NO_INTERNET) {
-                    taskDao.insertModifiedTask(
-                        task.toModifiedTaskEntity(
-                            modificationType = ModificationType.Created
+                if (error.isRetryable()) {
+                    taskDao.insertTaskPendingSync(
+                        taskEntity.toTaskPendingSyncEntity(
+                            userId = localUserId!!
                         )
                     )
                     return Result.Success(Unit)
@@ -48,18 +56,31 @@ class TaskRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteTask(taskId: String) {
-        val result = safeCall {
-            taskDao.deleteTask(taskId)
+    override suspend fun deleteTask(taskId: String): EmptyResult<DataError> {
+        taskDao.deleteTask(taskId)
+        return safeCall {
             agendaApi.deleteTask(taskId)
-        }
-        if(result is Result.Error) {
-            taskDao.insertModifiedTask(
-                ModifiedTaskEntity(
-                    taskId = taskId,
-                    modificationType = ModificationType.Deleted
+        }.onError { error ->
+            if (error.isRetryable()) {
+                taskDao.insertDeletedTaskSync(
+                    DeletedTaskSyncEntity(
+                        taskId = taskId,
+                        userId = localUserId!!
+                    )
                 )
-            )
+            }
+        }
+    }
+
+    override suspend fun syncPendingTasks() {
+        taskDao.getTasksPendingSync(
+            userId = localUserId ?: ""
+        ).map { taskPendingSyncEntity ->
+            safeCall {
+                agendaApi.createTask(taskPendingSyncEntity.task.toTask().toTaskRequest())
+            }.onSuccess {
+                taskDao.deleteTaskPendingSync(taskPendingSyncEntity.taskId)
+            }
         }
     }
 }

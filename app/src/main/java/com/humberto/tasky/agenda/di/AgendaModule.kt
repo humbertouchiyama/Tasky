@@ -39,6 +39,7 @@ class AgendaModule {
         taskDao: TaskDao,
         eventDao: EventDao,
         reminderDao: ReminderDao,
+        sessionManager: SessionManager
     ): AgendaRepository {
         return AgendaRepositoryImpl(
             agendaApiService,
@@ -46,6 +47,7 @@ class AgendaModule {
             taskDao,
             eventDao,
             reminderDao,
+            sessionManager
         )
     }
 
@@ -64,19 +66,27 @@ class AgendaModule {
 
     @Provides
     fun providesReminderRepository(
-        reminderDao: ReminderDao
+        reminderDao: ReminderDao,
+        agendaApi: AgendaApiService,
+        sessionManager: SessionManager
     ): ReminderRepository {
-        return ReminderRepositoryImpl(reminderDao)
+        return ReminderRepositoryImpl(
+            reminderDao,
+            agendaApi,
+            sessionManager
+        )
     }
 
     @Provides
     fun providesTaskRepository(
         reminderDao: TaskDao,
-        agendaApi: AgendaApiService
+        agendaApi: AgendaApiService,
+        sessionManager: SessionManager
     ): TaskRepository {
         return TaskRepositoryImpl(
             reminderDao,
-            agendaApi
+            agendaApi,
+            sessionManager
         )
     }
 }
