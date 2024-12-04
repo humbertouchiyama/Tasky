@@ -3,21 +3,24 @@ package com.humberto.tasky.agenda.data.event
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.event.Attendee
 import com.humberto.tasky.agenda.domain.event.Photo
+import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.core.database.entity.EventEntity
 import com.humberto.tasky.core.database.entity.LocalAttendee
 import com.humberto.tasky.core.database.entity.PhotoEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
+import kotlin.time.Duration.Companion.milliseconds
 
 fun EventEntity.toEvent(
     photos: List<Photo>
 ): AgendaItem {
+    val remindDuration = (from - remindAt).milliseconds
     return AgendaItem.Event(
         id = id,
         title = title,
         description = description,
         from = from.toZonedDateTime("UTC"),
         to = to.toZonedDateTime("UTC"),
-        remindAt = remindAt.toZonedDateTime("UTC"),
+        reminderType = ReminderType.fromDuration(remindDuration) ?: ReminderType.ThirtyMinutes,
         attendees = attendees.map { it.toAttendee() },
         photos = photos,
         isUserEventCreator = isUserEventCreator
@@ -25,14 +28,15 @@ fun EventEntity.toEvent(
 }
 
 fun AgendaItem.Event.toEventEntity(): EventEntity {
-    val remindAtEpoch = remindAt.toInstant().toEpochMilli()
+    val from = from.toInstant().toEpochMilli()
+    val remindAt = from - reminderType.duration.inWholeMilliseconds
     return EventEntity(
         id = id,
         title = title,
         description = description,
-        from = from.toInstant().toEpochMilli(),
+        from = from,
         to = to.toInstant().toEpochMilli(),
-        remindAt = remindAtEpoch,
+        remindAt = remindAt,
         isUserEventCreator = isUserEventCreator,
         attendees = attendees.map { it.toLocalAttendee() },
         photoKeys = photos.map { it.key }
@@ -53,7 +57,6 @@ fun LocalAttendee.toAttendee(): Attendee {
         fullName = fullName,
         eventId = eventId,
         isGoing = isGoing,
-        remindAt = remindAt.toZonedDateTime("UTC"),
         isEventCreator = isEventCreator
     )
 }
@@ -65,7 +68,6 @@ fun Attendee.toLocalAttendee(): LocalAttendee {
         fullName = fullName,
         eventId = eventId!!,
         isGoing = isGoing,
-        remindAt = remindAt!!.toInstant().toEpochMilli(),
         isEventCreator = isEventCreator
     )
 }

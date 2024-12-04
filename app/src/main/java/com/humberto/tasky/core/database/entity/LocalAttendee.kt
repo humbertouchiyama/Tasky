@@ -9,6 +9,5 @@ data class LocalAttendee(
     val fullName: String,
     val eventId: String,
     val isGoing: Boolean,
-    val remindAt: Long,
     val isEventCreator: Boolean
 )

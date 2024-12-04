@@ -10,8 +10,6 @@ data class AgendaItemUi(
     val dateTime: String,
     val agendaItemType: AgendaItemType,
     val from: ZonedDateTime,
-    val remindAt: ZonedDateTime,
-
     val itemDetails: AgendaItemDetails
 ) {
     val isItemCheckable

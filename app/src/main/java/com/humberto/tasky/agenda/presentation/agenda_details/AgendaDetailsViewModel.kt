@@ -17,6 +17,7 @@ import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAg
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.alarm.domain.AlarmScheduler
 import com.humberto.tasky.core.alarm.mapper.toAlarmItem
+import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.onError
@@ -28,9 +29,11 @@ import com.humberto.tasky.main.navigation.EditTextArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -43,7 +46,8 @@ class AgendaDetailsViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val eventRepository: EventRepository,
     private val reminderRepository: ReminderRepository,
-    private val alarmScheduler: AlarmScheduler
+    private val alarmScheduler: AlarmScheduler,
+    connectivityObserver: ConnectivityObserver
 ): ViewModel() {
 
     private val agendaDetailsArgs = savedStateHandle.toRoute<AgendaDetails>()
@@ -60,6 +64,14 @@ class AgendaDetailsViewModel @Inject constructor(
         )
     )
     val state: StateFlow<AgendaDetailsState> = _state.asStateFlow()
+
+    private val isConnected = connectivityObserver
+        .isConnected
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            false
+        )
 
     private val eventChannel = Channel<AgendaDetailsEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -194,12 +206,18 @@ class AgendaDetailsViewModel @Inject constructor(
                 _state.update { it.copy(isConfirmingToDelete = false) }
             }
             AgendaDetailsAction.OnOpenAttendeeDialog -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        agendaItem = currentState.agendaItem.updateIfEvent {
-                            copy(isAddingAttendee = true)
+                viewModelScope.launch {
+                    if(isConnected.value) {
+                        _state.update { currentState ->
+                            currentState.copy(
+                                agendaItem = currentState.agendaItem.updateIfEvent {
+                                    copy(isAddingAttendee = true)
+                                }
+                            )
                         }
-                    )
+                    } else {
+                        eventChannel.send(AgendaDetailsEvent.Error(UiText.StringResource(R.string.error_connected_to_add_attendees)))
+                    }
                 }
             }
             AgendaDetailsAction.OnDismissAttendeeDialog -> {
@@ -244,22 +262,22 @@ class AgendaDetailsViewModel @Inject constructor(
 
     private fun saveItem() {
         viewModelScope.launch {
-            _state.update { it.copy(isSaving = true) }
+            _state.update {
+                it.copy(
+                    isSaving = true,
+                    isEditing = false
+                )
+            }
             val agendaItem = _state.value.toAgendaItem()
-            val result = when(agendaItem) {
+            when(agendaItem) {
                 is AgendaItem.Task -> taskRepository.createTask(agendaItem)
                 is AgendaItem.Event -> eventRepository.createEvent(agendaItem)
                 is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem)
-            }
-            when (result) {
-                is Result.Success -> {
-                    alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
-                    toggleEditingState()
-                    eventChannel.send(AgendaDetailsEvent.SaveSuccess)
-                }
-                is Result.Error -> {
-                    eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))
-                }
+            }.onSuccess {
+                alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
+                eventChannel.send(AgendaDetailsEvent.SaveSuccess)
+            }.onError {
+                eventChannel.send(AgendaDetailsEvent.Error(it.asUiText()))
             }
             _state.update { it.copy(isSaving = false) }
         }
@@ -267,20 +285,21 @@ class AgendaDetailsViewModel @Inject constructor(
 
     private fun deleteItem() {
         viewModelScope.launch {
-            _state.update { it.copy(isDeleting = true) }
-            val agendaItem = _state.value.toAgendaItem()
-            when(agendaItem) {
-                is AgendaItem.Event -> eventRepository.deleteEvent(_state.value.id)
-                is AgendaItem.Reminder -> reminderRepository.deleteReminder(_state.value.id)
-                is AgendaItem.Task -> taskRepository.deleteTask(_state.value.id)
-            }
-            alarmScheduler.cancelAlarm(agendaItem.id)
-            eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
-            _state.update {
-                it.copy(
-                    isDeleting = false,
-                    isConfirmingToDelete = false
-                )
+            _state.value.id?.let { id ->
+                _state.update { it.copy(isDeleting = true) }
+                when(_state.value.agendaItem) {
+                    is AgendaItemDetails.Event -> eventRepository.deleteEvent(id)
+                    is AgendaItemDetails.Reminder -> reminderRepository.deleteReminder(id)
+                    is AgendaItemDetails.Task -> taskRepository.deleteTask(id)
+                }
+                alarmScheduler.cancelAlarm(id)
+                eventChannel.send(AgendaDetailsEvent.DeleteSuccess)
+                _state.update {
+                    it.copy(
+                        isDeleting = false,
+                        isConfirmingToDelete = false
+                    )
+                }
             }
         }
     }

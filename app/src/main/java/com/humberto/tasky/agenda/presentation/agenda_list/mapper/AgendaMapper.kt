@@ -17,7 +17,6 @@ fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
             dateTime = from.toFormattedDateTime(),
             agendaItemType = AgendaItemType.TASK,
             from = from,
-            remindAt = remindAt,
             itemDetails = AgendaItemDetails.Task(
                 isDone = isDone
             ),
@@ -29,7 +28,6 @@ fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
             dateTime = "${from.toFormattedDateTime()} - ${to.toFormattedDateTime()}",
             agendaItemType = AgendaItemType.EVENT,
             from = from,
-            remindAt = remindAt,
             itemDetails = AgendaItemDetails.Event(
                 to = to,
                 isUserEventCreator = isUserEventCreator
@@ -42,39 +40,7 @@ fun AgendaItem.toAgendaItemUi(): AgendaItemUi {
             dateTime = from.toFormattedDateTime(),
             agendaItemType = AgendaItemType.REMINDER,
             from = from,
-            remindAt = remindAt,
             itemDetails = AgendaItemDetails.Reminder,
-        )
-    }
-}
-
-fun AgendaItemUi.toAgendaItem(): AgendaItem {
-    return when (this.itemDetails) {
-        is AgendaItemDetails.Task -> AgendaItem.Task(
-            id = id,
-            title = title,
-            description = description,
-            from = from,
-            remindAt = remindAt,
-            isDone = itemDetails.isDone
-        )
-        is AgendaItemDetails.Event -> AgendaItem.Event(
-            id = id,
-            title = title,
-            description = description,
-            from = from,
-            remindAt = remindAt,
-            to = itemDetails.to,
-            attendees = listOf(),
-            photos = listOf(),
-            isUserEventCreator = itemDetails.isUserEventCreator
-        )
-        AgendaItemDetails.Reminder -> AgendaItem.Reminder(
-            id = id,
-            title = title,
-            description = description,
-            from = from,
-            remindAt = remindAt
         )
     }
 }
