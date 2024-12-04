@@ -122,17 +122,24 @@ class AgendaRepositoryImpl @Inject constructor(
         val deletedTaskIds = taskDao.getDeletedTaskSync(
             userId = localUserId!!
         )
-        if(deletedTaskIds.isEmpty()) return
+        val deletedReminderIds = reminderDao.getDeletedReminderSync(
+            userId = localUserId!!
+        )
+        if(
+            deletedTaskIds.isEmpty() &&
+            deletedReminderIds.isEmpty()
+        ) return
         safeCall {
             agendaApiService.syncAgenda(
                 SyncAgendaRequest(
                     deletedEventIds = listOf(), // TODO will be implemented
                     deletedTaskIds = deletedTaskIds,
-                    deletedReminderIds = listOf(), // TODO will be implemented
+                    deletedReminderIds = deletedReminderIds,
                 )
             )
         }.onSuccess {
             taskDao.deleteDeletedTasksSync(deletedTaskIds)
+            reminderDao.deleteDeletedRemindersSync(deletedReminderIds)
         }
     }
 }

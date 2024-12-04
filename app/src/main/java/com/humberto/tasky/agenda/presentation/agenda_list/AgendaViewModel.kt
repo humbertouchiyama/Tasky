@@ -176,7 +176,8 @@ class AgendaViewModel @Inject constructor(
                     }
                     listOf(
                         async { agendaRepository.syncDeletedAgendaItems() },
-                        async { taskRepository.syncPendingTasks() }
+                        async { taskRepository.syncPendingTasks() },
+                        async { reminderRepository.syncPendingReminders() }
                     ).awaitAll()
                     _agendaState.update { state ->
                         state.copy(isSyncingPendingItems = false)

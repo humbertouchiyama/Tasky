@@ -1,9 +1,13 @@
 package com.humberto.tasky.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.humberto.tasky.core.database.entity.DeletedReminderSyncEntity
 import com.humberto.tasky.core.database.entity.ReminderEntity
+import com.humberto.tasky.core.database.entity.ReminderPendingSyncEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,4 +30,22 @@ interface ReminderDao {
 
     @Query("DELETE FROM reminderentity")
     suspend fun deleteAllReminders()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertReminderPendingSync(reminderPendingSyncEntity: ReminderPendingSyncEntity)
+
+    @Query("SELECT * from reminderpendingsyncentity WHERE userId = :userId")
+    suspend fun getRemindersPendingSync(userId: String): List<ReminderPendingSyncEntity>
+
+    @Query("DELETE FROM reminderpendingsyncentity WHERE reminderId = :reminderId")
+    suspend fun deleteReminderPendingSync(reminderId: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeletedReminderSync(deletedReminderSyncEntity: DeletedReminderSyncEntity)
+
+    @Query("SELECT reminderId from deletedremindersyncentity WHERE userId = :userId")
+    suspend fun getDeletedReminderSync(userId: String): List<String>
+
+    @Query("DELETE FROM deletedremindersyncentity WHERE reminderId IN (:reminderIds)")
+    suspend fun deleteDeletedRemindersSync(reminderIds: List<String>)
 }
