@@ -5,16 +5,12 @@ package com.humberto.tasky.agenda.presentation.agenda_list
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +38,7 @@ import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyTheme
 import com.humberto.tasky.core.presentation.designsystem.components.FloatingActionButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuButton
+import com.humberto.tasky.core.presentation.designsystem.components.PullToRefreshLazyColumn
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyActionButton
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyCalendarHeader
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyDatePicker
@@ -279,11 +276,9 @@ private fun AgendaScreen(
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(state.agendaItems, key = { it.id }) { agendaItem ->
+            PullToRefreshLazyColumn(
+                items = state.agendaItems,
+                content = { agendaItem ->
                     AgendaListItem(
                         agendaItem = agendaItem,
                         onOpenItem = { onAction(AgendaAction.OnOpenAgendaItemClick(
@@ -302,8 +297,12 @@ private fun AgendaScreen(
                         )) },
                         onDeleteItem = { onAction(AgendaAction.OnDeleteAgendaItemClick(agendaItem)) },
                     )
+                },
+                isRefreshing = state.isRefreshing,
+                onRefresh = {
+                    onAction(AgendaAction.OnRefresh)
                 }
-            }
+            )
         }
     }
 }

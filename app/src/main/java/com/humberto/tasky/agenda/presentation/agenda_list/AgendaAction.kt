@@ -15,4 +15,5 @@ sealed interface AgendaAction {
     data class OnSelectDate(
         val selectedDate: LocalDate
     ): AgendaAction
+    data object OnRefresh: AgendaAction
 }
