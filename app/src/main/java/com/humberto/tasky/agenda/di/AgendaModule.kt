@@ -1,5 +1,7 @@
 package com.humberto.tasky.agenda.di
 
+import android.content.Context
+import androidx.work.WorkManager
 import com.humberto.tasky.agenda.data.AgendaApiService
 import com.humberto.tasky.agenda.data.AgendaRepositoryImpl
 import com.humberto.tasky.agenda.data.event.EventRepositoryImpl
@@ -17,6 +19,7 @@ import com.humberto.tasky.core.domain.repository.SessionManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import javax.inject.Singleton
@@ -81,12 +84,20 @@ class AgendaModule {
     fun providesTaskRepository(
         reminderDao: TaskDao,
         agendaApi: AgendaApiService,
-        sessionManager: SessionManager
+        sessionManager: SessionManager,
+        workManager: WorkManager
     ): TaskRepository {
         return TaskRepositoryImpl(
             reminderDao,
             agendaApi,
-            sessionManager
+            sessionManager,
+            workManager
         )
     }
+
+    @Provides
+    @Singleton
+    fun providesWorkManager(
+        @ApplicationContext context: Context
+    ): WorkManager = WorkManager.getInstance(context)
 }

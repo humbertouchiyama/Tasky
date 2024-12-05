@@ -25,7 +25,7 @@ interface AgendaApiService {
         @Body syncAgendaRequest: SyncAgendaRequest
     ): Response<Unit>
 
-    @POST("/fullAgenda")
+    @GET("/fullAgenda")
     suspend fun getFullAgenda(): Response<GetFullAgendaResponse>
 
     @GET("/attendee")
@@ -33,7 +33,7 @@ interface AgendaApiService {
         @Query("email") email: String
     ): Response<CheckAttendeeExistsResponse>
 
-    @GET("/attendee")
+    @DELETE("/attendee")
     suspend fun deleteAttendee(
         @Query("eventId") email: String
     ): Response<Unit>

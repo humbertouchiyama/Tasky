@@ -33,8 +33,8 @@ interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTaskPendingSync(taskPendingSyncEntity: TaskPendingSyncEntity)
 
-    @Query("SELECT * from taskpendingsyncentity WHERE userId = :userId")
-    suspend fun getTasksPendingSync(userId: String): List<TaskPendingSyncEntity>
+    @Query("SELECT * from taskpendingsyncentity WHERE userId = :userId AND taskId = :taskId")
+    suspend fun getTaskPendingSync(userId: String, taskId: String): TaskPendingSyncEntity
 
     @Query("DELETE FROM taskpendingsyncentity WHERE taskId = :taskId")
     suspend fun deleteTaskPendingSync(taskId: String)
