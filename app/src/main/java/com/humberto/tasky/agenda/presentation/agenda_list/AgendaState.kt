@@ -16,5 +16,6 @@ data class AgendaState(
     val isLoadingAgendaItems: Boolean = false,
     val confirmingItemToBeDeleted: AgendaItemUi? = null,
     val isDeletingItem: Boolean = false,
-    val isSyncingPendingItems: Boolean = false
+    val isSyncingPendingItems: Boolean = false,
+    val isRefreshing: Boolean = false
 )
