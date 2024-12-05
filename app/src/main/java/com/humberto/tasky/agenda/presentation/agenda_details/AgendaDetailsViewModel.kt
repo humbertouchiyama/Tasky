@@ -27,6 +27,7 @@ import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
 import com.humberto.tasky.main.navigation.EditTextArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,14 +47,15 @@ class AgendaDetailsViewModel @Inject constructor(
     private val eventRepository: EventRepository,
     private val reminderRepository: ReminderRepository,
     private val alarmScheduler: AlarmScheduler,
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    private val applicationScope: CoroutineScope
 ): ViewModel() {
 
     private val agendaDetailsArgs = savedStateHandle.toRoute<AgendaDetails>()
 
     private val _state = MutableStateFlow(
         AgendaDetailsState(
-            id = agendaDetailsArgs.agendaItemId ?: UUID.randomUUID().toString(),
+            id = agendaDetailsArgs.agendaItemId,
             isEditing = agendaDetailsArgs.isEditing,
             agendaItem = when(agendaDetailsArgs.agendaItemType) {
                 AgendaItemType.EVENT -> AgendaItemDetails.Event()
@@ -261,7 +262,12 @@ class AgendaDetailsViewModel @Inject constructor(
     }
 
     private fun saveItem() {
-        viewModelScope.launch {
+        val id = _state.value.id
+        if (id != null) {
+            updateItem()
+            return
+        }
+        applicationScope.launch {
             _state.update {
                 it.copy(
                     isSaving = true,
@@ -283,8 +289,32 @@ class AgendaDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun updateItem() {
+        applicationScope.launch {
+            _state.update {
+                it.copy(
+                    isSaving = true,
+                    isEditing = false
+                )
+            }
+            val agendaItem = _state.value.toAgendaItem()
+            when(agendaItem) {
+                is AgendaItem.Task -> taskRepository.updateTask(agendaItem)
+                is AgendaItem.Event -> eventRepository.updateEvent(agendaItem)
+                is AgendaItem.Reminder -> reminderRepository.updateReminder(agendaItem)
+            }.onSuccess {
+                alarmScheduler.cancelAlarm(agendaItem.id)
+                alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
+                eventChannel.send(AgendaDetailsEvent.SaveSuccess)
+            }.onError {
+                eventChannel.send(AgendaDetailsEvent.Error(it.asUiText()))
+            }
+            _state.update { it.copy(isSaving = false) }
+        }
+    }
+
     private fun deleteItem() {
-        viewModelScope.launch {
+        applicationScope.launch {
             _state.value.id?.let { id ->
                 _state.update { it.copy(isDeleting = true) }
                 when(_state.value.agendaItem) {

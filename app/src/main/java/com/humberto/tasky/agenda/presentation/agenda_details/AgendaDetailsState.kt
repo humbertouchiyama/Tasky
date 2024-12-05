@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 data class AgendaDetailsState(
-    val id: String,
+    val id: String?,
     val agendaItem: AgendaItemDetails,
     val title: String = "",
     val description: String = "",

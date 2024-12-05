@@ -11,6 +11,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetailsState {
     val from = agendaItem.from.withZoneSameInstant(ZoneId.systemDefault())
@@ -56,6 +57,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
 
 fun AgendaDetailsState.toAgendaItem(): AgendaItem {
     val from = fromDate.atTimeNoSecondsToUtc(fromTime)
+    val id = id ?: UUID.randomUUID().toString()
     return when (agendaItem) {
         is AgendaItemDetails.Task -> AgendaItem.Task(
             id = id,
@@ -111,7 +113,7 @@ fun Attendee.toAttendeeUi(): AttendeeUi {
     )
 }
 
-private fun LocalDate.atTimeNoSecondsToUtc(localTime: LocalTime): ZonedDateTime {
+fun LocalDate.atTimeNoSecondsToUtc(localTime: LocalTime): ZonedDateTime {
     val truncatedTime = localTime.truncatedTo(ChronoUnit.MINUTES)
     val zonedDateTime = this.atTime(truncatedTime).atZone(ZoneOffset.systemDefault())
     return zonedDateTime.withZoneSameInstant(ZoneOffset.UTC)

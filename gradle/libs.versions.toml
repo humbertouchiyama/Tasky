@@ -21,6 +21,9 @@ core-splash-screen = "1.0.1"
 datetime-picker = "0.9.0"
 room = "2.6.1"
 navigation-compose = "2.8.3"
+work-runtime-ktx = "2.9.1"
+hilt-work = "1.0.0"
+androidx-hilt-compiler = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,8 +45,10 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hilt-work" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt-compiler" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -54,6 +59,7 @@ datetime-picker = { group = "io.github.vanpra.compose-material-dialogs", name = 
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-runtime-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
