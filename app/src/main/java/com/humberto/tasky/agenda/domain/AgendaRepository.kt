@@ -8,6 +8,7 @@ import java.time.LocalDate
 interface AgendaRepository {
     suspend fun logout(): EmptyResult<DataError.Network>
     fun getAgendaForDate(localDate: LocalDate): Flow<List<AgendaItem>>
+    suspend fun getFullAgenda(): EmptyResult<DataError.Network>
     suspend fun upsertFullAgenda(
         tasks: List<AgendaItem.Task>,
         events: List<AgendaItem.Event>,

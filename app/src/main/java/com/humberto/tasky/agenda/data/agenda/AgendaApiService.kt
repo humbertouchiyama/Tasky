@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.data
+package com.humberto.tasky.agenda.data.agenda
 
 import com.humberto.tasky.agenda.data.event.CheckAttendeeExistsResponse
 import com.humberto.tasky.agenda.data.event.CreateEventRequest

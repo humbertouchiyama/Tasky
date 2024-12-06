@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.data
+package com.humberto.tasky.agenda.data.agenda
 
 import android.database.sqlite.SQLiteFullException
 import androidx.room.withTransaction
@@ -20,6 +20,7 @@ import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
+import com.humberto.tasky.core.domain.util.asEmptyDataResult
 import com.humberto.tasky.core.domain.util.onSuccess
 import com.humberto.tasky.core.domain.util.toEndOfDayUtc
 import com.humberto.tasky.core.domain.util.toStartOfDayUtc
@@ -89,6 +90,20 @@ class AgendaRepositoryImpl @Inject constructor(
         ) { tasks, events, reminders ->
             (tasks + events + reminders).sortedBy { it.from }
         }
+    }
+
+    override suspend fun getFullAgenda(): EmptyResult<DataError.Network> {
+        val result = safeCall {
+            agendaApiService.getFullAgenda()
+        }.onSuccess { getFullAgendaResponse ->
+            upsertFullAgenda(
+                tasks = getFullAgendaResponse.tasks.map { it.toTask() },
+                events = getFullAgendaResponse.events.map { it.toEvent() },
+                reminders = getFullAgendaResponse.reminders.map { it.toReminder() }
+            )
+            // schedule future alarms
+        }
+        return result.asEmptyDataResult()
     }
 
     override suspend fun upsertFullAgenda(

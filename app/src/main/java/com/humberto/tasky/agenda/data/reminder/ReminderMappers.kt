@@ -48,3 +48,14 @@ fun ReminderEntity.toReminderPendingSyncEntity(userId: String): ReminderPendingS
         reminder = this
     )
 }
+
+fun ReminderDto.toReminder(): AgendaItem.Reminder {
+    val remindDuration = (time - remindAt).milliseconds
+    return AgendaItem.Reminder(
+        id = id,
+        title = title,
+        description = description,
+        from = time.toZonedDateTime("UTC"),
+        reminderType = ReminderType.fromDuration(remindDuration) ?: ReminderType.ThirtyMinutes
+    )
+}

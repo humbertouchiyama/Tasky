@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.data
+package com.humberto.tasky.agenda.data.agenda
 
 import kotlinx.serialization.Serializable
 
