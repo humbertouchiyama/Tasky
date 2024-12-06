@@ -2,9 +2,10 @@ package com.humberto.tasky.agenda.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.humberto.tasky.agenda.data.AgendaApiService
-import com.humberto.tasky.agenda.data.AgendaRepositoryImpl
+import com.humberto.tasky.agenda.data.agenda.AgendaApiService
+import com.humberto.tasky.agenda.data.agenda.AgendaRepositoryImpl
 import com.humberto.tasky.agenda.data.event.EventRepositoryImpl
+import com.humberto.tasky.agenda.data.helper.WorkerHelper
 import com.humberto.tasky.agenda.data.reminder.ReminderRepositoryImpl
 import com.humberto.tasky.agenda.data.task.TaskRepositoryImpl
 import com.humberto.tasky.agenda.domain.AgendaRepository
@@ -71,12 +72,14 @@ class AgendaModule {
     fun providesReminderRepository(
         reminderDao: ReminderDao,
         agendaApi: AgendaApiService,
-        sessionManager: SessionManager
+        sessionManager: SessionManager,
+        workerHelper: WorkerHelper
     ): ReminderRepository {
         return ReminderRepositoryImpl(
             reminderDao,
             agendaApi,
-            sessionManager
+            sessionManager,
+            workerHelper
         )
     }
 
@@ -85,13 +88,13 @@ class AgendaModule {
         reminderDao: TaskDao,
         agendaApi: AgendaApiService,
         sessionManager: SessionManager,
-        workManager: WorkManager
+        workerHelper: WorkerHelper
     ): TaskRepository {
         return TaskRepositoryImpl(
             reminderDao,
             agendaApi,
             sessionManager,
-            workManager
+            workerHelper
         )
     }
 
@@ -100,4 +103,8 @@ class AgendaModule {
     fun providesWorkManager(
         @ApplicationContext context: Context
     ): WorkManager = WorkManager.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideWorkerHelper(workManager: WorkManager): WorkerHelper = WorkerHelper(workManager)
 }

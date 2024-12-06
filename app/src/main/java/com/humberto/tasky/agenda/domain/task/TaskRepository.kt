@@ -12,4 +12,7 @@ interface TaskRepository {
     suspend fun deleteTask(taskId: String): EmptyResult<DataError>
     suspend fun syncPendingUpdateTask(taskId: String)
     suspend fun syncPendingCreateTask(taskId: String)
+    companion object {
+        const val TASK_ID = "TASK_ID"
+    }
 }
