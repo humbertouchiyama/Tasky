@@ -1,15 +1,11 @@
 package com.humberto.tasky.agenda.data.task
 
 import android.database.sqlite.SQLiteFullException
-import androidx.work.Constraints
-import androidx.work.ListenableWorker
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
-import com.humberto.tasky.agenda.data.AgendaApiService
+import com.humberto.tasky.agenda.data.agenda.AgendaApiService
+import com.humberto.tasky.agenda.data.helper.WorkerHelper
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.task.TaskRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository.Companion.TASK_ID
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.database.entity.DeletedTaskSyncEntity
@@ -20,14 +16,13 @@ import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.isRetryable
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TaskRepositoryImpl @Inject constructor(
     private val taskDao: TaskDao,
     private val agendaApi: AgendaApiService,
     private val sessionManager: SessionManager,
-    private val workManager: WorkManager
+    private val workerHelper: WorkerHelper
 ): TaskRepository {
 
     private val localUserId: String?
@@ -55,7 +50,10 @@ class TaskRepositoryImpl @Inject constructor(
                             userId = localUserId!!
                         )
                     )
-                    enqueuePendingWorker<CreateTaskWorker>(taskId = task.id)
+                    workerHelper.enqueueSyncPendingWorker<CreateTaskWorker>(
+                        idKey = TASK_ID,
+                        id = task.id
+                    )
                     return Result.Success(Unit)
                 }
             }
@@ -78,7 +76,10 @@ class TaskRepositoryImpl @Inject constructor(
                             userId = localUserId!!
                         )
                     )
-                    enqueuePendingWorker<UpdateTaskWorker>(taskId = task.id)
+                    workerHelper.enqueueSyncPendingWorker<UpdateTaskWorker>(
+                        idKey = TASK_ID,
+                        id = task.id
+                    )
                     return Result.Success(Unit)
                 }
             }
@@ -102,20 +103,6 @@ class TaskRepositoryImpl @Inject constructor(
                 )
             }
         }
-    }
-
-    private inline fun <reified T: ListenableWorker> enqueuePendingWorker(taskId: String) {
-        val request = OneTimeWorkRequestBuilder<T>()
-            .setInputData(
-                workDataOf("TASK_ID" to taskId)
-            )
-            .setInitialDelay(15, TimeUnit.MINUTES)
-            .setConstraints(Constraints(
-                requiredNetworkType = NetworkType.CONNECTED
-            ))
-            .build()
-
-        workManager.enqueue(request)
     }
 
     override suspend fun syncPendingUpdateTask(taskId: String) {

@@ -8,6 +8,11 @@ import com.humberto.tasky.core.domain.util.Result
 interface ReminderRepository {
     suspend fun getReminder(reminderId: String): Result<AgendaItem, DataError>
     suspend fun createReminder(reminder: AgendaItem.Reminder): EmptyResult<DataError>
+    suspend fun updateReminder(reminder: AgendaItem.Reminder): EmptyResult<DataError>
     suspend fun deleteReminder(reminderId: String): EmptyResult<DataError>
-    suspend fun syncPendingReminders()
+    suspend fun syncPendingUpdateReminder(reminderId: String)
+    suspend fun syncPendingCreateReminder(reminderId: String)
+    companion object {
+        const val REMINDER_ID = "REMINDER_ID"
+    }
 }

@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.humberto.tasky.agenda.domain.task.TaskRepository
+import com.humberto.tasky.agenda.domain.task.TaskRepository.Companion.TASK_ID
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -16,7 +17,7 @@ class CreateTaskWorker @AssistedInject constructor(
 ): CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
-        val taskId = inputData.getString("TASK_ID") ?: return Result.failure()
+        val taskId = inputData.getString(TASK_ID) ?: return Result.failure()
 
         return try {
             taskRepository.syncPendingCreateTask(taskId = taskId)

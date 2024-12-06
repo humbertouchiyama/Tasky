@@ -1,9 +1,11 @@
 package com.humberto.tasky.agenda.data.reminder
 
 import android.database.sqlite.SQLiteFullException
-import com.humberto.tasky.agenda.data.AgendaApiService
+import com.humberto.tasky.agenda.data.agenda.AgendaApiService
+import com.humberto.tasky.agenda.data.helper.WorkerHelper
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
+import com.humberto.tasky.agenda.domain.reminder.ReminderRepository.Companion.REMINDER_ID
 import com.humberto.tasky.core.data.networking.safeCall
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.entity.DeletedReminderSyncEntity
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class ReminderRepositoryImpl @Inject constructor(
     private val reminderDao: ReminderDao,
     private val agendaApi: AgendaApiService,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val workerHelper: WorkerHelper
 ): ReminderRepository {
 
     private val localUserId: String?
@@ -47,6 +50,36 @@ class ReminderRepositoryImpl @Inject constructor(
                             userId = localUserId!!
                         )
                     )
+                    workerHelper.enqueueSyncPendingWorker<CreateReminderWorker>(
+                        idKey = REMINDER_ID,
+                        id = reminder.id
+                    )
+                    return Result.Success(Unit)
+                }
+            }
+            return result
+        } catch (e: SQLiteFullException) {
+            Result.Error(DataError.Local.DISK_FULL)
+        }
+    }
+
+    override suspend fun updateReminder(reminder: AgendaItem.Reminder): EmptyResult<DataError> {
+        return try {
+            val reminderEntity = reminder.toReminderEntity()
+            reminderDao.upsertReminder(reminderEntity)
+            val result = safeCall {
+                agendaApi.updateReminder(reminder.toReminderRequest())
+            }.onError { error ->
+                if (error.isRetryable()) {
+                    reminderDao.insertReminderPendingSync(
+                        reminderEntity.toReminderPendingSyncEntity(
+                            userId = localUserId!!
+                        )
+                    )
+                    workerHelper.enqueueSyncPendingWorker<UpdateReminderWorker>(
+                        idKey = REMINDER_ID,
+                        id = reminder.id
+                    )
                     return Result.Success(Unit)
                 }
             }
@@ -72,15 +105,27 @@ class ReminderRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncPendingReminders() {
-        reminderDao.getRemindersPendingSync(
-            userId = localUserId ?: ""
-        ).map { reminderPendingSyncEntity ->
-            safeCall {
-                agendaApi.createReminder(reminderPendingSyncEntity.reminder.toReminder().toReminderRequest())
-            }.onSuccess {
-                reminderDao.deleteReminderPendingSync(reminderPendingSyncEntity.reminderId)
-            }
+    override suspend fun syncPendingUpdateReminder(reminderId: String) {
+        val pendingReminderEntity = reminderDao.getReminderPendingSync(
+            userId = localUserId ?: "",
+            reminderId = reminderId
+        )
+        safeCall {
+            agendaApi.updateReminder(pendingReminderEntity.reminder.toReminder().toReminderRequest())
+        }.onSuccess {
+            reminderDao.deleteReminderPendingSync(pendingReminderEntity.reminderId)
+        }
+    }
+
+    override suspend fun syncPendingCreateReminder(reminderId: String) {
+        val pendingReminderEntity = reminderDao.getReminderPendingSync(
+            userId = localUserId ?: "",
+            reminderId = reminderId
+        )
+        safeCall {
+            agendaApi.createReminder(pendingReminderEntity.reminder.toReminder().toReminderRequest())
+        }.onSuccess {
+            reminderDao.deleteReminderPendingSync(pendingReminderEntity.reminderId)
         }
     }
 }
