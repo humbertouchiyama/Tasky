@@ -2,6 +2,12 @@ package com.humberto.tasky.agenda.presentation.agenda_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.humberto.tasky.agenda.data.agenda.SyncFullAgendaWorker
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
@@ -31,6 +37,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,7 +49,8 @@ class AgendaViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
     private val alarmScheduler: AlarmScheduler,
-    connectivityObserver: ConnectivityObserver
+    connectivityObserver: ConnectivityObserver,
+    private val workManager: WorkManager
 ): ViewModel() {
 
     private val _agendaState = MutableStateFlow(AgendaState())
@@ -62,6 +70,22 @@ class AgendaViewModel @Inject constructor(
     init {
         buildUserInitials()
         getAgendaForDate(LocalDate.now())
+        syncFullAgenda()
+    }
+
+    private fun syncFullAgenda() {
+        val request = PeriodicWorkRequestBuilder<SyncFullAgendaWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(
+                Constraints(
+                    requiredNetworkType = NetworkType.CONNECTED
+                )
+            )
+            .build()
+        workManager.enqueueUniquePeriodicWork(
+            "SyncFullAgendaWork",
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
     }
 
     private fun buildUserInitials() {
@@ -108,6 +132,11 @@ class AgendaViewModel @Inject constructor(
             AgendaAction.OnDismissDeleteAgendaItemClick -> {
                 _agendaState.update { it.copy(confirmingItemToBeDeleted = null) }
             }
+            AgendaAction.OnRefresh -> {
+                _agendaState.update { it.copy(isRefreshing = true) }
+                // agendaRepository.getAgenda()
+                _agendaState.update { it.copy(isRefreshing = false) }
+            }
             else -> Unit
         }
     }
@@ -130,7 +159,7 @@ class AgendaViewModel @Inject constructor(
     }
 
     private fun deleteItem() {
-        viewModelScope.launch {
+        applicationScope.launch {
             _agendaState.update { it.copy(isDeletingItem = true) }
             _agendaState.value.confirmingItemToBeDeleted?.let { itemUi ->
                 when(itemUi.agendaItemType) {
@@ -168,7 +197,7 @@ class AgendaViewModel @Inject constructor(
     }
 
     fun syncAllPendingItems() {
-        viewModelScope.launch {
+        applicationScope.launch {
             isConnected.collect { connected ->
                 if(connected && !_agendaState.value.isSyncingPendingItems) {
                     _agendaState.update { state ->
@@ -176,8 +205,6 @@ class AgendaViewModel @Inject constructor(
                     }
                     listOf(
                         async { agendaRepository.syncDeletedAgendaItems() },
-                        async { taskRepository.syncPendingTasks() },
-                        async { reminderRepository.syncPendingReminders() }
                     ).awaitAll()
                     _agendaState.update { state ->
                         state.copy(isSyncingPendingItems = false)

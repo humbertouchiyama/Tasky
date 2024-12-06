@@ -51,3 +51,15 @@ fun TaskEntity.toTaskPendingSyncEntity(userId: String): TaskPendingSyncEntity {
         task = this
     )
 }
+
+fun TaskDto.toTask(): AgendaItem.Task {
+    val remindDuration = (time - remindAt).milliseconds
+    return AgendaItem.Task(
+        id = id,
+        title = title,
+        description = description,
+        from = time.toZonedDateTime("UTC"),
+        reminderType = ReminderType.fromDuration(remindDuration) ?: ReminderType.ThirtyMinutes,
+        isDone = isDone
+    )
+}

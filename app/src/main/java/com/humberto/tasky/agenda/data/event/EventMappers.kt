@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 fun EventEntity.toEvent(
     photos: List<Photo>
-): AgendaItem {
+): AgendaItem.Event {
     val remindDuration = (from - remindAt).milliseconds
     return AgendaItem.Event(
         id = id,
@@ -43,7 +43,29 @@ fun AgendaItem.Event.toEventEntity(): EventEntity {
     )
 }
 
+fun EventDto.toEvent(): AgendaItem.Event {
+    val remindDuration = (from - remindAt).milliseconds
+    return AgendaItem.Event(
+        id = id,
+        title = title,
+        description = description,
+        from = from.toZonedDateTime("UTC"),
+        to = to.toZonedDateTime("UTC"),
+        reminderType = ReminderType.fromDuration(remindDuration) ?: ReminderType.ThirtyMinutes,
+        attendees = attendees.map { it.toAttendee() },
+        photos = photos.map { it.toPhoto() },
+        isUserEventCreator = isUserEventCreator
+    )
+}
+
 fun PhotoEntity.toPhoto(): Photo {
+    return Photo(
+        key = key,
+        url = url
+    )
+}
+
+fun PhotoDto.toPhoto(): Photo {
     return Photo(
         key = key,
         url = url
@@ -69,5 +91,16 @@ fun Attendee.toLocalAttendee(): LocalAttendee {
         eventId = eventId!!,
         isGoing = isGoing,
         isEventCreator = isEventCreator
+    )
+}
+
+fun AttendeeDto.toAttendee(): Attendee {
+    return Attendee(
+        userId = userId,
+        email = email,
+        fullName = fullName,
+        eventId = eventId,
+        isGoing = isGoing,
+        isEventCreator = false
     )
 }
