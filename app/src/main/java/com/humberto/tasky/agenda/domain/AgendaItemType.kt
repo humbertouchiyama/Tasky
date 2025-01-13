@@ -1,4 +1,4 @@
-package com.humberto.tasky.agenda.presentation
+package com.humberto.tasky.agenda.domain
 
 enum class AgendaItemType {
     TASK,
