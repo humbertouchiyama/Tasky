@@ -1,6 +1,6 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.model
 
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItemType
 import java.time.ZonedDateTime
 
 data class AgendaItemUi(

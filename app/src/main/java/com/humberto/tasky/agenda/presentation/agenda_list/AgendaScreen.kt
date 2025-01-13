@@ -31,7 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.agenda.presentation.agenda_list.components.AgendaListItem
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi

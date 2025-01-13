@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemDetails

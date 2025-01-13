@@ -1,7 +1,7 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.mapper
 
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemDetails
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import java.time.ZoneId
