@@ -1,4 +1,4 @@
-package com.humberto.tasky.core.alarm.domain
+package com.humberto.tasky.core.domain.alarm
 
 interface AlarmScheduler {
     fun scheduleAlarm(alarmItem: AlarmItem)

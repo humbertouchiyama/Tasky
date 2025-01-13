@@ -1,9 +1,8 @@
-package com.humberto.tasky.core.alarm.mapper
+package com.humberto.tasky.core.mapper
 
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.presentation.AgendaItemType
-import com.humberto.tasky.core.alarm.data.AlarmItemParcelable
-import com.humberto.tasky.core.alarm.domain.AlarmItem
+import com.humberto.tasky.agenda.domain.AgendaItemType
+import com.humberto.tasky.core.domain.alarm.AlarmItem
 import java.time.ZoneId
 
 fun AgendaItem.toAlarmItem(): AlarmItem {
@@ -21,15 +20,5 @@ fun AgendaItem.toAlarmItem(): AlarmItem {
             is AgendaItem.Task -> AgendaItemType.TASK
         },
         itemDate = fromLocalZone.toLocalDate()
-    )
-}
-
-fun AlarmItem.toParcelable(): AlarmItemParcelable {
-    return AlarmItemParcelable(
-        id = id,
-        title = title,
-        description = description,
-        itemType = itemType,
-        itemDateEpochDay = itemDate.toEpochDay(),
     )
 }

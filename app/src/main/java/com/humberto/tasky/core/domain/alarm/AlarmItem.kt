@@ -1,8 +1,11 @@
-package com.humberto.tasky.core.alarm.domain
+package com.humberto.tasky.core.domain.alarm
 
-import com.humberto.tasky.agenda.presentation.AgendaItemType
+import android.os.Parcelable
+import com.humberto.tasky.agenda.domain.AgendaItemType
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
+@Parcelize
 data class AlarmItem(
     val id: String,
     val title: String,
@@ -10,4 +13,4 @@ data class AlarmItem(
     val itemType: AgendaItemType,
     val triggerAt: Long,
     val itemDate: LocalDate
-)
+): Parcelable
