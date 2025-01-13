@@ -74,4 +74,5 @@
     <string name="permission_required">Permission required</string>
     <string name="notification_rationale">Stay on top of your schedule with timely notifications for events, tasks, and reminders.</string>
     <string name="error_connected_to_add_attendees">You need to be connected to the internet to add attendees.</string>
+    <string name="agenda_alarm_channel_name">Agenda alarms</string>
 </resources>
