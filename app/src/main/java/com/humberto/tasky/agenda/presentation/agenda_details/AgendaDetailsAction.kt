@@ -1,5 +1,6 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
+import android.net.Uri
 import com.humberto.tasky.main.navigation.EditTextArgs
 import java.time.LocalDate
 import java.time.LocalTime
@@ -25,4 +26,8 @@ sealed interface AgendaDetailsAction {
         val showNotificationRationale: Boolean
     ): AgendaDetailsAction
     data object DismissRationaleDialog: AgendaDetailsAction
+    data object OnAddPhotoClick: AgendaDetailsAction
+    data class OnPhotoPicked(val uri: Uri?): AgendaDetailsAction
+    data object NavigateToPhotoPreviewScreen: AgendaDetailsAction
+    data object OnInfoMessageSeen: AgendaDetailsAction
 }

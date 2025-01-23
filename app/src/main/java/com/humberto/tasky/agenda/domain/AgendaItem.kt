@@ -1,7 +1,7 @@
 package com.humberto.tasky.agenda.domain
 
 import com.humberto.tasky.agenda.domain.event.Attendee
-import com.humberto.tasky.agenda.domain.event.Photo
+import com.humberto.tasky.agenda.domain.event.EventPhoto
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import java.time.ZonedDateTime
 
@@ -20,9 +20,19 @@ sealed class AgendaItem(
         override val reminderType: ReminderType,
         val to: ZonedDateTime,
         val attendees: List<Attendee>,
-        val photos: List<Photo>,
+        val photos: List<EventPhoto>,
         val isUserEventCreator: Boolean
-    ) : AgendaItem(id, title, description, from, reminderType)
+    ) : AgendaItem(id, title, description, from, reminderType) {
+
+        fun getAttendee(userId: String): Attendee? {
+            return attendees.find { it.userId == userId }
+        }
+
+        companion object {
+            const val MAX_PHOTO_AMOUNT = 10
+            const val MAX_PHOTO_SIZE = 1_000_000
+        }
+    }
 
     data class Task(
         override val id: String,

@@ -39,7 +39,8 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                 agendaItem = AgendaItemDetails.Event(
                     toTime = to.toLocalTime(),
                     toDate = to.toLocalDate(),
-                    attendees = agendaItem.attendees.map { it.toAttendeeUi() }
+                    attendees = agendaItem.attendees.map { it.toAttendeeUi() },
+                    eventPhotos = agendaItem.photos
                 ),
             )
         }
@@ -80,7 +81,7 @@ fun AgendaDetailsState.toAgendaItem(): AgendaItem {
                     eventId = id
                 )
             },
-            photos = listOf(), // TODO
+            photos = agendaItem.eventPhotos
         )
         AgendaItemDetails.Reminder -> AgendaItem.Reminder(
             id = id,
