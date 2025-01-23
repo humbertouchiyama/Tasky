@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,10 +31,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -246,6 +250,46 @@ private fun AgendaDetailsScreen(
             )
         }
     }
+
+    val photoPickLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            onAction(AgendaDetailsAction.OnPhotoPicked(uri))
+        }
+    )
+
+    if (agendaItem is AgendaItemDetails.Event) {
+        LaunchedEffect(key1 = agendaItem.isAddingPhoto, key2 = photoPickLauncher) {
+            if (agendaItem.isAddingPhoto) {
+                photoPickLauncher.launch("image/*")
+            }
+        }
+    }
+
+    val snackBarState = remember {
+        SnackbarHostState()
+    }
+
+    LaunchedEffect(key1 = state.infoMessage, key2 = snackBarState) {
+        state.infoMessage?.let { message ->
+            snackBarState.showSnackbar(
+                message = message.asString(context)
+            )
+            onAction(AgendaDetailsAction.OnInfoMessageSeen)
+        }
+    }
+
+    val isEditing =
+        remember(state.agendaItem, state.isEditing) {
+            when (state.agendaItem) {
+                is AgendaItemDetails.Event -> {
+                    state.agendaItem.isUserEventCreator && state.isEditing
+                }
+
+                else -> state.isEditing
+            }
+        }
+
     TaskyScaffold(
         topAppBar = {
             TaskyToolbar(
@@ -279,7 +323,7 @@ private fun AgendaDetailsScreen(
                             .size(width = 48.dp, height = 36.dp)
                             .padding(end = 8.dp)
                             .clickable(onClick = {
-                                if(state.isEditing) {
+                                if(isEditing) {
                                     onAction(AgendaDetailsAction.OnSaveClick)
                                 } else {
                                     onAction(AgendaDetailsAction.OnEditClick)
@@ -293,7 +337,7 @@ private fun AgendaDetailsScreen(
                                 strokeWidth = 1.5.dp,
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
-                        } else if(state.isEditing) {
+                        } else if(isEditing) {
                             Text(
                                 text = stringResource(id = R.string.save),
                                 style = MaterialTheme.typography.titleSmall
@@ -308,7 +352,8 @@ private fun AgendaDetailsScreen(
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackBarState) },
     ) {
         Column(
             modifier = Modifier
@@ -323,7 +368,7 @@ private fun AgendaDetailsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     agendaItemDetails = agendaItem)
                 TaskyEditableField(
-                    isEditing = state.isEditing,
+                    isEditing = isEditing,
                     onClick = {
                         onAction(AgendaDetailsAction.OnEditTextClick(
                             EditTextArgs(
@@ -356,7 +401,7 @@ private fun AgendaDetailsScreen(
                     color = MaterialTheme.colorScheme.tertiary
                 )
                 TaskyEditableField(
-                    isEditing = state.isEditing,
+                    isEditing = isEditing,
                     onClick = {
                         onAction(AgendaDetailsAction.OnEditTextClick(
                             EditTextArgs(
@@ -379,15 +424,25 @@ private fun AgendaDetailsScreen(
                 }
             }
             if (agendaItem is AgendaItemDetails.Event) {
+                Spacer(modifier = Modifier.height(16.dp))
                 PhotosSection(
-                    photos = agendaItem.photosUrlList
+                    photos = agendaItem.eventPhotos,
+                    onAddNewPhotoClick = {
+                        onAction(AgendaDetailsAction.OnAddPhotoClick)
+                    },
+                    onPhotoClick = { },
+                    canEditPhotos = agendaItem.canEditPhotos && isEditing,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = 150.dp)
                 )
+                Spacer(modifier = Modifier.height(16.dp))
             }
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.tertiary
             )
             DateTimeSection(
-                isEditing = state.isEditing,
+                isEditing = isEditing,
                 onAction = { action-> onAction(action) },
                 state = state
             )
@@ -395,7 +450,7 @@ private fun AgendaDetailsScreen(
                 color = MaterialTheme.colorScheme.tertiary
             )
             ReminderDropdownField(
-                isEditing = state.isEditing,
+                isEditing = isEditing,
                 remindAtText = state.reminderType.toReminderText().asString(),
                 menuItems = ReminderType.entries.map { type ->
                     DropDownItem(
@@ -434,7 +489,7 @@ private fun AgendaDetailsScreen(
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        if(state.isEditing) {
+                        if(isEditing) {
                             Spacer(modifier = Modifier.width(16.dp))
                             Box(
                                 modifier = Modifier

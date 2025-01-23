@@ -4,7 +4,6 @@ import android.database.sqlite.SQLiteFullException
 import androidx.room.withTransaction
 import com.humberto.tasky.agenda.data.event.toEvent
 import com.humberto.tasky.agenda.data.event.toEventEntity
-import com.humberto.tasky.agenda.data.event.toPhoto
 import com.humberto.tasky.agenda.data.reminder.toReminder
 import com.humberto.tasky.agenda.data.reminder.toReminderEntity
 import com.humberto.tasky.agenda.data.task.toTask
@@ -66,14 +65,7 @@ class AgendaRepositoryImpl @Inject constructor(
             startOfDay = startOfDay,
             endOfDay = endOfDay
         ).map { eventEntities ->
-            eventEntities.map { eventEntity ->
-                val photos = eventDao
-                    .getPhotosByKeys(eventEntity.photoKeys)
-                    .map { it.toPhoto() }
-                eventEntity.toEvent(
-                    photos = photos
-                )
-            }
+            eventEntities.map { it.toEvent() }
         }
         val remindersFlow = reminderDao.getRemindersForDay(
             startOfDay = startOfDay,

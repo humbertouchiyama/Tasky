@@ -1,15 +1,22 @@
 package com.humberto.tasky.agenda.di
 
+import android.app.Application
 import android.content.Context
 import androidx.work.WorkManager
 import com.humberto.tasky.agenda.data.agenda.AgendaApiService
 import com.humberto.tasky.agenda.data.agenda.AgendaRepositoryImpl
 import com.humberto.tasky.agenda.data.event.EventRepositoryImpl
+import com.humberto.tasky.agenda.data.event.EventUploaderImpl
 import com.humberto.tasky.agenda.data.helper.WorkerHelper
+import com.humberto.tasky.agenda.data.photo.BitmapPhotoCompressor
+import com.humberto.tasky.agenda.data.photo.PhotoExtensionParserImpl
 import com.humberto.tasky.agenda.data.reminder.ReminderRepositoryImpl
 import com.humberto.tasky.agenda.data.task.TaskRepositoryImpl
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.domain.event.EventRepository
+import com.humberto.tasky.agenda.domain.event.EventUploader
+import com.humberto.tasky.agenda.domain.photo.PhotoCompressor
+import com.humberto.tasky.agenda.domain.photo.PhotoExtensionParser
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
 import com.humberto.tasky.core.database.AgendaDatabase
@@ -59,12 +66,14 @@ class AgendaModule {
     fun providesEventRepository(
         eventDao: EventDao,
         agendaApiService: AgendaApiService,
-        sessionManager: SessionManager
+        sessionManager: SessionManager,
+        eventUploader: EventUploader
     ): EventRepository {
         return EventRepositoryImpl(
             eventDao,
             agendaApiService,
-            sessionManager
+            sessionManager,
+            eventUploader
         )
     }
 
@@ -107,4 +116,26 @@ class AgendaModule {
     @Provides
     @Singleton
     fun provideWorkerHelper(workManager: WorkManager): WorkerHelper = WorkerHelper(workManager)
+
+    @Provides
+    @Singleton
+    fun providesEventUploader(
+        workManager: WorkManager
+    ): EventUploader = EventUploaderImpl(workManager)
+
+    @Provides
+    @Singleton
+    fun providesPhotoCompressor(
+        @ApplicationContext context: Context
+    ): PhotoCompressor {
+        return BitmapPhotoCompressor(context)
+    }
+
+    @Provides
+    @Singleton
+    fun providesPhotoExtensionParser(
+        application: Application
+    ): PhotoExtensionParser {
+        return PhotoExtensionParserImpl(application)
+    }
 }

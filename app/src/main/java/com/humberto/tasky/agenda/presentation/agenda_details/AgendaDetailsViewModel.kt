@@ -1,5 +1,6 @@
 package com.humberto.tasky.agenda.presentation.agenda_details
 
+import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,21 +8,22 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
+import com.humberto.tasky.agenda.domain.AgendaItemType
+import com.humberto.tasky.agenda.domain.event.EventPhoto
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
-import com.humberto.tasky.agenda.presentation.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.toAttendeeUi
 import com.humberto.tasky.agenda.presentation.agenda_details.mapper.updateWithAgendaItem
 import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
-import com.humberto.tasky.core.alarm.domain.AlarmScheduler
-import com.humberto.tasky.core.alarm.mapper.toAlarmItem
 import com.humberto.tasky.core.domain.ConnectivityObserver
+import com.humberto.tasky.core.domain.alarm.AlarmScheduler
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
+import com.humberto.tasky.core.mapper.toAlarmItem
 import com.humberto.tasky.core.presentation.ui.UiText
 import com.humberto.tasky.core.presentation.ui.asUiText
 import com.humberto.tasky.main.navigation.AgendaDetails
@@ -33,11 +35,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,16 +71,18 @@ class AgendaDetailsViewModel @Inject constructor(
     )
     val state: StateFlow<AgendaDetailsState> = _state.asStateFlow()
 
-    private val isConnected = connectivityObserver
-        .isConnected
+    private val connectivityStatus = connectivityObserver
+        .startObserving()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000L),
-            false
+            ConnectivityObserver.ConnectivityStatus.Unavailable
         )
 
     private val eventChannel = Channel<AgendaDetailsEvent>()
     val events = eventChannel.receiveAsFlow()
+
+    private val deletedRemotePhotos = MutableStateFlow<List<EventPhoto.Remote>>(emptyList())
 
     init {
         agendaDetailsArgs.agendaItemId?.let { id ->
@@ -95,6 +102,7 @@ class AgendaDetailsViewModel @Inject constructor(
                 )
             }
         }
+        observeConnectivityStatus()
     }
     
     fun updateStateWithEditTextArgs(editTextArgs: EditTextArgs?) {
@@ -105,6 +113,25 @@ class AgendaDetailsViewModel @Inject constructor(
                 else -> currentState
             }
         }
+    }
+
+    private fun observeConnectivityStatus() {
+        connectivityStatus.onEach { status ->
+            _state.update { it ->
+                it.copy(
+                    agendaItem = if (it.agendaItem is AgendaItemDetails.Event) {
+                        it.agendaItem.updateIfEvent {
+                            it.agendaItem.asEventDetails?.let {
+                                it.copy(canEditPhotos = status.isConnected() && it.isUserEventCreator)
+                            } ?: it.agendaItem
+                        }
+                    } else it.agendaItem,
+                    infoMessage = if (status == ConnectivityObserver.ConnectivityStatus.Lost) {
+                        UiText.StringResource(R.string.lost_connection)
+                    } else it.infoMessage
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun getItemById(id: String, type: AgendaItemType) {
@@ -208,7 +235,7 @@ class AgendaDetailsViewModel @Inject constructor(
             }
             AgendaDetailsAction.OnOpenAttendeeDialog -> {
                 viewModelScope.launch {
-                    if(isConnected.value) {
+                    if(connectivityStatus.value.isConnected()) {
                         _state.update { currentState ->
                             currentState.copy(
                                 agendaItem = currentState.agendaItem.updateIfEvent {
@@ -247,7 +274,79 @@ class AgendaDetailsViewModel @Inject constructor(
                     )
                 }
             }
+            AgendaDetailsAction.OnAddPhotoClick -> onClickAddPhoto()
+            is AgendaDetailsAction.OnPhotoPicked -> onPhotoPicked(agendaDetailsAction.uri)
+            AgendaDetailsAction.OnInfoMessageSeen -> onInfoMessageSeen()
             else -> Unit
+        }
+    }
+
+    private fun onInfoMessageSeen() {
+        _state.update { it.copy(infoMessage = null) }
+    }
+
+    private fun onClickAddPhoto() {
+        if (!connectivityStatus.value.isConnected()) {
+            _state.update {
+                it.copy(
+                    agendaItem = it.agendaItem.updateIfEvent {
+                        copy(isAddingPhoto = false)
+                    },
+                    infoMessage = UiText.StringResource(R.string.error_internet_required_to_update_photos),
+                )
+            }
+            return
+        }
+        _state.update {
+            it.copy(
+                agendaItem = it.agendaItem.updateIfEvent {
+                    copy(isAddingPhoto = true)
+                }
+            )
+        }
+    }
+
+    private fun onPhotoPicked(uri: Uri?) {
+        _state.update {
+            it.copy(
+                agendaItem = it.agendaItem.updateIfEvent {
+                    copy(isAddingPhoto = false)
+                }
+            )
+        }
+        if (state.value.isSaving) {
+            return
+        }
+        val agendaItem = _state.value.agendaItem
+        if (agendaItem is AgendaItemDetails.Event) {
+            if (agendaItem.eventPhotos.size >= AgendaItem.Event.MAX_PHOTO_AMOUNT) {
+                _state.update {
+                    it.copy(
+                        infoMessage = UiText.StringResource(
+                            R.string.error_too_many_photos,
+                            AgendaItem.Event.MAX_PHOTO_AMOUNT
+                        )
+                    )
+                }
+                return
+            }
+            uri?.let { uri ->
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            agendaItem = it.agendaItem.updateIfEvent {
+                                copy(
+                                    eventPhotos = agendaItem.eventPhotos + EventPhoto.Local(
+                                        uriString = uri.toString(),
+                                        key = UUID.randomUUID().toString(),
+                                    )
+                                )
+                            },
+//                            isEditing = true
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -262,8 +361,7 @@ class AgendaDetailsViewModel @Inject constructor(
     }
 
     private fun saveItem() {
-        val id = _state.value.id
-        if (id != null) {
+        if (_state.value.id != null) {
             updateItem()
             return
         }
@@ -300,7 +398,10 @@ class AgendaDetailsViewModel @Inject constructor(
             val agendaItem = _state.value.toAgendaItem()
             when(agendaItem) {
                 is AgendaItem.Task -> taskRepository.updateTask(agendaItem)
-                is AgendaItem.Event -> eventRepository.updateEvent(agendaItem)
+                is AgendaItem.Event -> eventRepository.updateEvent(
+                    event = agendaItem,
+                    deletedRemotePhotoKeys = deletedRemotePhotos.value.map { it.key }
+                )
                 is AgendaItem.Reminder -> reminderRepository.updateReminder(agendaItem)
             }.onSuccess {
                 alarmScheduler.cancelAlarm(agendaItem.id)
@@ -377,3 +478,6 @@ class AgendaDetailsViewModel @Inject constructor(
         }
     }
 }
+
+val AgendaItemDetails.asEventDetails: AgendaItemDetails.Event?
+    get() = this as? AgendaItemDetails.Event

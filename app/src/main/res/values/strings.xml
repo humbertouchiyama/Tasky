@@ -75,4 +75,8 @@
     <string name="notification_rationale">Stay on top of your schedule with timely notifications for events, tasks, and reminders.</string>
     <string name="error_connected_to_add_attendees">You need to be connected to the internet to add attendees.</string>
     <string name="agenda_alarm_channel_name">Agenda alarms</string>
+    <string name="photos">Photos</string>
+    <string name="error_internet_required_to_update_photos">You need an active internet connection to edit the photos</string>
+    <string name="error_too_many_photos">The maximum supported amount of photos is %d</string>
+    <string name="lost_connection">Ops, it looks like you lost the connection to the internet</string>
 </resources>
