@@ -88,9 +88,6 @@ fun AgendaScreenRoot(
             viewModel.updateSelectedDate( LocalDate.ofEpochDay(it) )
         }
     }
-    LaunchedEffect(Unit) {
-        viewModel.syncAllPendingItems()
-    }
     val state by viewModel.agendaState.collectAsStateWithLifecycle()
     AgendaScreen(
         state = state,
@@ -114,6 +111,10 @@ private fun AgendaScreen(
     state: AgendaState,
     onAction: (AgendaAction) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onAction(AgendaAction.OnRefresh)
+    }
+
     val dialogState = rememberMaterialDialogState()
     TaskyDatePicker(
         dialogState = dialogState,
@@ -333,7 +334,8 @@ private fun AgendaScreenPreview() {
                         reminderType = ReminderType.ThirtyMinutes,
                         isUserEventCreator = true,
                         attendees = listOf(),
-                        photos = listOf()
+                        photos = listOf(),
+                        host = "1"
                     ).toAgendaItemUi(),
                     AgendaItem.Reminder(
                         id = "3",

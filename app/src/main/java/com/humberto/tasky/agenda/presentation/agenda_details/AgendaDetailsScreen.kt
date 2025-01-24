@@ -99,7 +99,7 @@ fun AgendaDetailsScreenRoot(
             AgendaDetailsEvent.SaveSuccess -> {
                 Toast.makeText(
                     context,
-                    R.string.saved_successful,
+                    R.string.item_created_successfully,
                     Toast.LENGTH_LONG
                 ).show()
                 onBackClick(selectedDateEpochDay)
@@ -517,7 +517,8 @@ private fun AgendaDetailsScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     AttendeeList(
                         attendeeList = agendaItem.attendees,
-                        selectedAttendanceFilter = agendaItem.selectedFilter
+                        selectedAttendanceFilter = agendaItem.selectedFilter,
+                        eventCreator = agendaItem.eventCreator
                     )
                 }
             }
@@ -558,15 +559,13 @@ private fun AgendaDetailsScreenPreview() {
                             userId = "1",
                             fullName = "Humberto Costa",
                             email = "email@test.com",
-                            isGoing = true,
-                            isEventCreator = true
+                            isGoing = true
                         ),
                         AttendeeUi(
                             userId = "2",
                             fullName = "Humberto Costa",
                             email = "email2@test.com",
-                            isGoing = false,
-                            isEventCreator = false
+                            isGoing = false
                         ),
                     )
                 ),

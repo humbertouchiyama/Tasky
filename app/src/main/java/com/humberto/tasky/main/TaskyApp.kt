@@ -9,7 +9,10 @@ import androidx.work.Configuration
 import com.humberto.tasky.BuildConfig
 import com.humberto.tasky.R
 import com.humberto.tasky.core.domain.alarm.AlarmNotificationManager
+import com.humberto.tasky.core.domain.util.DispatcherProvider
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,9 +22,13 @@ class TaskyApp: Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject lateinit var dispatchers: DispatcherProvider
+
+    lateinit var applicationScope: CoroutineScope
+
     override fun onCreate() {
         super.onCreate()
-
+        applicationScope = CoroutineScope(SupervisorJob() + dispatchers.main)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree()) // Plant a tree for logging in debug mode
         }

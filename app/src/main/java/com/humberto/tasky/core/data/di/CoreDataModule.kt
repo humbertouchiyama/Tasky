@@ -1,5 +1,6 @@
 package com.humberto.tasky.core.data.di
 
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
@@ -10,12 +11,14 @@ import com.humberto.tasky.core.data.auth.SessionManagerImpl
 import com.humberto.tasky.core.data.networking.AccessTokenService
 import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.repository.SessionManager
+import com.humberto.tasky.main.TaskyApp
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
@@ -126,5 +129,12 @@ class CoreDataModule {
         return AndroidConnectivityObserver(
             connectivityManager
         )
+    }
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(app: Application): CoroutineScope {
+        return (app as TaskyApp).applicationScope
     }
 }

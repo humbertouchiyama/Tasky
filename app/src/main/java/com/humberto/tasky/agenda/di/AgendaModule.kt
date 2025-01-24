@@ -19,16 +19,19 @@ import com.humberto.tasky.agenda.domain.photo.PhotoCompressor
 import com.humberto.tasky.agenda.domain.photo.PhotoExtensionParser
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
+import com.humberto.tasky.core.data.di.ApplicationScope
 import com.humberto.tasky.core.database.AgendaDatabase
 import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.repository.SessionManager
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -50,7 +53,8 @@ class AgendaModule {
         taskDao: TaskDao,
         eventDao: EventDao,
         reminderDao: ReminderDao,
-        sessionManager: SessionManager
+        sessionManager: SessionManager,
+        @ApplicationScope applicationScope: CoroutineScope
     ): AgendaRepository {
         return AgendaRepositoryImpl(
             agendaApiService,
@@ -58,7 +62,8 @@ class AgendaModule {
             taskDao,
             eventDao,
             reminderDao,
-            sessionManager
+            sessionManager,
+            applicationScope
         )
     }
 

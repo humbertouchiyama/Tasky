@@ -6,7 +6,7 @@ import com.humberto.tasky.agenda.data.task.TaskDto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetFullAgendaResponse(
+data class AgendaDto(
     val events: List<EventDto>,
     val tasks: List<TaskDto>,
     val reminders: List<ReminderDto>,

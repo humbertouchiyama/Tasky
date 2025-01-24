@@ -1,8 +1,7 @@
 package com.humberto.tasky.agenda.data.agenda
 
 import com.humberto.tasky.agenda.data.event.CheckAttendeeExistsResponse
-import com.humberto.tasky.agenda.data.event.CreateEventRequest
-import com.humberto.tasky.agenda.data.event.UpdateEventRequest
+import com.humberto.tasky.agenda.data.event.EventDto
 import com.humberto.tasky.agenda.data.reminder.ReminderRequest
 import com.humberto.tasky.agenda.data.task.TaskRequest
 import okhttp3.MultipartBody
@@ -25,8 +24,14 @@ interface AgendaApiService {
         @Body syncAgendaRequest: SyncAgendaRequest
     ): Response<Unit>
 
+    @GET("/agenda")
+    suspend fun getAgenda(
+        @Query("timezone") timeZone: String,
+        @Query("time") time: Long
+    ): Response<AgendaDto>
+
     @GET("/fullAgenda")
-    suspend fun getFullAgenda(): Response<GetFullAgendaResponse>
+    suspend fun getFullAgenda(): Response<AgendaDto>
 
     @GET("/attendee")
     suspend fun checkAttendeeExists(
@@ -50,16 +55,16 @@ interface AgendaApiService {
     @Multipart
     @POST("/event")
     suspend fun createEvent(
-        @Part("create_event_request") createEventRequest: CreateEventRequest,
+        @Part createEventRequest: MultipartBody.Part,
         @Part photos: List<MultipartBody.Part>
-    ): Response<Unit>
+    ): Response<EventDto>
 
     @Multipart
     @PUT("/event")
     suspend fun updateEvent(
-        @Part("update_event_request") createEventRequest: UpdateEventRequest,
+        @Part updateEventRequest: MultipartBody.Part,
         @Part photos: List<MultipartBody.Part>
-    ): Response<Unit>
+    ): Response<EventDto>
 
     @DELETE("/event")
     suspend fun deleteEvent(@Query("eventId") eventId: String): Response<Unit>
