@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,13 +25,15 @@ fun TaskyScaffold(
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     title: String? = null,
     showRoundedBordersBackground: Boolean = true,
-    content: @Composable () -> Unit,
+    snackbarHost: @Composable () -> Unit = {},
+    content: @Composable () -> Unit
 ) {
     Scaffold(
         topBar = topAppBar,
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
-        modifier = modifier
+        modifier = modifier,
+        snackbarHost = snackbarHost
     ) { innerPadding ->
         if (showRoundedBordersBackground) {
             RoundedBordersBackground(

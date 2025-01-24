@@ -3,5 +3,11 @@ package com.humberto.tasky.core.domain
 import kotlinx.coroutines.flow.Flow
 
 interface ConnectivityObserver {
-    val isConnected: Flow<Boolean>
+    fun startObserving(): Flow<ConnectivityStatus>
+
+    enum class ConnectivityStatus {
+        Available, Unavailable, Lost;
+
+        fun isConnected() = this == Available
+    }
 }

@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import kotlinx.parcelize.RawValue
 
 sealed interface UiText {
     data class DynamicString(val value: String): UiText
     class StringResource(
         @StringRes val id: Int,
-        val args: Array<Any> = arrayOf()
+        vararg val args: @RawValue Any
     ): UiText
 
     @Composable

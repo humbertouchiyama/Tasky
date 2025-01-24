@@ -63,7 +63,9 @@ class AgendaDetailsViewModel @Inject constructor(
             id = agendaDetailsArgs.agendaItemId,
             isEditing = agendaDetailsArgs.isEditing,
             agendaItem = when(agendaDetailsArgs.agendaItemType) {
-                AgendaItemType.EVENT -> AgendaItemDetails.Event()
+                AgendaItemType.EVENT -> AgendaItemDetails.Event(
+                    isUserEventCreator = agendaDetailsArgs.agendaItemId == null
+                )
                 AgendaItemType.TASK -> AgendaItemDetails.Task()
                 AgendaItemType.REMINDER -> AgendaItemDetails.Reminder
             }
@@ -85,12 +87,7 @@ class AgendaDetailsViewModel @Inject constructor(
     private val deletedRemotePhotos = MutableStateFlow<List<EventPhoto.Remote>>(emptyList())
 
     init {
-        agendaDetailsArgs.agendaItemId?.let { id ->
-            getItemById(
-                id = id,
-                type = agendaDetailsArgs.agendaItemType
-            )
-        }
+        fetchAgendaItemIfExists()
         agendaDetailsArgs.selectedDateEpochDay?.let { selectedDateEpochDay ->
             _state.update { currentState ->
                 val selectedLocalDate = LocalDate.ofEpochDay(selectedDateEpochDay)
@@ -104,7 +101,29 @@ class AgendaDetailsViewModel @Inject constructor(
         }
         observeConnectivityStatus()
     }
-    
+
+    private fun fetchAgendaItemIfExists() {
+        agendaDetailsArgs.agendaItemId?.let { id ->
+            viewModelScope.launch {
+                _state.update { it.copy(isLoadingItem = true) }
+                when (agendaDetailsArgs.agendaItemType) {
+                    AgendaItemType.TASK -> taskRepository.getTask(id)
+                    AgendaItemType.EVENT -> eventRepository.getEvent(id)
+                    AgendaItemType.REMINDER -> reminderRepository.getReminder(id)
+                }.onSuccess { agendaItem ->
+                    _state.update { it.updateWithAgendaItem(agendaItem) }
+                }.onError { error ->
+                    _state.update {
+                        it.copy(
+                            infoMessage = error.asUiText(),
+                            isLoadingItem = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun updateStateWithEditTextArgs(editTextArgs: EditTextArgs?) {
         _state.update { currentState ->
             when(editTextArgs?.editTextScreenType) {
@@ -132,26 +151,6 @@ class AgendaDetailsViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
-    }
-
-    private fun getItemById(id: String, type: AgendaItemType) {
-        viewModelScope.launch {
-            val result = when (type) {
-                AgendaItemType.TASK -> taskRepository.getTask(id)
-                AgendaItemType.EVENT -> eventRepository.getEvent(id)
-                AgendaItemType.REMINDER -> reminderRepository.getReminder(id)
-            }
-
-            when (result) {
-                is Result.Success -> {
-                    val agendaItem = result.data
-                    _state.value = _state.value.updateWithAgendaItem(agendaItem)
-                }
-                is Result.Error -> {
-                    eventChannel.send(AgendaDetailsEvent.Error(result.error.asUiText()))
-                }
-            }
-        }
     }
 
     private fun toggleEditingState() {

@@ -8,28 +8,36 @@ import com.humberto.tasky.core.domain.ConnectivityObserver
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AndroidConnectivityObserver @Inject constructor(
     private val connectivityManager: ConnectivityManager
 ): ConnectivityObserver {
 
-    override val isConnected: Flow<Boolean>
-        get() = callbackFlow {
+    override fun startObserving(): Flow<ConnectivityObserver.ConnectivityStatus> {
+        return callbackFlow<ConnectivityObserver.ConnectivityStatus> {
             val callback = object : NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    trySend(true)
+                    launch {
+                        send(ConnectivityObserver.ConnectivityStatus.Available)
+                    }
                 }
 
                 override fun onLost(network: Network) {
                     super.onLost(network)
-                    trySend(false)
+                    launch {
+                        send(ConnectivityObserver.ConnectivityStatus.Lost)
+                    }
                 }
 
                 override fun onUnavailable() {
                     super.onUnavailable()
-                    trySend(false)
+                    launch {
+                        send(ConnectivityObserver.ConnectivityStatus.Unavailable)
+                    }
                 }
 
                 override fun onCapabilitiesChanged(
@@ -40,7 +48,12 @@ class AndroidConnectivityObserver @Inject constructor(
                     val connected = networkCapabilities.hasCapability(
                         NetworkCapabilities.NET_CAPABILITY_VALIDATED
                     )
-                    trySend(connected)
+                    launch {
+                        send(if(connected)
+                            ConnectivityObserver.ConnectivityStatus.Available else
+                                ConnectivityObserver.ConnectivityStatus.Unavailable
+                        )
+                    }
                 }
             }
 
@@ -48,6 +61,7 @@ class AndroidConnectivityObserver @Inject constructor(
 
             awaitClose {
                 connectivityManager.unregisterNetworkCallback(callback)
-            }
-        }
+                }
+        }.distinctUntilChanged()
+    }
 }

@@ -49,7 +49,7 @@
     <string name="to_label">To</string>
     <string name="at">At</string>
     <string name="add_title">Add title</string>
-    <string name="saved_successful">Saved changes successfully!</string>
+    <string name="item_created_successfully">Item created successfully!</string>
     <string name="delete_successful">Item deleted successfully!</string>
     <string name="add_description">Add description, e.g., project timeline</string>
     <string name="ten_minutes_before">10 minutes before</string>
