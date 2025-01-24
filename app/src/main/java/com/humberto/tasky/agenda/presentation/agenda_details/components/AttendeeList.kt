@@ -22,18 +22,10 @@ import com.humberto.tasky.agenda.presentation.agenda_details.model.AttendeeUi
 fun AttendeeList(
     modifier: Modifier = Modifier,
     attendeeList: List<AttendeeUi>,
-    selectedAttendanceFilter: FilterType
+    selectedAttendanceFilter: FilterType,
+    eventCreator: AttendeeUi?
 ) {
-    val goingList by remember(attendeeList) {
-        mutableStateOf(
-            attendeeList.filter { it.isGoing }
-        )
-    }
-    val notGoingList by remember(attendeeList) {
-        mutableStateOf(
-            attendeeList.filter { !it.isGoing }
-        )
-    }
+    val (goingList, notGoingList) = attendeeList.partition { it.isGoing }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -50,7 +42,8 @@ fun AttendeeList(
                 goingList.forEach { attendee ->
                     AttendeeListItem(
                         onDeleteClick = { },
-                        attendee = attendee
+                        attendee = attendee,
+                        isCreator = attendee.userId == eventCreator?.userId
                     )
                 }
             }
@@ -67,7 +60,8 @@ fun AttendeeList(
                 notGoingList.forEach { attendee ->
                     AttendeeListItem(
                         onDeleteClick = { },
-                        attendee = attendee
+                        attendee = attendee,
+                        isCreator = attendee.userId == eventCreator?.userId
                     )
                 }
             }

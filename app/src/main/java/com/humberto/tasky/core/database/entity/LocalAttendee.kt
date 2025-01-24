@@ -8,6 +8,5 @@ data class LocalAttendee(
     val email: String,
     val fullName: String,
     val eventId: String,
-    val isGoing: Boolean,
-    val isEventCreator: Boolean
+    val isGoing: Boolean
 )

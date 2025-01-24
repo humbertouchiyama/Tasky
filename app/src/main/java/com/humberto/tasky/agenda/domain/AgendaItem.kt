@@ -21,7 +21,8 @@ sealed class AgendaItem(
         val to: ZonedDateTime,
         val attendees: List<Attendee>,
         val photos: List<EventPhoto>,
-        val isUserEventCreator: Boolean
+        val isUserEventCreator: Boolean,
+        val host: String?,
     ) : AgendaItem(id, title, description, from, reminderType) {
 
         fun getAttendee(userId: String): Attendee? {

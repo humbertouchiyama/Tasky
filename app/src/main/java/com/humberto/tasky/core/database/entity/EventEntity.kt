@@ -16,5 +16,6 @@ data class EventEntity(
     val remindAt: Long,
     val isUserEventCreator: Boolean,
     val attendees: List<LocalAttendee>,
-    val photos: List<EventPhoto.Remote>
+    val photos: List<EventPhoto.Remote>,
+    val host: String?
 )
