@@ -36,7 +36,8 @@ import com.humberto.tasky.core.presentation.designsystem.components.ProfileMenuB
 fun AttendeeListItem(
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit,
-    attendee: AttendeeUi
+    attendee: AttendeeUi,
+    isCreator: Boolean
 ) {
     Row(
         modifier = modifier
@@ -59,7 +60,7 @@ fun AttendeeListItem(
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        if(attendee.isEventCreator) {
+        if(isCreator) {
             Text(
                 text = stringResource(id = R.string.creator),
                 fontSize = 14.sp,
@@ -94,9 +95,9 @@ private fun AttendeeListItemPreview() {
                 userId = "123",
                 fullName = "Humberto Costa",
                 email = "test@email.com",
-                isGoing = true,
-                isEventCreator = false
+                isGoing = true
             ),
+            isCreator = true
         )
     }
 }

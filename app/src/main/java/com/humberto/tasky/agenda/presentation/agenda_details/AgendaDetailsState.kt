@@ -21,6 +21,7 @@ data class AgendaDetailsState(
     val isDeleting: Boolean = false,
     val showNotificationRationale: Boolean = false,
     val infoMessage: UiText? = null,
+    val isLoadingItem: Boolean = false
 )
 
 sealed interface AgendaItemDetails {
@@ -31,11 +32,12 @@ sealed interface AgendaItemDetails {
         val eventPhotos: List<EventPhoto> = emptyList(),
         val canEditPhotos: Boolean = false,
         val isAddingPhoto: Boolean = false,
-        val isUserEventCreator: Boolean = true,
+        val isUserEventCreator: Boolean = false,
         val isAddingAttendee: Boolean = false,
         val isCheckingIfAttendeeExists: Boolean = false,
         val attendees: List<AttendeeUi> = listOf(),
-        val newAttendeeEmail: TextFieldState = TextFieldState()
+        val newAttendeeEmail: TextFieldState = TextFieldState(),
+        val eventCreator: AttendeeUi? = null,
     ): AgendaItemDetails
 
     data class Task(val isDone: Boolean = false): AgendaItemDetails
