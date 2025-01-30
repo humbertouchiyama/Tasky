@@ -34,8 +34,8 @@ interface ReminderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReminderPendingSync(reminderPendingSyncEntity: ReminderPendingSyncEntity)
 
-    @Query("SELECT * from reminderpendingsyncentity WHERE userId = :userId AND reminderId = :reminderId")
-    suspend fun getReminderPendingSync(userId: String, reminderId: String): ReminderPendingSyncEntity
+    @Query("SELECT * from reminderpendingsyncentity WHERE userId = :userId")
+    suspend fun getPendingRemindersSync(userId: String): List<ReminderPendingSyncEntity>
 
     @Query("DELETE FROM reminderpendingsyncentity WHERE reminderId = :reminderId")
     suspend fun deleteReminderPendingSync(reminderId: String)

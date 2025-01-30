@@ -2,6 +2,7 @@ package com.humberto.tasky.agenda.data.task
 
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
+import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.entity.TaskEntity
 import com.humberto.tasky.core.database.entity.TaskPendingSyncEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
@@ -42,13 +43,6 @@ fun AgendaItem.Task.toTaskRequest(): TaskRequest {
         time = from,
         remindAt = remindAt,
         isDone = isDone
-    )
-}
-
-fun TaskEntity.toTaskPendingSyncEntity(userId: String): TaskPendingSyncEntity {
-    return TaskPendingSyncEntity(
-        userId = userId,
-        task = this
     )
 }
 

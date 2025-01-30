@@ -2,17 +2,17 @@ package com.humberto.tasky.agenda.di
 
 import android.app.Application
 import android.content.Context
-import androidx.work.WorkManager
 import com.humberto.tasky.agenda.data.agenda.AgendaApiService
 import com.humberto.tasky.agenda.data.agenda.AgendaRepositoryImpl
+import com.humberto.tasky.agenda.data.agenda.AgendaSynchronizerImpl
 import com.humberto.tasky.agenda.data.event.EventRepositoryImpl
 import com.humberto.tasky.agenda.data.event.EventUploaderImpl
-import com.humberto.tasky.agenda.data.helper.WorkerHelper
 import com.humberto.tasky.agenda.data.photo.BitmapPhotoCompressor
 import com.humberto.tasky.agenda.data.photo.PhotoExtensionParserImpl
 import com.humberto.tasky.agenda.data.reminder.ReminderRepositoryImpl
 import com.humberto.tasky.agenda.data.task.TaskRepositoryImpl
 import com.humberto.tasky.agenda.domain.AgendaRepository
+import com.humberto.tasky.agenda.domain.AgendaSynchronizer
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.event.EventUploader
 import com.humberto.tasky.agenda.domain.photo.PhotoCompressor
@@ -25,7 +25,6 @@ import com.humberto.tasky.core.database.dao.EventDao
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.dao.TaskDao
 import com.humberto.tasky.core.domain.repository.SessionManager
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,14 +85,12 @@ class AgendaModule {
     fun providesReminderRepository(
         reminderDao: ReminderDao,
         agendaApi: AgendaApiService,
-        sessionManager: SessionManager,
-        workerHelper: WorkerHelper
+        sessionManager: SessionManager
     ): ReminderRepository {
         return ReminderRepositoryImpl(
             reminderDao,
             agendaApi,
-            sessionManager,
-            workerHelper
+            sessionManager
         )
     }
 
@@ -101,32 +98,20 @@ class AgendaModule {
     fun providesTaskRepository(
         reminderDao: TaskDao,
         agendaApi: AgendaApiService,
-        sessionManager: SessionManager,
-        workerHelper: WorkerHelper
+        sessionManager: SessionManager
     ): TaskRepository {
         return TaskRepositoryImpl(
             reminderDao,
             agendaApi,
-            sessionManager,
-            workerHelper
+            sessionManager
         )
     }
 
     @Provides
     @Singleton
-    fun providesWorkManager(
-        @ApplicationContext context: Context
-    ): WorkManager = WorkManager.getInstance(context)
-
-    @Provides
-    @Singleton
-    fun provideWorkerHelper(workManager: WorkManager): WorkerHelper = WorkerHelper(workManager)
-
-    @Provides
-    @Singleton
     fun providesEventUploader(
-        workManager: WorkManager
-    ): EventUploader = EventUploaderImpl(workManager)
+        app: Application
+    ): EventUploader = EventUploaderImpl(app)
 
     @Provides
     @Singleton
@@ -142,5 +127,11 @@ class AgendaModule {
         application: Application
     ): PhotoExtensionParser {
         return PhotoExtensionParserImpl(application)
+    }
+
+    @Provides
+    @Singleton
+    fun providesAgendaSynchronizer(app: Application): AgendaSynchronizer {
+        return AgendaSynchronizerImpl(app)
     }
 }

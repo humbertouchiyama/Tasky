@@ -2,27 +2,25 @@ package com.humberto.tasky.agenda.data.reminder
 
 import android.database.sqlite.SQLiteFullException
 import com.humberto.tasky.agenda.data.agenda.AgendaApiService
-import com.humberto.tasky.agenda.data.helper.WorkerHelper
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
-import com.humberto.tasky.agenda.domain.reminder.ReminderRepository.Companion.REMINDER_ID
 import com.humberto.tasky.core.data.networking.safeCall
+import com.humberto.tasky.core.database.ModificationType
 import com.humberto.tasky.core.database.dao.ReminderDao
 import com.humberto.tasky.core.database.entity.DeletedReminderSyncEntity
+import com.humberto.tasky.core.database.entity.ReminderPendingSyncEntity
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.DataError
 import com.humberto.tasky.core.domain.util.EmptyResult
 import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.isRetryable
 import com.humberto.tasky.core.domain.util.onError
-import com.humberto.tasky.core.domain.util.onSuccess
 import javax.inject.Inject
 
 class ReminderRepositoryImpl @Inject constructor(
     private val reminderDao: ReminderDao,
     private val agendaApi: AgendaApiService,
-    private val sessionManager: SessionManager,
-    private val workerHelper: WorkerHelper
+    private val sessionManager: SessionManager
 ): ReminderRepository {
 
     private val localUserId: String?
@@ -46,13 +44,11 @@ class ReminderRepositoryImpl @Inject constructor(
             }.onError { error ->
                 if (error.isRetryable()) {
                     reminderDao.insertReminderPendingSync(
-                        reminderEntity.toReminderPendingSyncEntity(
-                            userId = localUserId!!
+                        ReminderPendingSyncEntity(
+                            userId = localUserId!!,
+                            reminder = reminderEntity,
+                            type = ModificationType.Created
                         )
-                    )
-                    workerHelper.enqueueSyncPendingWorker<CreateReminderWorker>(
-                        idKey = REMINDER_ID,
-                        id = reminder.id
                     )
                     return Result.Success(Unit)
                 }
@@ -72,13 +68,11 @@ class ReminderRepositoryImpl @Inject constructor(
             }.onError { error ->
                 if (error.isRetryable()) {
                     reminderDao.insertReminderPendingSync(
-                        reminderEntity.toReminderPendingSyncEntity(
-                            userId = localUserId!!
+                        ReminderPendingSyncEntity(
+                            userId = localUserId!!,
+                            reminder = reminderEntity,
+                            type = ModificationType.Updated
                         )
-                    )
-                    workerHelper.enqueueSyncPendingWorker<UpdateReminderWorker>(
-                        idKey = REMINDER_ID,
-                        id = reminder.id
                     )
                     return Result.Success(Unit)
                 }
@@ -102,30 +96,6 @@ class ReminderRepositoryImpl @Inject constructor(
                     )
                 )
             }
-        }
-    }
-
-    override suspend fun syncPendingUpdateReminder(reminderId: String) {
-        val pendingReminderEntity = reminderDao.getReminderPendingSync(
-            userId = localUserId ?: "",
-            reminderId = reminderId
-        )
-        safeCall {
-            agendaApi.updateReminder(pendingReminderEntity.reminder.toReminder().toReminderRequest())
-        }.onSuccess {
-            reminderDao.deleteReminderPendingSync(pendingReminderEntity.reminderId)
-        }
-    }
-
-    override suspend fun syncPendingCreateReminder(reminderId: String) {
-        val pendingReminderEntity = reminderDao.getReminderPendingSync(
-            userId = localUserId ?: "",
-            reminderId = reminderId
-        )
-        safeCall {
-            agendaApi.createReminder(pendingReminderEntity.reminder.toReminder().toReminderRequest())
-        }.onSuccess {
-            reminderDao.deleteReminderPendingSync(pendingReminderEntity.reminderId)
         }
     }
 }

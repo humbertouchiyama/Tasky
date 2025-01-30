@@ -10,8 +10,6 @@ interface TaskRepository {
     suspend fun createTask(task: AgendaItem.Task): EmptyResult<DataError>
     suspend fun updateTask(task: AgendaItem.Task): EmptyResult<DataError>
     suspend fun deleteTask(taskId: String): EmptyResult<DataError>
-    suspend fun syncPendingUpdateTask(taskId: String)
-    suspend fun syncPendingCreateTask(taskId: String)
     companion object {
         const val TASK_ID = "TASK_ID"
     }
