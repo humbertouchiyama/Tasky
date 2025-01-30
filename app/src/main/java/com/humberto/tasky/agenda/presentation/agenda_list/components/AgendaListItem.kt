@@ -24,11 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.humberto.tasky.R
 import com.humberto.tasky.agenda.domain.AgendaItem
-import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
-import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
-import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemDetails
-import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import com.humberto.tasky.core.presentation.designsystem.TaskyBlack
 import com.humberto.tasky.core.presentation.designsystem.TaskyBrown
 import com.humberto.tasky.core.presentation.designsystem.TaskyDarkGray
@@ -40,40 +36,42 @@ import com.humberto.tasky.core.presentation.designsystem.TaskyWhite
 import com.humberto.tasky.core.presentation.designsystem.components.MoreButtonWithDropDownMenu
 import com.humberto.tasky.core.presentation.designsystem.components.TaskyRadioButton
 import com.humberto.tasky.core.presentation.designsystem.components.util.DropDownItem
+import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AgendaListItem(
-    modifier: Modifier = Modifier,
     onCheckItem: () -> Unit = { },
     onOpenItem: () -> Unit,
     onEditItem: () -> Unit,
     onDeleteItem: () -> Unit,
-    agendaItem: AgendaItemUi
+    agendaItem: AgendaItem,
+    modifier: Modifier = Modifier
 ) {
-    val backgroundColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.EVENT -> TaskyLightGreen
-        AgendaItemType.TASK -> TaskyGreen
-        AgendaItemType.REMINDER -> TaskyLight2
+    val backgroundColor = when (agendaItem) {
+        is AgendaItem.Event -> TaskyLightGreen
+        is AgendaItem.Reminder -> TaskyLight2
+        is AgendaItem.Task -> TaskyGreen
     }
 
-    val foregroundColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.TASK -> TaskyWhite
+    val foregroundColor = when (agendaItem) {
+        is AgendaItem.Task -> TaskyWhite
         else -> TaskyBlack
     }
 
-    val textColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.TASK -> TaskyWhite
+    val textColor = when (agendaItem) {
+        is AgendaItem.Task -> TaskyWhite
         else -> TaskyDarkGray
     }
 
-    val moreButtonColor = when (agendaItem.agendaItemType) {
-        AgendaItemType.TASK -> TaskyWhite
+    val moreButtonColor = when (agendaItem) {
+        is AgendaItem.Task -> TaskyWhite
         else -> TaskyBrown
     }
 
-    val isSelected = when (agendaItem.itemDetails) {
-        is AgendaItemDetails.Task -> agendaItem.itemDetails.isDone
+    val isSelected = when (agendaItem) {
+        is AgendaItem.Task -> agendaItem.isDone
         else -> false
     }
 
@@ -96,7 +94,7 @@ fun AgendaListItem(
             ) {
                 TaskyRadioButton(
                     selected = isSelected,
-                    enabled = agendaItem.isItemCheckable,
+                    enabled = agendaItem is AgendaItem.Task,
                     onClick = { onCheckItem() },
                     radioButtonColor = foregroundColor,
                     modifier = Modifier.padding(2.dp)
@@ -119,7 +117,7 @@ fun AgendaListItem(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = agendaItem.description,
+                        text = agendaItem.description ?: "",
                         color = textColor,
                         style = MaterialTheme.typography.bodyLarge,
                         minLines = 2,
@@ -150,10 +148,18 @@ fun AgendaListItem(
             modifier = Modifier.fillMaxWidth(),
             color = textColor,
             textAlign = TextAlign.End,
-            text = agendaItem.dateTime,
+            text = agendaItem.from.toFormattedDateTime(),
             style = MaterialTheme.typography.bodyLarge
         )
     }
+}
+
+private fun ZonedDateTime.toFormattedDateTime(): String {
+    val timeInLocalTime = this
+        .withZoneSameInstant(ZoneId.systemDefault())
+    return DateTimeFormatter
+        .ofPattern("MMM dd, HH:mm")
+        .format(timeInLocalTime)
 }
 
 @Preview
@@ -161,15 +167,14 @@ fun AgendaListItem(
 private fun AgendaListItemPreview() {
     TaskyTheme {
         AgendaListItem(
-            agendaItem =
-            AgendaItem.Task(
+            agendaItem = AgendaItem.Task(
                 id = "1",
                 title = "Meeting",
                 description = "Description",
                 from = ZonedDateTime.now(),
                 reminderType = ReminderType.ThirtyMinutes,
                 isDone = true
-            ).toAgendaItemUi(),
+            ),
             onOpenItem = { },
             onEditItem = { },
             onDeleteItem = { }

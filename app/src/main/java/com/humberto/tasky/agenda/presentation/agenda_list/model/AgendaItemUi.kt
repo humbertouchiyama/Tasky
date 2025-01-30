@@ -1,28 +1,30 @@
 package com.humberto.tasky.agenda.presentation.agenda_list.model
 
-import com.humberto.tasky.agenda.domain.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItem
 import java.time.ZonedDateTime
 
-data class AgendaItemUi(
-    val id: String,
-    val title: String,
-    val description: String = "",
-    val dateTime: String,
-    val agendaItemType: AgendaItemType,
-    val from: ZonedDateTime,
-    val itemDetails: AgendaItemDetails
-) {
-    val isItemCheckable
-        get() = agendaItemType == AgendaItemType.TASK
+sealed interface AgendaItemUi {
+    data class Item(val item: AgendaItem): AgendaItemUi
+    data object Needle: AgendaItemUi
 }
 
-sealed interface AgendaItemDetails {
-    data class Event(
-        val to: ZonedDateTime,
-        val isUserEventCreator: Boolean
-    ): AgendaItemDetails
+fun insertNeedle(items: List<AgendaItemUi>): List<AgendaItemUi> {
+    val now = ZonedDateTime.now()
 
-    data class Task(val isDone: Boolean = false): AgendaItemDetails
+    val itemsWithoutNeedle = items.filter { it !is AgendaItemUi.Needle }
 
-    data object Reminder: AgendaItemDetails
+    val sortedItems = itemsWithoutNeedle
+        .filterIsInstance<AgendaItemUi.Item>()
+        .sortedBy { it.item.from }
+
+    val needlePosition = sortedItems.indexOfFirst { it.item.from.isAfter(now) }
+
+    val position = if (needlePosition == -1) sortedItems.size else needlePosition
+
+    return sortedItems
+        .map { it as AgendaItemUi }
+        .toMutableList()
+        .apply {
+            add(position, AgendaItemUi.Needle)
+        }
 }

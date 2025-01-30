@@ -2,13 +2,14 @@ package com.humberto.tasky.agenda.presentation.agenda_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.humberto.tasky.agenda.domain.AgendaItemType
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.domain.AgendaRepository
 import com.humberto.tasky.agenda.domain.AgendaSynchronizer
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
-import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
+import com.humberto.tasky.agenda.presentation.agenda_list.model.insertNeedle
 import com.humberto.tasky.auth.domain.toInitials
 import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.alarm.AlarmScheduler
@@ -106,8 +107,13 @@ class AgendaViewModel @Inject constructor(
                 _agendaState.update { it.copy(confirmingItemToBeDeleted = null) }
             }
             AgendaAction.OnRefresh -> refreshAgenda()
+            is AgendaAction.OnToggleCheckForTask -> toggleTaskCheck()
             else -> Unit
         }
+    }
+
+    private fun toggleTaskCheck() {
+        TODO("Not yet implemented")
     }
 
     private var refreshJob: Job? = null
@@ -157,7 +163,7 @@ class AgendaViewModel @Inject constructor(
                 .collect { agendaItems ->
                     _agendaState.update { state ->
                         state.copy(
-                            agendaItems = agendaItems.map { it.toAgendaItemUi() },
+                            agendaItems = insertNeedle(agendaItems.map { AgendaItemUi.Item(it) }),
                             isLoadingAgendaItems = false
                         )
                     }
@@ -168,13 +174,13 @@ class AgendaViewModel @Inject constructor(
     private fun deleteItem() {
         applicationScope.launch {
             _agendaState.update { it.copy(isDeletingItem = true) }
-            _agendaState.value.confirmingItemToBeDeleted?.let { itemUi ->
-                when(itemUi.agendaItemType) {
-                    AgendaItemType.TASK -> taskRepository.deleteTask(itemUi.id)
-                    AgendaItemType.EVENT -> eventRepository.deleteEvent(itemUi.id)
-                    AgendaItemType.REMINDER -> reminderRepository.deleteReminder(itemUi.id)
+            _agendaState.value.confirmingItemToBeDeleted?.let { item ->
+                when (item) {
+                    is AgendaItem.Event -> eventRepository.deleteEvent(item.id)
+                    is AgendaItem.Reminder -> reminderRepository.deleteReminder(item.id)
+                    is AgendaItem.Task -> taskRepository.deleteTask(item.id)
                 }.onSuccess {
-                    alarmScheduler.cancelAlarm(itemUi.id)
+                    alarmScheduler.cancelAlarm(item.id)
                 }.onError { error ->
                     eventChannel.send(AgendaEvent.Error(error.asUiText()))
                 }
