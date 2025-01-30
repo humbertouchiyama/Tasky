@@ -7,7 +7,14 @@ import com.humberto.tasky.core.domain.util.Result
 
 interface EventRepository {
     suspend fun getEvent(eventId: String): Result<AgendaItem, DataError>
-    suspend fun createEvent(agendaItem: AgendaItem.Event): EmptyResult<DataError>
-    suspend fun deleteEvent(eventId: String)
+    suspend fun createEvent(event: AgendaItem.Event): Result<PhotoSizeTooLargeCount, DataError>
+    suspend fun updateEvent(
+        event: AgendaItem.Event,
+        deletedRemotePhotoKeys: List<String>
+    ): Result<PhotoSizeTooLargeCount, DataError>
+    suspend fun deleteEvent(eventId: String): EmptyResult<DataError>
     suspend fun checkAttendeeExists(email: String): Result<Attendee, DataError>
+    companion object {
+        const val EVENT_ID = "EVENT_ID"
+    }
 }

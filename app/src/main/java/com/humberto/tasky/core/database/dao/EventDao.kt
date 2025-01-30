@@ -1,20 +1,23 @@
 package com.humberto.tasky.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.humberto.tasky.core.database.entity.DeletedEventSyncEntity
 import com.humberto.tasky.core.database.entity.EventEntity
-import com.humberto.tasky.core.database.entity.PhotoEntity
+import com.humberto.tasky.core.database.entity.EventPendingSyncEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventDao {
 
     @Upsert
-    suspend fun upsertEvent(reminderEntity: EventEntity)
+    suspend fun upsertEvent(eventEntity: EventEntity)
 
     @Upsert
-    suspend fun upsertEvents(reminderEntities: List<EventEntity>)
+    suspend fun upsertEvents(eventEntities: List<EventEntity>)
 
     @Query("""
         SELECT * FROM evententity 
@@ -32,6 +35,21 @@ interface EventDao {
     @Query("DELETE FROM evententity")
     suspend fun deleteAllEvents()
 
-    @Query("SELECT * FROM photoentity WHERE `key` IN (:keys)")
-    suspend fun getPhotosByKeys(keys: List<String>): List<PhotoEntity>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEventPendingSync(eventPendingSyncEntity: EventPendingSyncEntity)
+
+    @Query("SELECT * from eventpendingsyncentity WHERE userId = :userId")
+    suspend fun getPendingEventsSync(userId: String): List<EventPendingSyncEntity>
+
+    @Query("DELETE FROM eventpendingsyncentity WHERE eventId = :eventId")
+    suspend fun deleteEventPendingSync(eventId: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertDeletedEventSync(deletedEventSyncEntity: DeletedEventSyncEntity)
+
+    @Query("SELECT eventId from deletedeventsyncentity WHERE userId = :userId")
+    suspend fun getDeletedEventSync(userId: String): List<String>
+
+    @Query("DELETE FROM deletedeventsyncentity WHERE eventId IN (:eventIds)")
+    suspend fun deleteDeletedEventsSync(eventIds: List<String>)
 }
