@@ -1,5 +1,6 @@
 package com.humberto.tasky.agenda.presentation.agenda_list
 
+import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_list.model.AgendaItemUi
 import com.humberto.tasky.core.presentation.ui.UiText
 import com.humberto.tasky.core.presentation.ui.buildHeaderDate
@@ -14,7 +15,7 @@ data class AgendaState(
     val isLoggingOut: Boolean = false,
     val agendaItems: List<AgendaItemUi> = listOf(),
     val isLoadingAgendaItems: Boolean = false,
-    val confirmingItemToBeDeleted: AgendaItemUi? = null,
+    val confirmingItemToBeDeleted: AgendaItem? = null,
     val isDeletingItem: Boolean = false,
     val isSyncingPendingItems: Boolean = false,
     val isRefreshing: Boolean = false
