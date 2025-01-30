@@ -10,9 +10,4 @@ interface ReminderRepository {
     suspend fun createReminder(reminder: AgendaItem.Reminder): EmptyResult<DataError>
     suspend fun updateReminder(reminder: AgendaItem.Reminder): EmptyResult<DataError>
     suspend fun deleteReminder(reminderId: String): EmptyResult<DataError>
-    suspend fun syncPendingUpdateReminder(reminderId: String)
-    suspend fun syncPendingCreateReminder(reminderId: String)
-    companion object {
-        const val REMINDER_ID = "REMINDER_ID"
-    }
 }

@@ -3,7 +3,6 @@ package com.humberto.tasky.agenda.data.reminder
 import com.humberto.tasky.agenda.domain.AgendaItem
 import com.humberto.tasky.agenda.presentation.agenda_details.ReminderType
 import com.humberto.tasky.core.database.entity.ReminderEntity
-import com.humberto.tasky.core.database.entity.ReminderPendingSyncEntity
 import com.humberto.tasky.core.domain.util.toZonedDateTime
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -39,13 +38,6 @@ fun AgendaItem.Reminder.toReminderRequest(): ReminderRequest {
         description = description,
         time = from,
         remindAt = remindAt
-    )
-}
-
-fun ReminderEntity.toReminderPendingSyncEntity(userId: String): ReminderPendingSyncEntity {
-    return ReminderPendingSyncEntity(
-        userId = userId,
-        reminder = this
     )
 }
 

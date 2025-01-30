@@ -2,21 +2,16 @@ package com.humberto.tasky.agenda.presentation.agenda_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
-import com.humberto.tasky.agenda.data.agenda.SyncFullAgendaWorker
+import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.domain.AgendaRepository
+import com.humberto.tasky.agenda.domain.AgendaSynchronizer
 import com.humberto.tasky.agenda.domain.event.EventRepository
 import com.humberto.tasky.agenda.domain.reminder.ReminderRepository
 import com.humberto.tasky.agenda.domain.task.TaskRepository
-import com.humberto.tasky.agenda.domain.AgendaItemType
 import com.humberto.tasky.agenda.presentation.agenda_list.mapper.toAgendaItemUi
 import com.humberto.tasky.auth.domain.toInitials
-import com.humberto.tasky.core.domain.alarm.AlarmScheduler
 import com.humberto.tasky.core.domain.ConnectivityObserver
+import com.humberto.tasky.core.domain.alarm.AlarmScheduler
 import com.humberto.tasky.core.domain.repository.SessionManager
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
@@ -25,19 +20,19 @@ import com.humberto.tasky.core.presentation.ui.buildHeaderDate
 import com.humberto.tasky.core.presentation.ui.displayUpperCaseMonth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,8 +44,8 @@ class AgendaViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val reminderRepository: ReminderRepository,
     private val alarmScheduler: AlarmScheduler,
-    connectivityObserver: ConnectivityObserver,
-    private val workManager: WorkManager
+    private val connectivityObserver: ConnectivityObserver,
+    private val agendaSynchronizer: AgendaSynchronizer
 ): ViewModel() {
 
     private val _agendaState = MutableStateFlow(AgendaState())
@@ -59,33 +54,11 @@ class AgendaViewModel @Inject constructor(
     private val eventChannel = Channel<AgendaEvent>()
     val events = eventChannel.receiveAsFlow()
 
-    private val isConnected = connectivityObserver
-        .isConnected
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            false
-        )
-
     init {
         buildUserInitials()
         getAgendaForDate(LocalDate.now())
-        syncFullAgenda()
-    }
-
-    private fun syncFullAgenda() {
-        val request = PeriodicWorkRequestBuilder<SyncFullAgendaWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(
-                Constraints(
-                    requiredNetworkType = NetworkType.CONNECTED
-                )
-            )
-            .build()
-        workManager.enqueueUniquePeriodicWork(
-            "SyncFullAgendaWork",
-            ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+        agendaSynchronizer.scheduleSync()
+        observeConnectivity()
     }
 
     private fun buildUserInitials() {
@@ -132,17 +105,51 @@ class AgendaViewModel @Inject constructor(
             AgendaAction.OnDismissDeleteAgendaItemClick -> {
                 _agendaState.update { it.copy(confirmingItemToBeDeleted = null) }
             }
-            AgendaAction.OnRefresh -> {
-                _agendaState.update { it.copy(isRefreshing = true) }
-                // agendaRepository.getAgenda()
-                _agendaState.update { it.copy(isRefreshing = false) }
-            }
+            AgendaAction.OnRefresh -> refreshAgenda()
             else -> Unit
         }
     }
 
+    private var refreshJob: Job? = null
+
+    private fun refreshAgenda() {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
+            _agendaState.update { it.copy(isRefreshing = true) }
+            agendaRepository.syncAndUpdateCache(
+                time = agendaState.value
+                    .selectedDate
+                    .atTime(12, 0)
+                    .atZone(ZoneId.systemDefault()),
+                updateTimeOnly = true
+            )
+                .onSuccess {
+                    _agendaState.update { it.copy(isRefreshing = false) }
+                }
+                .onError { error ->
+                    // show error msg
+                    _agendaState.update { it.copy(isRefreshing = false) }
+                }
+        }
+    }
+
+    private fun observeConnectivity() {
+        connectivityObserver
+            .startObserving()
+            .distinctUntilChanged()
+            .onEach { status ->
+                if (status == ConnectivityObserver.ConnectivityStatus.Available) {
+                    refreshAgenda()
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private var getAgendaForDateJob: Job? = null
+
     private fun getAgendaForDate(selectedDate: LocalDate) {
-        viewModelScope.launch {
+        getAgendaForDateJob?.cancel()
+        getAgendaForDateJob = viewModelScope.launch {
             _agendaState.update { state ->
                 state.copy(isLoadingAgendaItems = true)
             }
@@ -192,25 +199,6 @@ class AgendaViewModel @Inject constructor(
             eventChannel.send(AgendaEvent.LogoutSuccess)
             _agendaState.update { state ->
                 state.copy(isLoggingOut = false)
-            }
-        }
-    }
-
-    fun syncAllPendingItems() {
-        applicationScope.launch {
-            isConnected.collect { connected ->
-                if(connected && !_agendaState.value.isSyncingPendingItems) {
-                    _agendaState.update { state ->
-                        state.copy(isSyncingPendingItems = true)
-                    }
-                    listOf(
-                        async { agendaRepository.syncDeletedAgendaItems() },
-                    ).awaitAll()
-                    _agendaState.update { state ->
-                        state.copy(isSyncingPendingItems = false)
-                    }
-                    return@collect
-                }
             }
         }
     }

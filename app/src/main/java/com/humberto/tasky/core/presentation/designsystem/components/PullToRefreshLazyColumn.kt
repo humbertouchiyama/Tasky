@@ -36,7 +36,7 @@ fun <T> PullToRefreshLazyColumn(
         LazyColumn(
             state = lazyListState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         ) {
             items(items) {
                 content(it)
