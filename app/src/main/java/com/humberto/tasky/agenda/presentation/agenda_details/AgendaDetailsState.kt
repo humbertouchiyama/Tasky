@@ -37,7 +37,7 @@ sealed interface AgendaItemDetails {
         val isCheckingIfAttendeeExists: Boolean = false,
         val attendees: List<AttendeeUi> = listOf(),
         val newAttendeeEmail: TextFieldState = TextFieldState(),
-        val eventCreator: AttendeeUi? = null,
+        val eventCreator: AttendeeUi? = null
     ): AgendaItemDetails
 
     data class Task(val isDone: Boolean = false): AgendaItemDetails

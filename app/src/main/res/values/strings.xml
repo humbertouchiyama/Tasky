@@ -49,7 +49,6 @@
     <string name="to_label">To</string>
     <string name="at">At</string>
     <string name="add_title">Add title</string>
-    <string name="item_created_successfully">Item created successfully!</string>
     <string name="delete_successful">Item deleted successfully!</string>
     <string name="add_description">Add description, e.g., project timeline</string>
     <string name="ten_minutes_before">10 minutes before</string>
@@ -79,4 +78,11 @@
     <string name="error_internet_required_to_update_photos">You need an active internet connection to edit the photos</string>
     <string name="error_too_many_photos">The maximum supported amount of photos is %d</string>
     <string name="lost_connection">Ops, it looks like you lost the connection to the internet</string>
+    <string name="multiple_photos_too_large">%d photos were too large and were skipped.</string>
+    <string name="task_updated">Updated task successfully!</string>
+    <string name="event_updated">Updated event successfully!</string>
+    <string name="reminder_updated">Updated reminder successfully!</string>
+    <string name="task_created">Created task successfully!</string>
+    <string name="event_created">Created event successfully!</string>
+    <string name="reminder_created">Created reminder successfully!</string>
 </resources>

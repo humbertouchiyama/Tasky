@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -89,17 +92,10 @@ fun AgendaDetailsScreenRoot(
     ObserveAsEvents(viewModel.events) { event ->
         val selectedDateEpochDay = state.fromDate.toEpochDay()
         when(event) {
-            is AgendaDetailsEvent.Error -> {
+            is AgendaDetailsEvent.SaveSuccess -> {
                 Toast.makeText(
                     context,
-                    event.error.asString(context),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-            AgendaDetailsEvent.SaveSuccess -> {
-                Toast.makeText(
-                    context,
-                    R.string.item_created_successfully,
+                    event.message.asString(context),
                     Toast.LENGTH_LONG
                 ).show()
                 onBackClick(selectedDateEpochDay)
@@ -353,7 +349,12 @@ private fun AgendaDetailsScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackBarState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarState,
+                modifier = Modifier.padding(WindowInsets.ime.asPaddingValues())
+            )
+       },
     ) {
         Column(
             modifier = Modifier
