@@ -20,7 +20,6 @@ import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.alarm.AlarmScheduler
 import com.humberto.tasky.core.domain.util.DataError
-import com.humberto.tasky.core.domain.util.Result
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
 import com.humberto.tasky.core.mapper.toAlarmItem
@@ -168,12 +167,8 @@ class AgendaDetailsViewModel @Inject constructor(
                     )
                 }
             }
-            is AgendaDetailsAction.OnSaveClick -> {
-                saveItem()
-            }
-            AgendaDetailsAction.OnEditClick -> {
-                toggleEditingState()
-            }
+            is AgendaDetailsAction.OnSaveClick -> saveItem()
+            AgendaDetailsAction.OnEditClick -> toggleEditingState()
             is AgendaDetailsAction.OnSelectFromDate -> {
                 _state.update { currentState ->
                     currentState.copy(
@@ -226,9 +221,7 @@ class AgendaDetailsViewModel @Inject constructor(
                     )
                 }
             }
-            AgendaDetailsAction.OnConfirmDeleteClick -> {
-                deleteItem()
-            }
+            AgendaDetailsAction.OnConfirmDeleteClick -> deleteItem()
             AgendaDetailsAction.OnDismissDeleteClick -> {
                 _state.update { it.copy(isConfirmingToDelete = false) }
             }
@@ -256,9 +249,7 @@ class AgendaDetailsViewModel @Inject constructor(
                     )
                 }
             }
-            AgendaDetailsAction.OnAddAttendeeClick -> {
-                checkAndAddAttendee()
-            }
+            AgendaDetailsAction.OnAddAttendeeClick -> checkAndAddAttendee()
             is AgendaDetailsAction.SubmitNotificationPermissionInfo -> {
                 _state.update {
                     it.copy(
