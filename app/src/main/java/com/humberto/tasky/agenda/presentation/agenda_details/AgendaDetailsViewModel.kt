@@ -20,6 +20,7 @@ import com.humberto.tasky.agenda.presentation.edit_text.EditTextScreenType
 import com.humberto.tasky.core.domain.ConnectivityObserver
 import com.humberto.tasky.core.domain.alarm.AlarmScheduler
 import com.humberto.tasky.core.domain.util.DataError
+import com.humberto.tasky.core.domain.util.map
 import com.humberto.tasky.core.domain.util.onError
 import com.humberto.tasky.core.domain.util.onSuccess
 import com.humberto.tasky.core.mapper.toAlarmItem
@@ -236,7 +237,11 @@ class AgendaDetailsViewModel @Inject constructor(
                             )
                         }
                     } else {
-                        eventChannel.send(AgendaDetailsEvent.Error(UiText.StringResource(R.string.error_connected_to_add_attendees)))
+                        _state.update {
+                            it.copy(
+                                infoMessage = UiText.StringResource(R.string.error_connected_to_add_attendees)
+                            )
+                        }
                     }
                 }
             }
@@ -364,16 +369,33 @@ class AgendaDetailsViewModel @Inject constructor(
             }
             val agendaItem = _state.value.toAgendaItem()
             when(agendaItem) {
-                is AgendaItem.Task -> taskRepository.createTask(agendaItem)
+                is AgendaItem.Task -> taskRepository.createTask(agendaItem).map { 0 }
                 is AgendaItem.Event -> eventRepository.createEvent(agendaItem)
-                is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem)
-            }.onSuccess {
+                is AgendaItem.Reminder -> reminderRepository.createReminder(agendaItem).map { 0 }
+            }.onSuccess { count ->
                 alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
-                eventChannel.send(AgendaDetailsEvent.SaveSuccess)
-            }.onError {
-                eventChannel.send(AgendaDetailsEvent.Error(it.asUiText()))
+                _state.update { it.copy(isSaving = false) }
+                eventChannel.send(
+                    AgendaDetailsEvent.SaveSuccess(
+                        message = if (count > 0) {
+                            UiText.StringResource(R.string.multiple_photos_too_large, count)
+                        } else {
+                            when(agendaItem) {
+                                is AgendaItem.Task -> UiText.StringResource(R.string.task_created)
+                                is AgendaItem.Event -> UiText.StringResource(R.string.event_created)
+                                is AgendaItem.Reminder -> UiText.StringResource(R.string.reminder_created)
+                            }
+                        }
+                    )
+                )
+            }.onError { error ->
+                _state.update {
+                    it.copy(
+                        infoMessage = error.asUiText(),
+                        isSaving = false
+                    )
+                }
             }
-            _state.update { it.copy(isSaving = false) }
         }
     }
 
@@ -387,20 +409,37 @@ class AgendaDetailsViewModel @Inject constructor(
             }
             val agendaItem = _state.value.toAgendaItem()
             when(agendaItem) {
-                is AgendaItem.Task -> taskRepository.updateTask(agendaItem)
+                is AgendaItem.Task -> taskRepository.updateTask(agendaItem).map { 0 }
                 is AgendaItem.Event -> eventRepository.updateEvent(
                     event = agendaItem,
                     deletedRemotePhotoKeys = deletedRemotePhotos.value.map { it.key }
                 )
-                is AgendaItem.Reminder -> reminderRepository.updateReminder(agendaItem)
-            }.onSuccess {
+                is AgendaItem.Reminder -> reminderRepository.updateReminder(agendaItem).map { 0 }
+            }.onSuccess { count ->
                 alarmScheduler.cancelAlarm(agendaItem.id)
                 alarmScheduler.scheduleAlarm(agendaItem.toAlarmItem())
-                eventChannel.send(AgendaDetailsEvent.SaveSuccess)
-            }.onError {
-                eventChannel.send(AgendaDetailsEvent.Error(it.asUiText()))
+                _state.update { it.copy(isSaving = false) }
+                eventChannel.send(
+                    AgendaDetailsEvent.SaveSuccess(
+                        message = if (count > 0) {
+                            UiText.StringResource(R.string.multiple_photos_too_large, count)
+                        } else {
+                            when(agendaItem) {
+                                is AgendaItem.Task -> UiText.StringResource(R.string.task_updated)
+                                is AgendaItem.Event -> UiText.StringResource(R.string.event_updated)
+                                is AgendaItem.Reminder -> UiText.StringResource(R.string.reminder_updated)
+                            }
+                        }
+                    )
+                )
+            }.onError { error ->
+                _state.update {
+                    it.copy(
+                        infoMessage = error.asUiText(),
+                        isSaving = false
+                    )
+                }
             }
-            _state.update { it.copy(isSaving = false) }
         }
     }
 
@@ -447,21 +486,19 @@ class AgendaDetailsViewModel @Inject constructor(
                             )
                         }
                     }.onError { error ->
-                        when(error) {
-                            DataError.Network.NOT_FOUND -> {
-                                eventChannel.send(AgendaDetailsEvent.Error(
-                                    UiText.StringResource(R.string.user_not_found)
-                                ))
-                            }
-                            DataError.Network.CONFLICT -> {
-                                eventChannel.send(AgendaDetailsEvent.Error(
-                                    UiText.StringResource(R.string.you_cant_add_yourself)
-                                ))
-                            }
-                            else -> eventChannel.send(AgendaDetailsEvent.Error(error.asUiText()))
-                        }
                         _state.update {
-                            it.copy(agendaItem = agendaItem.copy(isCheckingIfAttendeeExists = false))
+                            it.copy(
+                                infoMessage = when(error) {
+                                    DataError.Network.NOT_FOUND -> {
+                                        UiText.StringResource(R.string.user_not_found)
+                                    }
+                                    DataError.Network.CONFLICT -> {
+                                        UiText.StringResource(R.string.you_cant_add_yourself)
+                                    }
+                                    else -> error.asUiText()
+                                },
+                                agendaItem = agendaItem.copy(isCheckingIfAttendeeExists = false)
+                            )
                         }
                     }
             }

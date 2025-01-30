@@ -31,7 +31,7 @@ sealed class AgendaItem(
 
         companion object {
             const val MAX_PHOTO_AMOUNT = 10
-            const val MAX_PHOTO_SIZE = 1_000_000
+            const val MAX_PHOTO_SIZE = 400_000
         }
     }
 

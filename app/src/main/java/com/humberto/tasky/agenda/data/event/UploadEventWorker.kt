@@ -63,7 +63,7 @@ class UploadEventWorker @AssistedInject constructor(
 
                         val compressedBytes = photoCompressor.compress(
                             contentUri = uri,
-                            compressionThreshold = 200 * 1024L
+                            compressionThreshold = 150 * 1024L
                         ) ?: return@async null
 
                         if(compressedBytes.size > AgendaItem.Event.MAX_PHOTO_SIZE) {
