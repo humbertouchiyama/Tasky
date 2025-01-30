@@ -385,7 +385,13 @@ private fun AgendaDetailsScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TaskyRadioButton(enabled = false)
+                        TaskyRadioButton(
+                            when (agendaItem) {
+                                is AgendaItemDetails.Task -> agendaItem.isDone
+                                else -> false
+                            },
+                            enabled = false
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = state.title

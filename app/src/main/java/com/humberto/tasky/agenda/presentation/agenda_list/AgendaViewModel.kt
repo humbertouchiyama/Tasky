@@ -107,13 +107,26 @@ class AgendaViewModel @Inject constructor(
                 _agendaState.update { it.copy(confirmingItemToBeDeleted = null) }
             }
             AgendaAction.OnRefresh -> refreshAgenda()
-            is AgendaAction.OnToggleCheckForTask -> toggleTaskCheck()
+            is AgendaAction.OnToggleCheckForTask -> toggleTaskCheck(action.item)
             else -> Unit
         }
     }
 
-    private fun toggleTaskCheck() {
-        TODO("Not yet implemented")
+    private fun toggleTaskCheck(item: AgendaItem) {
+        if (item !is AgendaItem.Task) return
+        val newTask = item.copy(isDone = !item.isDone)
+        viewModelScope.launch {
+            taskRepository.updateTask(newTask)
+        }
+        _agendaState.update {
+            it.copy(
+                agendaItems = it.agendaItems.map { agendaItemUi ->
+                    if (agendaItemUi is AgendaItemUi.Item && agendaItemUi.item.id == newTask.id) {
+                        AgendaItemUi.Item(newTask)
+                    } else agendaItemUi
+                }
+            )
+        }
     }
 
     private var refreshJob: Job? = null

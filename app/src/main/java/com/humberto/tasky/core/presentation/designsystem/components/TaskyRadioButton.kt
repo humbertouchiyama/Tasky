@@ -38,7 +38,7 @@ fun TaskyRadioButton(
                 color = radioButtonColor,
                 shape = CircleShape
             )
-            .padding(4.dp)
+            .padding(2.5.dp)
             .clickable(enabled = enabled) {
                 onClick()
             },
@@ -46,9 +46,9 @@ fun TaskyRadioButton(
     ) {
         if (selected) {
             Icon(
-                Icons.Default.Check,
+                Icons.Filled.Check,
                 contentDescription = null,
-                tint = radioButtonColor,
+                tint = radioButtonColor
             )
         }
     }
