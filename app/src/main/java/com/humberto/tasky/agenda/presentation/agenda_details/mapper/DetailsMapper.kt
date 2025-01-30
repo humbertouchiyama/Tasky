@@ -29,7 +29,7 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
         )
         is AgendaItem.Event -> {
             val to = agendaItem.to.withZoneSameInstant(ZoneId.systemDefault())
-            AgendaDetailsState(
+            this.copy(
                 id = agendaItem.id,
                 title = agendaItem.title,
                 description = agendaItem.description ?: "",
@@ -41,11 +41,12 @@ fun AgendaDetailsState.updateWithAgendaItem(agendaItem: AgendaItem): AgendaDetai
                     toDate = to.toLocalDate(),
                     attendees = agendaItem.attendees.map { it.toAttendeeUi() },
                     eventPhotos = agendaItem.photos,
-                    eventCreator = agendaItem.attendees.find { it.userId == agendaItem.host }?.toAttendeeUi()
+                    eventCreator = agendaItem.attendees.find { it.userId == agendaItem.host }?.toAttendeeUi(),
+                    isUserEventCreator = agendaItem.isUserEventCreator
                 ),
             )
         }
-        is AgendaItem.Reminder -> AgendaDetailsState(
+        is AgendaItem.Reminder -> this.copy(
             id = agendaItem.id,
             title = agendaItem.title,
             description = agendaItem.description ?: "",
