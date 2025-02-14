@@ -8,21 +8,23 @@ Tasky is an offline-first task management app similar to Google Calendar, design
 
 ---
 
+## Demo Videos
+
 **Auth Flow**
 
-![Auth flow demo video](https://i.imgur.com/qRSXBWj.gif)
+https://github.com/user-attachments/assets/98422874-0671-4a9e-af33-b1d50504c3d2
 
 **Reminders and Tasks**
 
-![Reminders and Tasks demo video](https://i.imgur.com/jwT5aBz.gif)
+https://github.com/user-attachments/assets/0b559119-ed2e-4eca-9342-68cbc546eb64
 
 **Events**
 
-![Events demo video](https://i.imgur.com/Pg30Ytp.gif)
+https://github.com/user-attachments/assets/077b2988-d791-4234-8c69-2e0cb5a0b899
 
 **Push Notifications**
 
-![Push notifications demo video](https://i.imgur.com/Nebfuz5.gif)
+https://github.com/user-attachments/assets/848ddadd-8655-4782-938a-3f126d7a99a1
 
 ## Features
 
